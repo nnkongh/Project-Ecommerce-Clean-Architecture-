@@ -1,0 +1,6 @@
+@GenericRepository_Pattern_HostAddress = http://localhost:5050
+
+GET {{GenericRepository_Pattern_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
