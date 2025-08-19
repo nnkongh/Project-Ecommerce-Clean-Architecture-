@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs.Product;
 using Ecommerce.Domain.Interfaces;
+using Ecommerce.Domain.Shared;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Products.GetAllProducts
 {
-    public class GetAllProductsHandler : IRequestHandler<GetAllProductsQueries, IEnumerable<ProductModel>>
+    public sealed class GetAllProductsHandler : IRequestHandler<GetAllProductsQueries, Result<IEnumerable<ProductModel>>>
     {
         private readonly IProductRepository _repo;
         private readonly IMapper _mapper;
@@ -20,11 +21,15 @@ namespace Ecommerce.Application.Common.Queries.Products.GetAllProducts
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ProductModel>> Handle(GetAllProductsQueries request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<ProductModel>>> Handle(GetAllProductsQueries request, CancellationToken cancellationToken)
         {
             var products = await _repo.GetAllAsync();
+            if (products is null || !products.Any())
+            {
+                return Result.Failure<IEnumerable<ProductModel>>(Error.NullValue);
+            }
             var mapped = _mapper.Map<IEnumerable<ProductModel>>(products);
-            return mapped;
+            return Result.Success(mapped);
         }
     }
 }

@@ -2,7 +2,9 @@
 using Ecommerce.Application.DTOs.Product;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Interfaces.Base;
+using Ecommerce.Domain.Interfaces.UnitOfWork;
 using Ecommerce.Domain.Models;
+using Ecommerce.Domain.Shared;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -12,22 +14,29 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Products.UpdateProduct
 {
-    public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, Unit>
+    public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, Result>
     {
         private readonly IProductRepository _repo;
+        private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
 
-        public UpdateProductCommandHandler(IMapper mapper, IProductRepository repo)
+        public UpdateProductCommandHandler(IMapper mapper, IProductRepository repo, IUnitOfWork uow)
         {
             _mapper = mapper;
             _repo = repo;
+            _uow = uow;
         }
 
-        public async Task<Unit> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
         {
+            if(request.update is null)
+            {
+                return Result.Failure(Error.NullValue);
+            }
             var entity = _mapper.Map<Product>(request);
             await _repo.UpdateAsync(entity);
-            return Unit.Value;
+            await _uow.SaveChangesAsync(cancellationToken);
+            return Result.Success();
         }
 
         

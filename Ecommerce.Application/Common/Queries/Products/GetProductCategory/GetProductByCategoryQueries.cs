@@ -1,4 +1,5 @@
 ﻿using Ecommerce.Application.DTOs.Product;
+using Ecommerce.Domain.Shared;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Products.Queries.Products.GetProductById
 {
-    public record GetProductByCategoryQueries : IRequest<IEnumerable<ProductModel>>
+    public sealed record GetProductByCategoryQueries : IRequest<Result<IEnumerable<ProductModel>>>
     {
     }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs.Product;
 using Ecommerce.Domain.Interfaces;
+using Ecommerce.Domain.Shared;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Products.GetProductIdByCategory
 {
-    public class GetProductIdByCategoryHandler : IRequestHandler<GetProductIdByCategoryQueries, ProductModel>
+    public sealed class GetProductIdByCategoryHandler : IRequestHandler<GetProductIdByCategoryQueries, Result<ProductModel>>
     {
         private readonly IProductRepository _repo;
         private readonly IMapper _mapper;
@@ -22,15 +23,19 @@ namespace Ecommerce.Application.Common.Queries.Products.GetProductIdByCategory
             _repo = repo;
         }
 
-        public async Task<ProductModel> Handle(GetProductIdByCategoryQueries request, CancellationToken cancellationToken)
+        public async Task<Result<ProductModel>> Handle(GetProductIdByCategoryQueries request, CancellationToken cancellationToken)
         {
-            if(request == null)
+            if(request.productId <= 0)
             {
-                // throw new
+                return Result.Failure<ProductModel>(Error.NullValue);
             }
             var item = await _repo.GetProductByIdWithCategoryAsync(request!.productId);
+            if(item == null)
+            {
+                return Result.Failure<ProductModel>(Error.NullValue);
+            }
             var mapped = _mapper.Map<ProductModel>(item);
-            return mapped;
+            return Result.Success(mapped);
         }
     }
 }

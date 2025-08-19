@@ -2,6 +2,7 @@
 using Ecommerce.Application.DTOs.Product;
 using Ecommerce.Domain.DTOs.Product;
 using Ecommerce.Domain.Interfaces;
+using Ecommerce.Domain.Shared;
 using Ecommerce.Domain.Specification;
 using MediatR;
 using System;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Products.Queries.Products.GetProductById
 {
-    public class GetProductByCategoryHandler : IRequestHandler<GetProductByCategoryQueries, IEnumerable<ProductModel>>
+    public sealed class GetProductByCategoryHandler : IRequestHandler<GetProductByCategoryQueries, Result<IEnumerable<ProductModel>>>
     {
         private readonly IProductRepository _repo;
         private readonly IMapper _mapper;
@@ -23,15 +24,15 @@ namespace Ecommerce.Application.Products.Queries.Products.GetProductById
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<ProductModel>> Handle(GetProductByCategoryQueries request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<ProductModel>>> Handle(GetProductByCategoryQueries request, CancellationToken cancellationToken)
         {
-            if (request is null)
+            var list = await _repo.GetProductByCategoryAsync();
+            if (list is null || !list.Any())
             {
-                //throw new
+                return Result.Failure<IEnumerable<ProductModel>>(Error.NullValue);
             }
-            var product = await _repo.GetProductByCategoryAsync();
-            var mapped = _mapper.Map<IEnumerable<ProductModel>>(product);
-            return mapped;
+            var mapped = _mapper.Map<IEnumerable<ProductModel>>(list);
+            return Result.Success(mapped);
         }
     }
 }
