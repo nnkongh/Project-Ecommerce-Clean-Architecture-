@@ -19,18 +19,17 @@ namespace Ecommerce.Infrastructure.Repository.Base
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
-        public async Task<T> AddAsync(T entity)
+        public Task<T> AddAsync(T entity)
         {
             _context.Set<T>().Add(entity);
-            await _context.SaveChangesAsync();
-            return entity;
+            return Task.FromResult(entity);
 
         }
 
-        public async Task DeleteAsync(T id)
+        public Task DeleteAsync(T id)
         {
             var entity = _context.Set<T>().Remove(id);
-            await _context.SaveChangesAsync();
+            return Task.CompletedTask;
         }
 
         public async Task<IReadOnlyList<T>> GetAll()
@@ -50,10 +49,10 @@ namespace Ecommerce.Infrastructure.Repository.Base
             return await _context.Set<T>().FindAsync(id);
         }
 
-        public async Task UpdateAsync(T entity)
+        public virtual Task UpdateAsync(T entity)
         {
             _context.Set<T>().Update(entity);
-            await _context.SaveChangesAsync();
+            return Task.CompletedTask;
         }
         public async Task<IReadOnlyList<T>> GetAllAsync()
         {
@@ -94,7 +93,7 @@ namespace Ecommerce.Infrastructure.Repository.Base
             }
             return await query.ToListAsync();
         }
-
+        
         public async Task<IReadOnlyList<T>> GetAsync(ISpecification<T> spec)
         {
             return await ApplySpecification(spec).ToListAsync();
