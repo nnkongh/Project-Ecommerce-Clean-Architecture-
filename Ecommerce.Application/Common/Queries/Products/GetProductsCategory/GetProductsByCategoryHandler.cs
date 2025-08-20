@@ -13,18 +13,18 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Products.Queries.Products.GetProductById
 {
-    public sealed class GetProductByCategoryHandler : IRequestHandler<GetProductByCategoryQueries, Result<IEnumerable<ProductModel>>>
+    public sealed class GetProductsByCategoryHandler : IRequestHandler<GetProductsByCategoryQueries, Result<IEnumerable<ProductModel>>>
     {
         private readonly IProductRepository _repo;
         private readonly IMapper _mapper;
 
-        public GetProductByCategoryHandler(IProductRepository repo, IMapper mapper)
+        public GetProductsByCategoryHandler(IProductRepository repo, IMapper mapper)
         {
             _repo = repo;
             _mapper = mapper;
         }
 
-        public async Task<Result<IEnumerable<ProductModel>>> Handle(GetProductByCategoryQueries request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<ProductModel>>> Handle(GetProductsByCategoryQueries request, CancellationToken cancellationToken)
         {
             var list = await _repo.GetProductByCategoryAsync();
             if (list is null || !list.Any())

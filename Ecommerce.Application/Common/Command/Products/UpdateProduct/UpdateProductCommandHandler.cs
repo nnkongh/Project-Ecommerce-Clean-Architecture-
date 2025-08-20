@@ -29,11 +29,15 @@ namespace Ecommerce.Application.Common.Command.Products.UpdateProduct
 
         public async Task<Result> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
         {
-            if(request.update is null)
+            if(string.IsNullOrWhiteSpace(request.update.Name))
             {
-                return Result.Failure(Error.NullValue);
+                return Result.Failure(new Error("","Name can not be null"));
             }
-            var entity = _mapper.Map<Product>(request);
+            if(request.update.Price <= 0)
+            {
+                return Result.Failure(new Error("", "Price must be greater than zero"));
+            }
+            var entity = _mapper.Map<Product>(request.update);
             await _repo.UpdateAsync(entity);
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success();

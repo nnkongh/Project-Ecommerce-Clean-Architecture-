@@ -27,11 +27,14 @@ namespace Ecommerce.Application.Common.Command.Products.CreateProduct
 
         public async Task<Result> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
-            if(request.create is null)
+            if(string.IsNullOrWhiteSpace(request.create.Name))
             {
-                return Result.Failure(Error.NullValue);
+                return Result.Failure(new Error("","Product name is required"));
             }
-            var entity = _mapper.Map<Product>(request);
+            if(request.create.Price <= 0){
+                return Result.Failure(new Error("", "Product price must be greater than zero"));
+            }
+            var entity = _mapper.Map<Product>(request.create);
             var item = await _repository.AddAsync(entity);
             var mapped = _mapper.Map<ProductModel>(item);
             await _uow.SaveChangesAsync(cancellationToken);

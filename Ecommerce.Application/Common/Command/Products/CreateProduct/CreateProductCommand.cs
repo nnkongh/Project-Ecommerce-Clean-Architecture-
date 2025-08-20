@@ -1,4 +1,4 @@
-﻿using Ecommerce.Application.DTOs.CRUD;
+﻿using Ecommerce.Application.DTOs.CRUD.Product;
 using Ecommerce.Application.DTOs.Product;
 using Ecommerce.Domain.Shared;
 using MediatR;
