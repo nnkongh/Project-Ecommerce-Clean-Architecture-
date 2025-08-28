@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Products.CreateProduct
 {
-    public class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Result>
+    public sealed class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Result>
     {
         private readonly IProductRepository _repository;
         private readonly IUnitOfWork _uow;

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Products.DeleteProduct
 {
-    public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand, Result>
+    public sealed class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand, Result>
     {
         private readonly IProductRepository _repo;
         private readonly IUnitOfWork _uow;
@@ -31,8 +31,7 @@ namespace Ecommerce.Application.Common.Command.Products.DeleteProduct
             {
                 return Result.Failure(Error.NullValue);
             }
-            var entity = _mapper.Map<Product>(request!.id);
-            await _repo.DeleteAsync(entity);
+            await _repo.Delete(request.id);
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }

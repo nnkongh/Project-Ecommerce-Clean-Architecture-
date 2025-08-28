@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Products.UpdateProduct
 {
-    public class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, Result>
+    public sealed class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, Result>
     {
         private readonly IProductRepository _repo;
         private readonly IUnitOfWork _uow;
