@@ -12,7 +12,8 @@ namespace Ecommerce.Domain.DTOs.Product
 {
     public class OrderModel : BaseProduct
     {
-        public string UserName { get; set; }
+        public int Id { get; set; }
+        public int UserId { get; set; }
         public List<OrderItemModel> orderItems { get; set; } = [];
         public OrderStatus status { get; set; }
 
