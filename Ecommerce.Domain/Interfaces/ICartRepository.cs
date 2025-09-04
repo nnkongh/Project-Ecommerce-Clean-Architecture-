@@ -5,6 +5,8 @@ namespace Ecommerce.Domain.Interfaces
 {
     public interface ICartRepository  : IRepositoryBase<Cart>
     {
-        
+        Task<Cart> GetCartByUserIdAsync(string userId);
+        Task<Cart> GetCartByIdAsync(int cartId);
+        Task<IReadOnlyCollection<CartItem>> GetCartItemAsync(int cartId);
     }
 }

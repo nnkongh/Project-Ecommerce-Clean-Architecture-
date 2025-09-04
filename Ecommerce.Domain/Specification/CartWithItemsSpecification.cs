@@ -11,7 +11,7 @@ namespace Ecommerce.Domain.Specification
 {
     public class CartWithItemsSpecification : BaseSpecification<Cart>
     {
-        public CartWithItemsSpecification(string userName) : base(p => p.UserName.ToLower() == userName.ToLower())
+        public CartWithItemsSpecification(string userId) : base(p => p.UserId == userId)
         {
             AddIncludes(p => p.Items);
         }

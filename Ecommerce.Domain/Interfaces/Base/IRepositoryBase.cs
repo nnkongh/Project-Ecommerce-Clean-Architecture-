@@ -21,7 +21,7 @@ namespace Ecommerce.Domain.Interfaces.Base
         Task<T> GetEnityWithSpecAsync(ISpecification<T> spec);
         Task<IReadOnlyList<T>> GetAsync(ISpecification<T> spec);
         Task<T> AddAsync(T entity);
-        Task UpdateAsync(T entity);
-        Task DeleteAsync(T entity);
+        Task<bool> UpdateAsync(int id, T entity, params Expression<Func<T, object>>[] propertiesToUpdate);
+        Task<bool> Delete(int id);
     }
 }

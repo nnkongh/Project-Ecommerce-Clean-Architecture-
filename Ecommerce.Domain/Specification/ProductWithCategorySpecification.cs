@@ -22,5 +22,6 @@ namespace Ecommerce.Domain.Specification
         {
             AddIncludes(p => p.Category);
         }
+        
     }
 }
