@@ -32,7 +32,7 @@ namespace Ecommerce.Application.Products.Queries.Products.GetProductByName
             var list = await _repo.GetProductByNameAsync(request.name);
             if (list is null || !list.Any())
             {
-                return Result.Failure<IEnumerable<ProductModel>>(Error.NullValue);
+                return Result.Success(Enumerable.Empty<ProductModel>());
             }
             var mapped = _mapper.Map<IEnumerable<ProductModel>>(list);
             return Result.Success(mapped);

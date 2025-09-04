@@ -15,12 +15,14 @@ namespace Ecommerce.Application.Products.Queries.Products.GetProductByCategory
 {
     public sealed class GetProductByCategoryIdHandler : IRequestHandler<GetProductByCategoryIdQueries, Result<IEnumerable<ProductModel>>>
     {
-        private readonly IProductRepository _repo;
+        private readonly IProductRepository _productRepo;
+        private readonly ICategoryRepository _categoryRepo;
         private readonly IMapper _mapper;
-        public GetProductByCategoryIdHandler(IProductRepository repo, IMapper mapper)
+        public GetProductByCategoryIdHandler(IProductRepository productRepo, IMapper mapper, ICategoryRepository categoryRepo)
         {
-            _repo = repo;
+            _productRepo = productRepo;
             _mapper = mapper;
+            _categoryRepo = categoryRepo;
         }
 
         public async Task<Result<IEnumerable<ProductModel>>> Handle(GetProductByCategoryIdQueries request, CancellationToken cancellationToken)
@@ -29,13 +31,27 @@ namespace Ecommerce.Application.Products.Queries.Products.GetProductByCategory
             {
                 return Result.Failure<IEnumerable<ProductModel>>(Error.NullValue);
             }
-            var list = await _repo.GetProductByCategoryIdAsync(request.categoryId);
+            var existing = await CheckIsExistsCategory(request.categoryId);
+            if (existing == false)
+            {
+                return Result.Failure<IEnumerable<ProductModel>>(new Error("", $"Category with id {request.categoryId} is not found"));
+            }
+            var list = await _productRepo.GetProductByCategoryIdAsync(request.categoryId);
             if(list is null || !list.Any())
             {
-                return Result.Failure<IEnumerable<ProductModel>>(Error.NullValue);
+                return Result.Success(Enumerable.Empty<ProductModel>());
             }
             var mapped = _mapper.Map<IEnumerable<ProductModel>>(list);
             return Result.Success(mapped);
+        }
+        private async Task<bool> CheckIsExistsCategory(int categoryId)
+        {
+            var existing = await _categoryRepo.GetByIdASync(categoryId);
+            if (existing == null)
+            {
+                return false;
+            }
+            return true;
         }
     }
 }

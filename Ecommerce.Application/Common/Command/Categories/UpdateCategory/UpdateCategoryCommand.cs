@@ -5,12 +5,13 @@ using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Categories.UpdateCategory
 {
-    public sealed record UpdateCategoryCommand(CategoryModel update) : IRequest<Result>
+    public sealed record UpdateCategoryCommand(int id, UpdateCategoryRequest update, params Expression<Func<Task, object>>[] propertiesToUpdate) : IRequest<Result>
     {
     }
 }

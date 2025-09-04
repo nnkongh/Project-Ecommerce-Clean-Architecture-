@@ -38,7 +38,15 @@ namespace Ecommerce.Application.Common.Command.Products.UpdateProduct
                 return Result.Failure(new Error("", "Price must be greater than zero"));
             }
             var entity = _mapper.Map<Product>(request.update);
-            await _repo.UpdateAsync(entity);
+            var updated = await _repo.UpdateAsync(request.id,entity,
+                                                    x => x.Name,
+                                                    x => x.Price,
+                                                    x => x.Description,
+                                                    x => x.ImageUrl);
+            if (!updated)
+            {
+                return Result.Failure(new Error("", "An error occur while processing progress"));
+            }
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }

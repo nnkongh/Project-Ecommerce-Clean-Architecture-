@@ -2,6 +2,7 @@
 using Ecommerce.Application.DTOs.Product;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Shared;
+using Ecommerce.Domain.Specification;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Category.GetCategoryById
 {
-    public sealed class GetCategoryByIdHandler : IRequestHandler<GetCategoryByIdQueries, IEnumerable<CategoryModel>>
+    public sealed class GetCategoryByIdHandler : IRequestHandler<GetCategoryByIdQueries, Result<CategoryModel>>
     {
         private readonly ICategoryRepository _repo;
         private readonly IMapper _mapper;
@@ -22,18 +23,21 @@ namespace Ecommerce.Application.Common.Queries.Category.GetCategoryById
         }
 
 
-        public async Task<IEnumerable<CategoryModel>> Handle(GetCategoryByIdQueries request, CancellationToken cancellationToken)
+        public async Task<Result<CategoryModel>> Handle(GetCategoryByIdQueries request, CancellationToken cancellationToken)
         {
-            if(request.id <= 0)
+            if (request.id <= 0)
             {
-                return Enumerable.Empty<CategoryModel>();
+                return Result.Failure<CategoryModel>(new Error("Null",$"{request.id} is null"));
             }
             var category = await _repo.GetByIdASync(request.id);
-            if(category is null)
+            if (category is null)
             {
-                return Enumerable.Empty<CategoryModel>();
+                return Result.Failure<CategoryModel>(Error.NullValue);
             }
-            var mapped = _mapper.Map<IEnumerable<CategoryModel>>(category);
+            //if (category.Products.Any()) {
+            //    return Result.Success(new CategoryModel());
+            //}
+            var mapped = _mapper.Map<CategoryModel>(category);
             return mapped;
         }
     }

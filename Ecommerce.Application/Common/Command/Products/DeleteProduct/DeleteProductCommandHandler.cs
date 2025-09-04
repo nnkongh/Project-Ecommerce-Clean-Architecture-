@@ -27,11 +27,15 @@ namespace Ecommerce.Application.Common.Command.Products.DeleteProduct
 
         public async Task<Result> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
         {
-            if(request.id <= request.id)
+            if(request.id <= 0)
             {
                 return Result.Failure(Error.NullValue);
             }
-            await _repo.Delete(request.id);
+            var deleted = await _repo.Delete(request.id);
+            if (!deleted)
+            {
+                return Result.Failure(new Error("Not Found", $"Can not delete product with id {request.id} cause its not found"));
+            }
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }

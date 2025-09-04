@@ -31,12 +31,18 @@ namespace Ecommerce.Application.Common.Command.Categories.UpdateCategory
             {
                 return Result.Failure(new Error("","Category name is required"));
             }
-            if(request.update.Id <= 0)
+            if(request.id <= 0)
             {
                 return Result.Failure(Error.NullValue);
             }
             var category = _mapper.Map<Category>(request.update);
-            await _categoryRepository.UpdateAsync(category);
+            var updated = await _categoryRepository.UpdateAsync(request.id,
+                                                                category,
+                                                                x => x.Name, x => x.Description);
+            if(updated)
+            {
+                return Result.Failure(new Error("Not Found", $"Category with id {request.id} not found!"));
+            }
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success();
 
