@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.WebApi.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("category")]
     public class CategoryController : ApiController
     {
@@ -25,35 +25,35 @@ namespace Ecommerce.WebApi.Controllers
         {
             var command = new CreateCategoryCommand(model);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
         }
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             var command = new DeleteCategoryCommand(id);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(result.IsSuccess) : NotFound(new {message = $"Category with id {id} not found"});
         }
         [HttpPut("update/{id}")]
-        public async Task<IActionResult> UpdateCategory(UpdateCategoryRequest model)
+        public async Task<IActionResult> UpdateCategory(int id, UpdateCategoryRequest model)
         {
-            var command = new UpdateCategoryCommand(model);
+            var command = new UpdateCategoryCommand(id,model);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(result.IsSuccess) : NotFound(new {message = $"Category with id {id} not found"});
         }
         [HttpGet("list")]
-        public async Task<IActionResult> GetCategories()
+        public async Task<ActionResult<IEnumerable<CategoryModel>>> GetCategories()
         {
             var query = new GetAllCategoriesQueries();
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+            return Ok(result);
         }
-        [HttpGet("category/{id}")]
-        public async Task<IActionResult> GetCategoryById(int id)
+        [HttpGet("{id}")]
+        public async Task<ActionResult<IEnumerable<CategoryModel>>> GetCategoryById(int id)
         {
             var query = new GetCategoryByIdQueries(id);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(result.Value) : NotFound(new { message = $"Category with id {id} not found" });
         }
     }
 }
