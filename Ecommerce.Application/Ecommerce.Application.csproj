@@ -16,10 +16,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Products\Command\Products\" />
-    <Folder Include="Products\Command\Users\" />
-    <Folder Include="Products\Queries\Users\" />
-    <Folder Include="Services\" />
+    <Folder Include="Common\Command\Orders\UpdateOrder\" />
+    <Folder Include="Common\Command\Users\" />
+    <Folder Include="Common\Queries\Orders\" />
+    <Folder Include="Common\Queries\Users\" />
   </ItemGroup>
 
 </Project>

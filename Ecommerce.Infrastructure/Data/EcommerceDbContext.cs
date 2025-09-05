@@ -21,5 +21,12 @@ namespace Ecommerce.Infrastructure.Data
         public DbSet<Product> Products { get; set; } = null!;
         public DbSet<Order> Orders { get; set; } = null!;
         public DbSet<Comment> Comments { get; set; } = null!;
+        public DbSet<Wishlist> Wishlist { get; set; } = null;
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+            // Nếu không có dòng này thì migration sẽ tạo lại các bảng đã có
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Ecommerce.Domain.Interfaces.Base;
+using Ecommerce.Domain.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +8,9 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Domain.Interfaces
 {
-    public interface IWishlistRepository
+    public interface IWishlistRepository : IRepositoryBase<Wishlist>
     {
+        Task<Wishlist?> GetByUserIdAndProductIdAsync(string userId, int productI);
+        Task<Wishlist?> GetByIdAsync(int id);
     }
 }

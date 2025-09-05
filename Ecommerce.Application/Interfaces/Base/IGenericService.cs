@@ -22,6 +22,6 @@ namespace Ecommerce.Application.Interfaces.Base
         Task<TModel> GetByIdASync(int id);
         Task<TModel> AddAsync(TModel entity);
         Task UpdateAsync(TModel entity);
-        Task DeleteAsync(TModel entity);
+        void DeleteAsync(TModel entity);
     }
 }

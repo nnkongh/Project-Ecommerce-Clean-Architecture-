@@ -1,9 +1,32 @@
-﻿namespace Ecommerce.Domain.Models
+﻿using System.Text.Json.Serialization;
+
+namespace Ecommerce.Domain.Models
 {
     public class Wishlist
     {
         public int Id { get; set; }
         public string UserName { get; set; } = null!;
-        public List<ProductWishList> ProductsWishList { get; set; } = new List<ProductWishList>();
+        public string? UserId { get; set; }
+        public List<ProductWishList> Items { get; set; } = new List<ProductWishList>();
+
+        public void AddItem(int ProductId)
+        {
+            var existing = Items.FirstOrDefault(x => x.ProductId == ProductId);
+            if (existing == null)
+            {
+                Items.Add(new ProductWishList()
+                {
+                    ProductId = ProductId,
+                });
+            }
+        }
+        public void RemoveItem(int ProductId)
+        {
+            var existing = Items.FirstOrDefault(x => x.ProductId == ProductId);
+            if (existing != null)
+            {
+                Items.Remove(existing);
+            }
+        }
     }
 }

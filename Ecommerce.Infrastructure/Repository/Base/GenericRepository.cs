@@ -26,10 +26,15 @@ namespace Ecommerce.Infrastructure.Repository.Base
 
         }
 
-        public Task DeleteAsync(T id)
+        public virtual async Task<bool> Delete(int id)
         {
-            var entity = _context.Set<T>().Remove(id);
-            return Task.CompletedTask;
+            var entity = await _context.Set<T>().FindAsync(id);
+            if(entity != null)
+            {
+                _context.Set<T>().Remove(entity);
+                return true;
+            }
+            return false;
         }
 
         public async Task<IReadOnlyList<T>> GetAll()
@@ -49,10 +54,22 @@ namespace Ecommerce.Infrastructure.Repository.Base
             return await _context.Set<T>().FindAsync(id);
         }
 
-        public virtual Task UpdateAsync(T entity)
+        public virtual async  Task<bool> UpdateAsync(int id, T entity, params Expression<Func<T,object>>[] propertiesToUpdate)
         {
-            _context.Set<T>().Update(entity);
-            return Task.CompletedTask;
+            var existing = await _context.Set<T>().FindAsync(id);
+            if (existing == null) return false;
+
+            if(propertiesToUpdate?.Length > 0)
+            {
+                
+                foreach(var prop in propertiesToUpdate)
+                {
+                    var compiled = prop.Compile(); // biến một kiểu expression thành một kiểu delegate Func<T,object>
+                    var newValue = compiled(entity);
+                    _context.Entry(existing).Property(prop).CurrentValue = newValue;
+                }
+            }
+            return true;
         }
         public async Task<IReadOnlyList<T>> GetAllAsync()
         {

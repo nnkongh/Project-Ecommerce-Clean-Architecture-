@@ -13,8 +13,13 @@ namespace Ecommerce.Infrastructure.Data
     {
         public EcommerceDbContext CreateDbContext(string[] args)
         {
+            var basePath = Path.Combine(Directory.GetCurrentDirectory(), "..", "Ecommerce.WebApi");
+            if (!Directory.Exists(basePath))
+            {
+                basePath = Path.Combine(Directory.GetCurrentDirectory(), "Ecommerce.WebApi");
+            }
             var config = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
+                .SetBasePath(basePath)
                 .AddJsonFile("appsettings.json")
                 .Build();
             var optionsBuilder = new DbContextOptionsBuilder<EcommerceDbContext>();
@@ -22,7 +27,5 @@ namespace Ecommerce.Infrastructure.Data
             optionsBuilder.UseSqlServer(connectionString);
             return new EcommerceDbContext(optionsBuilder.Options);
         }
-
-   
     }
 }

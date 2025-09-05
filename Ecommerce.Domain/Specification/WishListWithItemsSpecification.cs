@@ -11,13 +11,13 @@ namespace Ecommerce.Domain.Specification
 {
     public class WishListWithItemsSpecification : BaseSpecification<Wishlist>
     {
-        public WishListWithItemsSpecification(string name) : base(p => p.UserName.ToLower() == name.ToLower())
+        public WishListWithItemsSpecification(string userId) : base(p => p.UserId == userId)
         {
-            AddIncludes(p => p.ProductsWishList);
+            AddIncludes(p => p.Items);
         }
         public WishListWithItemsSpecification(int wishListId) : base(p => p.Id == wishListId)
         {
-            AddIncludes(p => p.ProductsWishList);
+            AddIncludes(p => p.Items);
         }
     }
 }

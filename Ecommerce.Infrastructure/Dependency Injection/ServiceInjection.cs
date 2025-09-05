@@ -4,15 +4,16 @@ using Ecommerce.Application.Mappers;
 using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Interfaces.Base;
+using Ecommerce.Domain.Interfaces.UnitOfWork;
 using Ecommerce.Infrastructure.Authen;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Identity;
 using Ecommerce.Infrastructure.Mapper;
 using Ecommerce.Infrastructure.Repository;
 using Ecommerce.Infrastructure.Repository.Base;
+using Ecommerce.Infrastructure.Repository.UnitOfWork;
 using Ecommerce.Infrastructure.Repository.User_Repository;
 using Ecommerce.Infrastructure.Services.Authen;
-using Ecommerce.Infrastructure.Services.Core;
 using Ecommerce.Infrastructure.Services.Email;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -94,7 +95,7 @@ namespace Ecommerce.Infrastructure.Dependency_Injection
 
 
             // Add MediaTr
-            services.AddMediatR(config => config.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+            services.AddMediatR(config => config.RegisterServicesFromAssembly(typeof(Ecommerce.Application.AssemblyReference).Assembly));
 
             // Add AutoMapper
             services.AddAutoMapper(typeof(ObjectMapper).Assembly);
@@ -111,7 +112,10 @@ namespace Ecommerce.Infrastructure.Dependency_Injection
             // Add Generic Service
             services.AddScoped(typeof(IRepositoryBase<>), typeof(GenericRepository<>));
             services.AddScoped<IProductRepository, ProductRepository>();
-            services.AddScoped<IProductService,ProductService>();
+            services.AddScoped<ICartRepository,CartRepository>();
+            services.AddScoped<ICategoryRepository,CategoryRepository>();
+            services.AddScoped<IOrderRepository,OrderRepository>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             var email = config.GetSection("EmailConfiguration").Get<EmailConfiguration>();
             services.AddSingleton(email);
