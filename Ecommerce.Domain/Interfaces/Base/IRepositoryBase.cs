@@ -10,7 +10,7 @@ namespace Ecommerce.Domain.Interfaces.Base
 {
     public interface IRepositoryBase<T> where T : class
     {
-        Task<T> GetByIdASync(int id);
+        Task<T> GetByIdAsync(int id);
         Task<IReadOnlyList<T>> GetAllAsync();
         Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>> predicate,
                                         Func<IQueryable<T>, IOrderedQueryable<T>> orderBy,

@@ -16,7 +16,7 @@ namespace Ecommerce.Web.Controllers
             _authService = authService;
         }
         [HttpPost]
-        public async Task<IActionResult> RefreshToken([FromBody] TokenDto tokenDto)
+        public async Task<IActionResult> RefreshToken([FromBody] TokenModel tokenDto)
         {
             var tokenRef = await _authService.CreateRefreshToken(tokenDto);
             return Ok(tokenRef);

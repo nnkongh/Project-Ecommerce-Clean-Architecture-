@@ -13,8 +13,8 @@ namespace Ecommerce.Infrastructure.Mapper
     {
         public UserProfile()
         {
-            CreateMap<AppUser, UserDto>().ForMember(dest => dest.Role, opt => opt.Ignore());
-            CreateMap<UserDto, AppUser>()
+            CreateMap<AppUser, UserModel>().ForMember(dest => dest.Role, opt => opt.Ignore());
+            CreateMap<UserModel, AppUser>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.SecurityStamp, opt => opt.Ignore())
                 .ForMember(dest => dest.ConcurrencyStamp, opt => opt.Ignore())

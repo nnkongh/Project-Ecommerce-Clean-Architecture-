@@ -10,7 +10,7 @@ namespace Ecommerce.Application.Interfaces.Authentication
     public interface IUserTokenService
     {
         // token operations
-        Task<string> GeneratePasswordResetTokenAsync(UserDto userDto);
+        Task<string> GeneratePasswordResetTokenAsync(UserModel userDto);
         Task<bool> ResetPasswordAsync(string userId, string token, string password);
     }
 }

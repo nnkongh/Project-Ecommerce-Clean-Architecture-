@@ -1,4 +1,5 @@
 ﻿using Ecommerce.Application.DTOs;
+using Ecommerce.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,9 +12,9 @@ namespace Ecommerce.Application.Interfaces.Authentication
     public interface IUserAuthenticationService
     {
         // Login/Authentication
-        Task<UserDto> FindUserNameAsync(string userName);
-        Task<UserDto> FindEmailAsync(string email);
-        Task<UserDto> FindByIdAsync(string id);
+        Task<User?> FindUserNameAsync(string userName);
+        Task<User?> FindEmailAsync(string email);
+        Task<User?> FindByIdAsync(string id);
         Task<bool> CheckPasswordAsync(string userId, string password);
        
     }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Ecommerce.Application.DTOs;
 using Ecommerce.Application.DTOs.CRUD.Category;
 using Ecommerce.Application.DTOs.CRUD.Product;
 using Ecommerce.Application.DTOs.Product;
@@ -21,6 +22,7 @@ namespace Ecommerce.Application.Mappers
             CreateMap<Category, CategoryModel>().ReverseMap();
             CreateMap<OrderItem, OrderItemModel >().ReverseMap();
             CreateMap<Cart,CartModel>().ReverseMap();
+            CreateMap<User,UserModel>().ReverseMap();
 
 
             // Mapping for specific models

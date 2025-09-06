@@ -106,7 +106,7 @@ namespace Ecommerce.Infrastructure.Dependency_Injection
             services.AddScoped<IUserAuthenticationService,UserAuthenticationRepository>();
             services.AddScoped<IUserTokenService,UserTokenRepository>();
             services.AddScoped<IUserRoleService,UserRoleRepository>();
-            services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IAuthenticationService, TokenService>();
 
 
             // Add Generic Service

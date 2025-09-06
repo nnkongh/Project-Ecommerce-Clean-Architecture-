@@ -6,11 +6,9 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.DTOs.Authentication
 {
-    public class ResetPasswordDto
+    public class ForgotPasswordModel
     {
         public string Email { get; set; } = default!;
-        public string Token { get; set; } = default!;
-        public string NewPassword { get; set; } = default!;
-        public string ConfirmPassword { get; set; } = default!;
+        public string ClientUrl { get; set; } = default!;
     }
 }

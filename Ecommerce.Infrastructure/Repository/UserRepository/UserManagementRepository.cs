@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs;
 using Ecommerce.Application.Interfaces.Authentication;
+using Ecommerce.Domain.Interfaces.UnitOfWork;
+using Ecommerce.Domain.Models;
+using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Identity;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -17,7 +20,7 @@ namespace Ecommerce.Infrastructure.Authen
         private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UserManagementRepository(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper)
+        public UserManagementRepository(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper, IUnitOfWork uow)
         {
             _mapper = mapper;
             _userManager = userManager;
@@ -25,22 +28,28 @@ namespace Ecommerce.Infrastructure.Authen
         }
 
 
-        public async Task<UserDto> CreateUserAsync(UserDto userDto, string password)
-        {
-            var user = new AppUser
+        public async Task<User> CreateUserAsync(UserModel userDto, string password)
+        {   
+            var userApp = new AppUser
             {
                 UserName = userDto.UserName,
-                ImageUrl = "",
                 Email = userDto.Email,
             };
            
-            var result = await _userManager.CreateAsync(user, password);
-            var role = await _userManager.AddToRoleAsync(user, "User");
+            var result = await _userManager.CreateAsync(userApp, password);
+            var role = await _userManager.AddToRoleAsync(userApp, "User");
             if (!result.Succeeded)
             {
                 throw new Exception("User creation failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
             }
-            return _mapper.Map<UserDto>(user);
+            var user = new User
+            {
+                UserName = userDto.UserName,
+                Email = userDto.Email,
+                ImageUrl = ""
+            };
+            return user;
+            
         }
 
         public async Task<bool> DeleteUserAsync(string userId)
@@ -53,8 +62,8 @@ namespace Ecommerce.Infrastructure.Authen
             var result = await _userManager.DeleteAsync(user);
             return result.Succeeded;
         }
-
-        public async Task UpdateUserAsync(UserDto userDto)
+        // LOGIC SAI
+        public async Task UpdateUserAsync(UserModel userDto)
         {
             var user = await _userManager.FindByIdAsync(userDto.Id);
             if (user == null)

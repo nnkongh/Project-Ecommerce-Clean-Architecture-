@@ -16,13 +16,13 @@ namespace Ecommerce.Web.Controllers
             _authenticationService = authenticationService;
         }
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginDto login)
+        public async Task<IActionResult> Login(LoginModel login)
         {
             var token = await _authenticationService.Login(login, HttpContext);
             return Ok(token);
         }
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterDto register)
+        public async Task<IActionResult> Register(RegisterModel register)
         {
             await _authenticationService.Register(register);
             return Ok();
@@ -34,13 +34,13 @@ namespace Ecommerce.Web.Controllers
             return Ok();
         }
         [HttpPost("forgot-password")]
-        public async Task<IActionResult> ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordModel forgotPasswordDto)
         {
             await _authenticationService.ForgotPassword(forgotPasswordDto);
             return Ok();
         }
         [HttpPost("reset-password")]
-        public async Task<IActionResult> ResetPassword(ResetPasswordDto resetPasswordDto)
+        public async Task<IActionResult> ResetPassword(ResetPasswordModel resetPasswordDto)
         {
             await _authenticationService.ResetPassword(resetPasswordDto);
             return Ok();

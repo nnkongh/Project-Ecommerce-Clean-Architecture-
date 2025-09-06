@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.DTOs
 {
-    public class UserDto
+    public class UserModel
     {
         public string Id { get; set; } = default!;
         public string UserName { get; set; } = default!;
+        public string Address { get; set; } = default!;
+        public string PhoneNumber { get; set; } = default!;
         public string Email { get; set; } = default!;
         public string Role { get; set; } = default!;
         public string ImageUrl { get; set; } = default!;

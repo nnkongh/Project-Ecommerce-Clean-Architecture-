@@ -5,8 +5,8 @@ namespace Ecommerce.Domain.Models
     public class Wishlist
     {
         public int Id { get; set; }
-        public string UserName { get; set; } = null!;
         public string? UserId { get; set; }
+        public User? User { get; set; }
         public List<ProductWishList> Items { get; set; } = new List<ProductWishList>();
 
         public void AddItem(int ProductId)

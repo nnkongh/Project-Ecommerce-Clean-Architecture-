@@ -9,8 +9,8 @@ namespace Ecommerce.Domain.Models
     public class Cart
     {
         public int Id { get; set; }
-        public string UserId { get; set; }
-        public string UserName { get; set; }  = default!;
+        public User? User { get; set; }        
+        public string? UserId { get; set; }
         public List<CartItem> Items { get; set; } = [];
 
         public void AddItem(int productId, int quantity)

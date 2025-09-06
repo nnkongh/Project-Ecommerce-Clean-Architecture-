@@ -21,7 +21,8 @@ namespace Ecommerce.Infrastructure.Data
         public DbSet<Product> Products { get; set; } = null!;
         public DbSet<Order> Orders { get; set; } = null!;
         public DbSet<Comment> Comments { get; set; } = null!;
-        public DbSet<Wishlist> Wishlist { get; set; } = null;
+        public DbSet<Wishlist> Wishlist { get; set; } = null!;
+        public DbSet<User> User { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

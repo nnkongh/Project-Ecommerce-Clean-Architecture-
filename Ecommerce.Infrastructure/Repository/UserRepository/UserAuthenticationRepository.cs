@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs;
 using Ecommerce.Application.Interfaces.Authentication;
+using Ecommerce.Domain.Models;
 using Ecommerce.Infrastructure.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -16,13 +17,12 @@ namespace Ecommerce.Infrastructure.Authen
 {
     public class UserAuthenticationRepository : IUserAuthenticationService
     {
-        private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _userManager;
-
+        private readonly IMapper _mapper;
         public UserAuthenticationRepository(UserManager<AppUser> userManager, IMapper mapper)
         {
-            _mapper = mapper;
             _userManager = userManager;
+            _mapper = mapper;
         }
         public async Task<bool> CheckPasswordAsync(string userId, string password)
         {
@@ -31,22 +31,22 @@ namespace Ecommerce.Infrastructure.Authen
             return await _userManager.CheckPasswordAsync(user, password);
         }
 
-        public async Task<UserDto> FindByIdAsync(string id)
+        public async Task<User?> FindByIdAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
-            return user == null ? null : _mapper.Map<UserDto>(user);
+            return user == null ? null : _mapper.Map<User>(user);
         }
 
-        public async Task<UserDto> FindEmailAsync(string email)
+        public async Task<User?> FindEmailAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            return user == null ? null : _mapper.Map<UserDto>(user);
+            return user == null ? null : _mapper.Map<User>(user);
         }
 
-        public async Task<UserDto> FindUserNameAsync(string userName)
+        public async Task<User?> FindUserNameAsync(string userName)
         {
             var user = await _userManager.FindByNameAsync(userName);
-            return user == null ? null : _mapper.Map<UserDto>(user);
+            return user == null ? null : _mapper.Map<User>(user);
         }
     }
 }

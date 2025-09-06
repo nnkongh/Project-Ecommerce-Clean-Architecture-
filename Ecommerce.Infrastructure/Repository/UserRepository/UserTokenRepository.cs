@@ -18,7 +18,7 @@ namespace Ecommerce.Infrastructure.Repository.User_Repository
         {
             _userManager = userManager;
         }
-        public async Task<string> GeneratePasswordResetTokenAsync(UserDto userDto)
+        public async Task<string> GeneratePasswordResetTokenAsync(UserModel userDto)
         {
             var user = await _userManager.FindByIdAsync(userDto.Id);
             if (user == null) throw new ArgumentNullException("User is null");
