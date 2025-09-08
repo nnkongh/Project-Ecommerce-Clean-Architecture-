@@ -37,7 +37,7 @@ namespace Ecommerce.Application.Common.Command.Wishlists
 
         public async Task<Result> Handle(AddToWishListCommand request, CancellationToken cancellationToken)
         {
-            var existintgProduct = await _productRepo.GetByIdASync(request.productId);
+            var existintgProduct = await _productRepo.GetByIdAsync(request.productId);
             if(existintgProduct == null)
             {
                 return Result.Failure(new Error("", $"Product with id {request.productId} is not found"));

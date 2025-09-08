@@ -17,7 +17,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Users.RegisterUser
 {
-    public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<UserModel>>
+    public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result>
     {
         private readonly IAuthenticationService _authenticationService;
         private readonly IUserRepository _userRepository;
@@ -32,7 +32,7 @@ namespace Ecommerce.Application.Common.Command.Users.RegisterUser
             _authenticationService = authenticationService;
         }
 
-        public async Task<Result<UserModel>> Handle(RegisterCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
 
             // Validation

@@ -33,7 +33,7 @@ namespace Ecommerce.Application.Common.Command.Carts.RemoveItemInCart
             {
                 return Result.Failure(new Error("NotFound", "UserId must be provided."));
             }
-            var product = await _productRepository.GetByIdASync(request.productId);
+            var product = await _productRepository.GetByIdAsync(request.productId);
             if (product == null)
             {
                 return Result.Failure(new Error("ProductNotFound", "The specified product does not exist."));

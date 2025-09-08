@@ -28,7 +28,7 @@ namespace Ecommerce.Application.Common.Command.Carts.AddToCart
 
         public async Task<Result> Handle(AddToCartCommand request, CancellationToken cancellationToken)
         {
-            var product = await _productRepository.GetByIdASync(request.ProductId);
+            var product = await _productRepository.GetByIdAsync(request.ProductId);
             if(product == null)
             {
                 return Result.Failure(new Error("ProductNotFound", "The specified product does not exist."));

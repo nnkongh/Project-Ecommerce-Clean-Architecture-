@@ -27,7 +27,7 @@ namespace Ecommerce.Application.Common.Command.Carts.DeleteCart
             {
                 return Result.Failure(new Error("NotFound", "CartId must be greater than zero."));
             }
-            var cart = await _cartRepository.GetByIdASync(request.cartId);
+            var cart = await _cartRepository.GetByIdAsync(request.cartId);
             if(cart == null)
             {
                 return Result.Failure(new Error("CartNotFound", "The specified cart does not exist."));

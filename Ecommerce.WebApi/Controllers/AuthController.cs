@@ -1,49 +1,64 @@
-﻿using Ecommerce.Application.DTOs.Authentication;
+﻿using Ecommerce.Application.Common.Command.Auth.Forgot;
+using Ecommerce.Application.Common.Command.Auth.Login;
+using Ecommerce.Application.Common.Command.Auth.Reset;
+using Ecommerce.Application.Common.Command.Users.CreateUser;
+using Ecommerce.Application.DTOs.Authentication;
 using Ecommerce.Application.Interfaces.Authentication;
+using Ecommerce.WebApi.Controllers.BaseController;
+using Ecommerce.WebApi.Interfaces;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace Ecommerce.Web.Controllers
 {
-    [ApiController]
     [Route("auth")]
-    public class AuthController : ControllerBase
+    public class AuthController : ApiController
     {
-        private readonly IAuthenticationService _authenticationService;
-
-        public AuthController(IAuthenticationService authenticationService)
+        private readonly ICookieTokenService _cookieTokenService;
+        public AuthController(ISender sender, ICookieTokenService cookieTokenService) : base(sender)
         {
-            _authenticationService = authenticationService;
+            _cookieTokenService = cookieTokenService;
         }
+
         [HttpPost("login")]
         public async Task<IActionResult> Login(LoginModel login)
         {
-            var token = await _authenticationService.Login(login, HttpContext);
-            return Ok(token);
+            var command = new LoginCommand(login);
+            var result = await Sender.Send(command);
+            _cookieTokenService.SetTokenInsideCookie(result.Value, HttpContext);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.IsFailure);
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterModel register)
         {
-            await _authenticationService.Register(register);
-            return Ok();
+            var  command = new RegisterCommand(register);
+            var result = await Sender.Send(command);
+            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
         }
         [HttpPost("logout")]
         public async Task<IActionResult> Logout(ClaimsPrincipal principal, HttpContext context)
         {
-            await _authenticationService.Logout(principal, context);
+            var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            if(userId == null)
+            {
+                return BadRequest();
+            }
             return Ok();
         }
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordModel forgotPasswordDto)
         {
-            await _authenticationService.ForgotPassword(forgotPasswordDto);
-            return Ok();
+            var command = new ForgotPasswordCommand(forgotPasswordDto);
+            var result = await Sender.Send(command);
+            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
         }
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordModel resetPasswordDto)
         {
-            await _authenticationService.ResetPassword(resetPasswordDto);
-            return Ok();
+            var command = new ResetPasswordCommand(resetPasswordDto);
+            var result = await Sender.Send(command);
+            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
         }
     }
 }
