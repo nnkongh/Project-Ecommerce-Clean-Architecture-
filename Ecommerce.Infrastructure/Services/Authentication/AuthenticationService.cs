@@ -4,6 +4,8 @@ using Ecommerce.Application.DTOs.Authentication;
 using Ecommerce.Application.DTOs.EmailMessage;
 using Ecommerce.Application.Interfaces;
 using Ecommerce.Application.Interfaces.Authentication;
+using Ecommerce.Domain.Models;
+using Ecommerce.Domain.Shared;
 using Ecommerce.Infrastructure.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
@@ -33,19 +35,15 @@ namespace Ecommerce.Infrastructure.Services.Authentication
             _userManagementService = userManagementService;
         }
 
-        public async Task ForgotPassword(ForgotPasswordModel forgotPasswordDto)
+        public async Task<Result> ForgotPassword(ForgotPasswordModel forgotPasswordDto)
         {
-            if (string.IsNullOrEmpty(forgotPasswordDto.Email) || string.IsNullOrEmpty(forgotPasswordDto.ClientUrl))
-            {
-                throw new ArgumentNullException("Email or ClientUrl cannot be null or empty");
-            }
             try
             {
                 // tim kiem nguoi dung theo email
                 var user = await _userAuthenticationService.FindEmailAsync(forgotPasswordDto.Email);
                 if (user == null || forgotPasswordDto.ClientUrl == null)
                 {
-                    throw new ArgumentNullException("User is null");
+                    return Result.Failure(new Error("", "User does not exist"));
                 }
                 // tạo token, param là 1 dictionary chứa token và email. callback sẽ chứa clientUrl và param. cuối cùng là message sẽ được gửi đến email của người dùng
                 var mapped = _mapper.Map<UserModel>(user);
@@ -54,6 +52,7 @@ namespace Ecommerce.Infrastructure.Services.Authentication
                 var callback = QueryHelpers.AddQueryString(forgotPasswordDto.ClientUrl, param!);
                 var msg = new Message([user.Email!], "Reset password", callback);
                 _emailService.SendEmail(msg);
+                return Result.Success();
 
             }
             catch (Exception ex)
@@ -64,23 +63,22 @@ namespace Ecommerce.Infrastructure.Services.Authentication
         }
 
 
-        public async Task<TokenModel> Login(LoginModel login)
+        public async Task<Result<UserModel>> Login(LoginModel login)
         {
             try
             {
                 var user = await _userAuthenticationService.FindEmailAsync(login.Email);
                 if (user == null)
                 {
-                    throw new NotFoundException(nameof(user));
+                    return Result.Failure<UserModel>(new Error("", "Email not found"));
                 }
                 var result = await _userAuthenticationService.CheckPasswordAsync(user.Id, login.Password);
-                if (!result)
+                if(result == false)
                 {
-                    throw new UnauthorizedAccessException("Invalid email or password");
+                    return Result.Failure<UserModel>(new Error("", "Invalid email or password"));
                 }
                 var mapped = _mapper.Map<UserModel>(user);
-                var token = await _tokenService.CreateToken(mapped, true);
-                return token;
+                return Result.Success(mapped);
             }
             catch (Exception ex)
             {
@@ -89,7 +87,7 @@ namespace Ecommerce.Infrastructure.Services.Authentication
 
         }
 
-        public async Task<UserModel> Register(RegisterModel model)
+        public async Task<Result> Register(RegisterModel model)
         {
             var userDto = new UserModel
             {
@@ -99,18 +97,32 @@ namespace Ecommerce.Infrastructure.Services.Authentication
                 RefreshToken = "",
             };
             var result = await _userManagementService.CreateUserAsync(userDto, model.Password);
-            return userDto;
+            if(result  == null)
+            {
+                //
+                return Result.Failure(new Error("", "Some "));
+            }
+            return Result.Success();
         }
 
-        public async Task ResetPassword(ResetPasswordModel model)
+        public async Task<Result> ResetPassword(ResetPasswordModel model)
         {
             try
             {
                 var user = await _userAuthenticationService.FindEmailAsync(model.Email);
+                if(user == null)
+                {
+                    return Result.Failure(new Error("", "Email does not exist"));
+                }
                 var mapped = _mapper.Map<UserModel>(user);
                 var token = await _userTokenService.GeneratePasswordResetTokenAsync(mapped);
                 var result = await _userTokenService.ResetPasswordAsync(user.Id, token, model.NewPassword);
+                if(result == false)
+                {
+                    return Result.Failure(new Error("", "Reset password failed"));
+                }
                 await _userManagementService.UpdateUserAsync(mapped);
+                return Result.Success();
             }
             catch (Exception ex)
             {
