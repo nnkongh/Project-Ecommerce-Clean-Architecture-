@@ -18,22 +18,23 @@ namespace Ecommerce.Infrastructure.Repository
         {
         }
 
-        public async Task<IEnumerable<Product>> GetProductByCategoryIdAsync(int categoryId)
+        public async Task<IEnumerable<Product?>> GetProductByCategoryIdAsync(int categoryId)
         {
             return await _context.Products
                 .Where(x => x.CategoryId == categoryId).ToListAsync();
         }
 
-        public async Task<Product> GetProductByIdWithCategoryAsync(int productId)
+        public async Task<Product?> GetProductByIdWithCategoryAsync(int productId)
         {
             var spec = new ProductWithCategorySpecification(productId);
             return await GetEnityWithSpecAsync(spec);
         }
 
-        public async Task<IEnumerable<Product>> GetProductByNameAsync(string name)
+        public async Task<IEnumerable<Product?>> GetProductByNameAsync(string name)
         {
             var spec = new ProductWithCategorySpecification(name);
-            return await GetAsync(spec);
+            var result = await GetAsync(spec);
+            return result;
         }
 
         public async Task<IEnumerable<Product>> GetProductByCategoryAsync()

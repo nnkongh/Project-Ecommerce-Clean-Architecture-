@@ -49,7 +49,7 @@ namespace Ecommerce.Infrastructure.Repository.Base
                 .ToListAsync();
         }
 
-        public virtual async Task<T> GetByIdASync(int id)
+        public virtual async Task<T?> GetByIdAsync(int id)
         {
             return await _context.Set<T>().FindAsync(id);
         }
@@ -116,7 +116,7 @@ namespace Ecommerce.Infrastructure.Repository.Base
             return await ApplySpecification(spec).ToListAsync();
         }
 
-        public async Task<T> GetEnityWithSpecAsync(ISpecification<T> spec)
+        public async Task<T?> GetEnityWithSpecAsync(ISpecification<T> spec)
         {
             return await ApplySpecification(spec).FirstOrDefaultAsync();
         }

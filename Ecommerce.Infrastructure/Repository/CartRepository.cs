@@ -17,18 +17,20 @@ namespace Ecommerce.Infrastructure.Repository
         public CartRepository(EcommerceDbContext context) : base(context)
         {   
         }
-        public async Task<Cart> GetCartByUserIdAsync(string userId)
+        public async Task<Cart?> GetCartByUserIdAsync(string userId)
         {
             var spec = new CartWithItemsSpecification(userId);
-            return (await GetAsync(spec)).FirstOrDefault();
+            var result = await GetAsync(spec);
+            return result.Count > 0 ? result[0] : null;
         }
-        public async Task<Cart> GetCartByIdAsync(int cartId)
+        public async Task<Cart?> GetCartByIdAsync(int cartId)
         {
             var spec = new CartWithItemsSpecification(cartId);
-            return (await GetAsync(spec)).FirstOrDefault();
+            var result = await GetAsync(spec);
+            return result.Count > 0 ? result[0] : null;
         }
 
-        public async Task<IReadOnlyCollection<CartItem>> GetCartItemAsync(int cartId)
+        public async Task<IReadOnlyCollection<CartItem?>> GetCartItemAsync(int cartId)
         {
             var list = await _context.Set<CartItem>().Where(c => c.CartId == cartId).AsNoTracking().ToListAsync();
             return list;

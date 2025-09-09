@@ -23,16 +23,18 @@ namespace Ecommerce.Infrastructure.Repository
         //{
         //    return await _context.WishtList.FirstOrDefaultAsync(w => w.UserId == userId && w.Pr);
         //}
-        public async Task<Wishlist> GetByIdAsync(int wishListId)
+        public async Task<Wishlist?> GetWishlistWithItemByIdAsync(int wishListId)
         {
             var spec = new WishListWithItemsSpecification(wishListId);
-            return (await GetAsync(spec)).FirstOrDefault();
+            var result = await GetAsync(spec);
+            return result.Count > 0 ? result[0] : null;
         }
 
         public async Task<Wishlist?> GetByUserIdAsync(string userId)
         {
             var spec = new WishListWithItemsSpecification(userId);
-            return (await GetAsync(spec)).FirstOrDefault();
+            var result = await GetAsync(spec);
+            return result.Count > 0 ? result[0] : null;
         }
 
         public async Task<bool> GetExistingProduct(string userId, int productId)
