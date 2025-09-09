@@ -36,16 +36,17 @@ namespace Ecommerce.Web.Controllers
             var result = await Sender.Send(command);
             return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
         }
-        [HttpPost("logout")]
-        public async Task<IActionResult> Logout(ClaimsPrincipal principal, HttpContext context)
-        {
-            var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            if(userId == null)
-            {
-                return BadRequest();
-            }
-            return Ok();
-        }
+        //[HttpPost("logout")]
+        //public async Task<IActionResult> Logout(ClaimsPrincipal principal, HttpContext context)
+        //{
+        //    var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+        //    _cookieTokenService.RemoveTokenFromCookie()
+        //    if(userId == null)
+        //    {
+        //        return BadRequest();
+        //    }
+        //    return Ok();
+        //}
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordModel forgotPasswordDto)
         {

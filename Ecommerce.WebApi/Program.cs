@@ -1,4 +1,5 @@
 using Ecommerce.Infrastructure.Dependency_Injection;
+using Ecommerce.WebApi.DependencyInjection;
 using System.Threading.Tasks;
 
 namespace Ecommerce.WebApi
@@ -13,6 +14,7 @@ namespace Ecommerce.WebApi
 
             builder.Services.AddControllers();
             builder.Services.AddInfrastructureServices(builder.Configuration);
+            builder.Services.AddAdapterServices();
             var app = builder.Build();
 
          
