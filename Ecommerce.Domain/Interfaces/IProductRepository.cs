@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Domain.Interfaces
 {
-    public interface IProductRepository : IRepositoryBase<Product>
+    public interface IProductRepository : IRepositoryBase<Product, int>
     {
-        Task<IEnumerable<Product>> GetProductByNameAsync(string name);
-        Task<Product> GetProductByIdWithCategoryAsync(int productId);
-        Task<IEnumerable<Product>> GetProductByCategoryIdAsync(int categoryId);
+        Task<IEnumerable<Product?>> GetProductByNameAsync(string name);
+        Task<Product?> GetProductByIdWithCategoryAsync(int productId);
+        Task<IEnumerable<Product?>> GetProductByCategoryIdAsync(int categoryId);
         Task<IEnumerable<Product>> GetProductByCategoryAsync();
     }
 }

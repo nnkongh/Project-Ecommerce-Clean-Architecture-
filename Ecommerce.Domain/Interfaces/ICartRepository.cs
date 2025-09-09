@@ -3,10 +3,10 @@ using Ecommerce.Domain.Models;
 
 namespace Ecommerce.Domain.Interfaces
 {
-    public interface ICartRepository  : IRepositoryBase<Cart>
+    public interface ICartRepository  : IRepositoryBase<Cart,int>
     {
-        Task<Cart> GetCartByUserIdAsync(string userId);
-        Task<Cart> GetCartByIdAsync(int cartId);
-        Task<IReadOnlyCollection<CartItem>> GetCartItemAsync(int cartId);
+        Task<Cart?> GetCartByUserIdAsync(string userId);
+        Task<Cart?> GetCartByIdAsync(int cartId);
+        Task<IReadOnlyCollection<CartItem?>> GetCartItemAsync(int cartId);
     }
 }

@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Domain.Interfaces.Base
 {
-    public interface IRepositoryBase<T> where T : class
+    public interface IRepositoryBase<T,TKey> where T : class
     {
-        Task<T> GetByIdAsync(int id);
+        Task<T?> GetByIdAsync(TKey id);
         Task<IReadOnlyList<T>> GetAllAsync();
         Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>> predicate,
                                         Func<IQueryable<T>, IOrderedQueryable<T>> orderBy,
@@ -18,10 +18,10 @@ namespace Ecommerce.Domain.Interfaces.Base
         Task<IReadOnlyList<T>> GetByAsync(Expression<Func<T, bool>> predicate);
         Task<IReadOnlyList<T>> GetAsync(Expression<Func<T,bool>> predicate,
                                         Func<IQueryable<T>,IOrderedQueryable<T>> orderBy);
-        Task<T> GetEnityWithSpecAsync(ISpecification<T> spec);
+        Task<T?> GetEnityWithSpecAsync(ISpecification<T> spec);
         Task<IReadOnlyList<T>> GetAsync(ISpecification<T> spec);
         Task<T> AddAsync(T entity);
-        Task<bool> UpdateAsync(int id, T entity, params Expression<Func<T, object>>[] propertiesToUpdate);
-        Task<bool> Delete(int id);
+        Task<bool> UpdateAsync(TKey id, T entity, params Expression<Func<T, object>>[] propertiesToUpdate);
+        Task<bool> Delete(TKey id);
     }
 }

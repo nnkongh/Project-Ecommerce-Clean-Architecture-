@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs;
-using Ecommerce.Application.Interfaces.Authentication;
 using Ecommerce.Domain.Interfaces.UnitOfWork;
 using Ecommerce.Domain.Models;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Identity;
+using Ecommerce.Infrastructure.Interfaces.Authentication;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Infrastructure.Authen
 {
-    public class UserManagementRepository : IUserManagementService
+    public class UserManagementRepository : IIdentityManagementUserProvider
     {
         private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _userManager;
@@ -28,27 +28,15 @@ namespace Ecommerce.Infrastructure.Authen
         }
 
 
-        public async Task<User> CreateUserAsync(UserModel userDto, string password)
-        {   
-            var userApp = new AppUser
-            {
-                UserName = userDto.UserName,
-                Email = userDto.Email,
-            };
-           
-            var result = await _userManager.CreateAsync(userApp, password);
-            var role = await _userManager.AddToRoleAsync(userApp, "User");
+        public async Task<AppUser> CreateUserAsync(AppUser Appuser, string password)
+        {
+            var result = await _userManager.CreateAsync(Appuser,password);
+            var role = await _userManager.AddToRoleAsync(Appuser, "User");
             if (!result.Succeeded)
             {
                 throw new Exception("User creation failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
             }
-            var user = new User
-            {
-                UserName = userDto.UserName,
-                Email = userDto.Email,
-                ImageUrl = ""
-            };
-            return user;
+            return Appuser;
             
         }
 
@@ -63,7 +51,7 @@ namespace Ecommerce.Infrastructure.Authen
             return result.Succeeded;
         }
         // LOGIC SAI
-        public async Task UpdateUserAsync(UserModel userDto)
+        public async Task UpdateUserAsync(AppUser userDto)
         {
             var user = await _userManager.FindByIdAsync(userDto.Id);
             if (user == null)

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Domain.Interfaces
 {
-    public interface ICategoryRepository : IRepositoryBase<Category>
+    public interface ICategoryRepository : IRepositoryBase<Category,int>
     {
     }
 }

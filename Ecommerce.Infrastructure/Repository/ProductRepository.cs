@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Infrastructure.Repository
 {
-    public class ProductRepository : GenericRepository<Product>, IProductRepository
+    public class ProductRepository : GenericRepository<Product, int>, IProductRepository
     {
         public ProductRepository(EcommerceDbContext context) : base(context)
         {

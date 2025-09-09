@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Infrastructure.Repository
 {
-    public class OrderRepository : GenericRepository<Order>, IOrderRepository
+    public class OrderRepository : GenericRepository<Order, int>, IOrderRepository
     {
         public OrderRepository(EcommerceDbContext context) : base(context)
         {

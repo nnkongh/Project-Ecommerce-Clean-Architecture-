@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Infrastructure.Repository.User_Repository
 {
-    public class UserRoleRepository : IUserRoleService
+    public class UserRoleRepository : IIdentityRole
     {
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly UserManager<AppUser> _userManager;

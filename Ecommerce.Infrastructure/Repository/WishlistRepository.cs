@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Infrastructure.Repository
 {
-    public class WishlistRepository : GenericRepository<Wishlist>, IWishlistRepository
+    public class WishlistRepository : GenericRepository<Wishlist, int>, IWishlistRepository
     {
         public WishlistRepository(EcommerceDbContext context) : base(context)
         {

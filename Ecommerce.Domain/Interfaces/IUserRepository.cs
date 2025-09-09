@@ -8,10 +8,9 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Domain.Interfaces
 {
-    public interface IUserRepository : IRepositoryBase<User>
+    public interface IUserRepository : IRepositoryBase<User, string>
     {
-        Task<User?> GetUserByEmailAsync(string email);
-        Task<User?> GetUserByUsernameAsync(string username);
-        Task<User?> GetUserByIdAsync(string id);
+        //Task<User?> GetUserByUsernameAsync(string username);
+        //Task<User?> GetUserByIdAsync(string id);
     }
 }

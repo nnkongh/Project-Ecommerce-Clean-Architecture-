@@ -15,14 +15,12 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Infrastructure.Authen
 {
-    public class UserAuthenticationRepository : IUserAuthenticationService
+    public class UserAuthenticationRepository : IIdentityUserProvider
     {
         private readonly UserManager<AppUser> _userManager;
-        private readonly IMapper _mapper;
         public UserAuthenticationRepository(UserManager<AppUser> userManager, IMapper mapper)
         {
             _userManager = userManager;
-            _mapper = mapper;
         }
         public async Task<bool> CheckPasswordAsync(string userId, string password)
         {
@@ -31,22 +29,22 @@ namespace Ecommerce.Infrastructure.Authen
             return await _userManager.CheckPasswordAsync(user, password);
         }
 
-        public async Task<User?> FindByIdAsync(string id)
+        public async Task<AppUser?> FindByIdAsync(string id)
         {
             var user = await _userManager.FindByIdAsync(id);
-            return user == null ? null : _mapper.Map<User>(user);
+            return user;
         }
 
-        public async Task<User?> FindEmailAsync(string email)
+        public async Task<AppUser?> FindEmailAsync(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            return user == null ? null : _mapper.Map<User>(user);
+            return user;
         }
 
-        public async Task<User?> FindUserNameAsync(string userName)
+        public async Task<AppUser?> FindUserNameAsync(string userName)
         {
             var user = await _userManager.FindByNameAsync(userName);
-            return user == null ? null : _mapper.Map<User>(user);
+            return user;
         }
     }
 }

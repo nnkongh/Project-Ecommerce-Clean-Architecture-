@@ -3,6 +3,7 @@ using Ecommerce.Domain.Specification.Base;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Tls;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Infrastructure.Repository.Base
 {
-    public class GenericRepository<T> : IRepositoryBase<T> where T : class
+    public class GenericRepository<T,TKey> : IRepositoryBase<T,TKey> where T : class
     {
         protected readonly EcommerceDbContext _context;
         public GenericRepository(EcommerceDbContext context)
@@ -26,7 +27,7 @@ namespace Ecommerce.Infrastructure.Repository.Base
 
         }
 
-        public virtual async Task<bool> Delete(int id)
+        public virtual async Task<bool> Delete(TKey id)
         {
             var entity = await _context.Set<T>().FindAsync(id);
             if(entity != null)
@@ -49,12 +50,12 @@ namespace Ecommerce.Infrastructure.Repository.Base
                 .ToListAsync();
         }
 
-        public virtual async Task<T?> GetByIdAsync(int id)
+        public virtual async Task<T?> GetByIdAsync(TKey id)
         {
             return await _context.Set<T>().FindAsync(id);
         }
 
-        public virtual async  Task<bool> UpdateAsync(int id, T entity, params Expression<Func<T,object>>[] propertiesToUpdate)
+        public virtual async  Task<bool> UpdateAsync(TKey id, T entity, params Expression<Func<T,object>>[] propertiesToUpdate)
         {
             var existing = await _context.Set<T>().FindAsync(id);
             if (existing == null) return false;

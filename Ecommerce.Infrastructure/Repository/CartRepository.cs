@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Infrastructure.Repository
 {
-    public class CartRepository : GenericRepository<Cart>, ICartRepository
+    public class CartRepository : GenericRepository<Cart,int>, ICartRepository
     {
         public CartRepository(EcommerceDbContext context) : base(context)
         {   

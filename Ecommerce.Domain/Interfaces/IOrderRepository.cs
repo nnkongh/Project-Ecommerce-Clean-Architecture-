@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Domain.Interfaces
 {
-    public interface IOrderRepository : IRepositoryBase<Order>
+    public interface IOrderRepository : IRepositoryBase<Order, int>
     {
         Task<IEnumerable<Order>> GetOrdersByUserNameAsync(string userName);
     }

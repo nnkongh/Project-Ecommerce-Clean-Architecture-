@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Domain.Interfaces
 {
-    public interface IWishlistRepository : IRepositoryBase<Wishlist>
+    public interface IWishlistRepository : IRepositoryBase<Wishlist,int>
     {
         Task<bool> GetExistingProduct(string userId, int productI);
-        Task<Wishlist?> GetByIdAsync(int id);
+        Task<Wishlist?> GetWishlistWithItemByIdAsync(int id);
         Task<Wishlist?> GetByUserIdAsync(string userId);
     }
 }
