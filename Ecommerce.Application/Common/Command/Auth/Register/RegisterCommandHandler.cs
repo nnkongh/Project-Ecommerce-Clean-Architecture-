@@ -2,7 +2,6 @@
 using Ecommerce.Application.Common.Command.Users.CreateUser;
 using Ecommerce.Application.DTOs;
 using Ecommerce.Application.Interfaces;
-using Ecommerce.Application.Interfaces.Authentication;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Interfaces.UnitOfWork;
 using Ecommerce.Domain.Models;
@@ -44,12 +43,12 @@ namespace Ecommerce.Application.Common.Command.Users.RegisterUser
                 throw new ArgumentNullException("UserName, Email, Password or ConfirmPassword cannot be null or empty");
             }
             ;
-            if (!string.Equals(request.register.Password, request.register.ConfirmPassword, StringComparison.Ordinal))
+            if (!string.Equals(request.register.Password, request.register.ConfirmPassword, StringComparison.OrdinalIgnoreCase))
             {
                 throw new("Password and ConfirmPassword do not match");
             }
             var result = await _authenticationService.Register(request.register);
-            var mapped = _mapper.Map<User>(result);
+            var mapped = _mapper.Map<User>(result.Value);
             await _userRepository.AddAsync(mapped);
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success(result);

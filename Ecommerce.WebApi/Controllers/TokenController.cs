@@ -1,4 +1,5 @@
 ﻿using Ecommerce.Application.DTOs.Authentication;
+using Ecommerce.Application.Interfaces;
 using Ecommerce.Application.Interfaces.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,8 +19,8 @@ namespace Ecommerce.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> RefreshToken([FromBody] TokenModel tokenDto)
         {
-            var tokenRef = await _authService.CreateRefreshToken(tokenDto);
-            return Ok(tokenRef);
+            //var tokenRef = await _authService.CreateRefreshToken(tokenDto);
+            return Ok();
         } 
     }
 }

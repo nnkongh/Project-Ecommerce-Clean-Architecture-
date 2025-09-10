@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Auth.Forgot
 {
-    public sealed record ForgotPasswordCommand(ForgotPasswordModel model) : IRequest<Result>
+    public sealed record ForgotPasswordCommand(ForgotPasswordModel model) : IRequest<Result<string>>
     {
     }
 }

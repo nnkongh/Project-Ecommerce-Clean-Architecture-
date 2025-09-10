@@ -52,7 +52,7 @@ namespace Ecommerce.Web.Controllers
         {
             var command = new ForgotPasswordCommand(forgotPasswordDto);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
+            return result.IsSuccess ? Ok(result) : BadRequest(result.IsFailure);
         }
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordModel resetPasswordDto)

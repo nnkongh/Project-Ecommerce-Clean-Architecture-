@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Auth.Forgot
 {
-    public class ForgotPasswordCommandHandler : IRequestHandler<ForgotPasswordCommand, Result>
+    public class ForgotPasswordCommandHandler : IRequestHandler<ForgotPasswordCommand, Result<string>>
     {
         private readonly IAuthenticationService _authService;
 
@@ -18,18 +18,18 @@ namespace Ecommerce.Application.Common.Command.Auth.Forgot
             _authService = authService;
         }
 
-        public async Task<Result> Handle(ForgotPasswordCommand request, CancellationToken cancellationToken)
+        public async Task<Result<string>> Handle(ForgotPasswordCommand request, CancellationToken cancellationToken)
         {
             if (string.IsNullOrEmpty(request.model.Email))
             {
-                return Result.Failure(new Error("", "Email is empty"));
+                return Result.Failure<string>(new Error("", "Email is empty"));
             }
             var result = await _authService.ForgotPassword(request.model);
             if (result.IsFailure)
             {
                 return result;
             }
-            return result;
+            return result.Value;
         }
     }
 }

@@ -31,7 +31,7 @@ namespace Ecommerce.Application.Common.Command.Auth.Reset
             {
                 return Result.Failure(new Error("", "Token is empty"));
             }
-            if (string.Compare(request.model.ConfirmPassword, request.model.NewPassword, StringComparison.OrdinalIgnoreCase) == 0)
+            if (!string.Equals(request.model.ConfirmPassword, request.model.NewPassword, StringComparison.Ordinal))
             {
                 return Result.Failure(new Error("", "Password and confirm password does not match"));
             }
