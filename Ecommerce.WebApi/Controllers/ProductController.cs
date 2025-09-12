@@ -27,49 +27,49 @@ namespace Ecommerce.WebApi.Controllers
         {
             var query = new GetProductByNameQueries(name);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.IsFailure);
         }
         [HttpGet("by-category/{id}")]
         public async Task<IActionResult> SearchProductByCategoryId(int id)
         {
             var query = new GetProductByCategoryIdQueries(id);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.IsFailure);
         }
         [HttpGet("search")]
         public async Task<IActionResult> SearchProduct()
         {
             var query = new GetProductsByCategoryQueries();
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.IsFailure);
         }
         [HttpGet("list")]
         public async Task<IActionResult> GetList()
         {
             var query = new GetAllProductsQueries();
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.IsFailure);
         }
         [HttpPost("add")]
         public async Task<IActionResult> AddProduct([FromBody]CreateProductRequest request)
         {
             var command = new CreateProductCommand(request);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
         }
         [HttpPut("update/{id:int}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody]UpdateProductRequest request)
         {
             var command = new UpdateProductCommand(id,request);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
         }
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var command = new DeleteProductCommand(id);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
         }
 
     }
