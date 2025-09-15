@@ -7,16 +7,17 @@ namespace Ecommerce.Domain.Models
         public int Id { get; set; }
         public string? UserId { get; set; }
         public User? User { get; set; }
-        public List<ProductWishList> Items { get; set; } = new List<ProductWishList>();
+        public List<ItemWishList> Items { get; set; } = new List<ItemWishList>();
 
-        public void AddItem(int ProductId)
+        public void AddItem(int ProductId, string productName)
         {
             var existing = Items.FirstOrDefault(x => x.ProductId == ProductId);
             if (existing == null)
             {
-                Items.Add(new ProductWishList()
+                Items.Add(new ItemWishList()
                 {
                     ProductId = ProductId,
+                    ProductName = productName,
                 });
             }
         }
@@ -27,6 +28,10 @@ namespace Ecommerce.Domain.Models
             {
                 Items.Remove(existing);
             }
+        }
+        public void ClearItem()
+        {
+            Items.Clear();
         }
     }
 }

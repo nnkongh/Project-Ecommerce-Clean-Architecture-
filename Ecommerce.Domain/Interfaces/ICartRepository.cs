@@ -7,6 +7,5 @@ namespace Ecommerce.Domain.Interfaces
     {
         Task<Cart?> GetCartByUserIdAsync(string userId);
         Task<Cart?> GetCartByIdAsync(int cartId);
-        Task<IReadOnlyCollection<CartItem?>> GetCartItemAsync(int cartId);
     }
 }

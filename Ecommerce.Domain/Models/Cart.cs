@@ -13,7 +13,7 @@ namespace Ecommerce.Domain.Models
         public string? UserId { get; set; }
         public List<CartItem> Items { get; set; } = [];
 
-        public void AddItem(int productId, int quantity)
+        public void AddItem(int productId, int quantity, decimal unitPrice, string productName)
         {
             var existingItem = Items.FirstOrDefault(i => i.ProductId == productId);
             if(existingItem != null)
@@ -26,6 +26,8 @@ namespace Ecommerce.Domain.Models
                 {
                     Quantity = quantity,
                     ProductId = productId,
+                    ProductName = productName,
+                    UnitPrice = unitPrice,
                 });
             }
         }
@@ -37,6 +39,10 @@ namespace Ecommerce.Domain.Models
                 Items.Remove(item);
                 item.DecreaseQuantity(item.Quantity);
             }
+        }
+        public void Clear()
+        {
+            Items.Clear();
         }
     }
 }
