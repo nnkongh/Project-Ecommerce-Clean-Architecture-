@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Application.Common.Command.Wishlists
+namespace Ecommerce.Application.Common.Queries.Wishlist.GetItemWishlist
 {
-    public sealed record AddToWishListCommand(int productId,string userId) : IRequest<Result>
+    public sealed record GetItemWishlistByIdQueries(int wishlistId) : IRequest<Result<IReadOnlyList<ItemWishlistModel>>>
     {
     }
 }

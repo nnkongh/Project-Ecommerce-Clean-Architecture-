@@ -33,21 +33,23 @@ namespace Ecommerce.Application.Common.Command.Users.RegisterUser
 
         public async Task<Result> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
-
-            // Validation
-            if (string.IsNullOrWhiteSpace(request.register.UserName) 
-                || string.IsNullOrWhiteSpace(request.register.Email) 
-                || string.IsNullOrWhiteSpace(request.register.Password) 
-                || string.IsNullOrWhiteSpace(request.register.ConfirmPassword))
+            if (string.IsNullOrWhiteSpace(request.register.UserName)
+                   || string.IsNullOrWhiteSpace(request.register.Email)
+                   || string.IsNullOrWhiteSpace(request.register.Password)
+                   || string.IsNullOrWhiteSpace(request.register.ConfirmPassword))
             {
-                throw new ArgumentNullException("UserName, Email, Password or ConfirmPassword cannot be null or empty");
+                return Result.Failure(new Error("", "Can not pass empty"));
             }
-            ;
+            // Validation
             if (!string.Equals(request.register.Password, request.register.ConfirmPassword, StringComparison.OrdinalIgnoreCase))
             {
-                throw new("Password and ConfirmPassword do not match");
+                return Result.Failure(new Error("", "Password and confirm password do not match"));
             }
             var result = await _authenticationService.Register(request.register);
+            if (result.IsFailure)
+            {
+                return Result.Failure(new Error("", "Register has been failed"));
+            }
             var mapped = _mapper.Map<User>(result.Value);
             await _userRepository.AddAsync(mapped);
             await _uow.SaveChangesAsync(cancellationToken);

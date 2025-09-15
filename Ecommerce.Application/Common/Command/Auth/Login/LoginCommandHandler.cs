@@ -13,36 +13,31 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Auth.Login
 {
-    public class LoginCommandHandler : IRequestHandler<LoginCommand, Result<TokenModel>>
+    public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, Result<TokenModel>>
     {
         private readonly IAuthenticationService _authService;
-        private readonly IMapper _mapper;
         private readonly ITokenService _tokenService;
-        public LoginCommandHandler(IAuthenticationService authService, IMapper mapper, ITokenService tokenService)
+        public LoginCommandHandler(IAuthenticationService authService, ITokenService tokenService)
         {
             _authService = authService;
-            _mapper = mapper;
             _tokenService = tokenService;
         }
 
         public async Task<Result<TokenModel>> Handle(LoginCommand request, CancellationToken cancellationToken)
         {
-            if(string.IsNullOrEmpty(request.login.Email) || string.IsNullOrEmpty(request.login.Password))
+            if (string.IsNullOrEmpty(request.login.Email) || string.IsNullOrEmpty(request.login.Password))
             {
                 return Result.Failure<TokenModel>(new Error("", "Email or Password is empty"));
             }
-            try
+            var result = await _authService.Login(request.login); //
+            if (result.IsFailure)
             {
-                var result = await _authService.Login(request.login);
-                var token = await _tokenService.CreateToken(result.Value, true);
-                return Result.Success(token);
+                return Result.Failure<TokenModel>(result.Error);
             }
-            catch (Exception ex)
-            {
-                throw new Exception("Some error occur while processing", ex);
-            }
-            
-
+            var token = await _tokenService.CreateToken(result.Value, true);
+            return Result.Success(token);
         }
+
+
     }
 }

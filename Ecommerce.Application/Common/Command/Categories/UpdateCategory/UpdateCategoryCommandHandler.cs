@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Categories.UpdateCategory
 {
-    public sealed class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryCommand, Result>
+    public sealed class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryCommand, Result<CategoryModel>>
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IMapper _mapper;
@@ -25,27 +25,23 @@ namespace Ecommerce.Application.Common.Command.Categories.UpdateCategory
             _uow = uow;
         }
 
-        public async Task<Result> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
+        public async Task<Result<CategoryModel>> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
         {
-            if(string.IsNullOrWhiteSpace(request.update.Name))
+            if (string.IsNullOrWhiteSpace(request.update.Name))
             {
-                return Result.Failure(new Error("","Category name is required"));
+                return Result.Failure<CategoryModel>(new Error("", "Category name is required"));
             }
-            if(request.id <= 0)
+            if (request.id <= 0)
             {
-                return Result.Failure(Error.NullValue);
+                return Result.Failure<CategoryModel>(new Error("", $"Category with id {request.id}"));
             }
             var category = _mapper.Map<Category>(request.update);
             var updated = await _categoryRepository.UpdateAsync(request.id,
                                                                 category,
                                                                 x => x.Name, x => x.Description);
-            if(updated)
-            {
-                return Result.Failure(new Error("Not Found", $"Category with id {request.id} not found!"));
-            }
+            var mapped = _mapper.Map<CategoryModel>(updated);
             await _uow.SaveChangesAsync(cancellationToken);
-            return Result.Success();
-
+            return Result.Success(mapped);
         }
     }
 }

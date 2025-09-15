@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Categories.UpdateCategory
 {
-    public sealed record UpdateCategoryCommand(int id, UpdateCategoryRequest update, params Expression<Func<Task, object>>[] propertiesToUpdate) : IRequest<Result>
+    public sealed record UpdateCategoryCommand(int id, UpdateCategoryRequest update, params Expression<Func<Task, object>>[] propertiesToUpdate) : IRequest<Result<CategoryModel>>
     {
     }
 }

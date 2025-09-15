@@ -16,13 +16,11 @@ namespace Ecommerce.Application.Common.Command.Categories.DeleteCategory
     {
         private readonly ICategoryRepository _repository;
         private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
 
 
-        public DeleteCategoryCommandHandler(ICategoryRepository repository, IMapper mapper, IUnitOfWork unitOfWork)
+        public DeleteCategoryCommandHandler(ICategoryRepository repository, IUnitOfWork unitOfWork)
         {
             _repository = repository;
-            _mapper = mapper;
             _uow = unitOfWork;
         }
 

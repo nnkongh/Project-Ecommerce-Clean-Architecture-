@@ -29,14 +29,11 @@ namespace Ecommerce.Application.Common.Queries.Category.GetCategoryById
             {
                 return Result.Failure<CategoryModel>(new Error("Null",$"{request.id} is null"));
             }
-            var category = await _repo.GetByIdASync(request.id);
+            var category = await _repo.GetByIdAsync(request.id);
             if (category is null)
             {
                 return Result.Failure<CategoryModel>(Error.NullValue);
             }
-            //if (category.Products.Any()) {
-            //    return Result.Success(new CategoryModel());
-            //}
             var mapped = _mapper.Map<CategoryModel>(category);
             return mapped;
         }

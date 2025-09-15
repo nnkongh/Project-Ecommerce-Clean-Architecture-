@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Carts.GetCart
 {
-    public sealed record GetItemQueries(CartModel cart) : IRequest<Result<IReadOnlyList<CartItemModel>>>
+    public sealed record GetItemQueries(int id) : IRequest<Result<IReadOnlyList<CartItemModel>>>
     {
     }
 }

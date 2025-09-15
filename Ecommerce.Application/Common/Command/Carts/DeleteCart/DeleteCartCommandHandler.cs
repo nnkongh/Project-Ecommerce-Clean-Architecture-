@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Carts.DeleteCart
 {
-    public class DeleteCartCommandHandler : IRequestHandler<DeleteCartCommand, Result>
+    public sealed class DeleteCartCommandHandler : IRequestHandler<DeleteCartCommand, Result>
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICartRepository _cartRepository;
@@ -25,7 +25,7 @@ namespace Ecommerce.Application.Common.Command.Carts.DeleteCart
         {
             if(request.cartId <= 0)
             {
-                return Result.Failure(new Error("NotFound", "CartId must be greater than zero."));
+                return Result.Failure(new Error("NotFound", "CartId is not found"));
             }
             var cart = await _cartRepository.GetByIdAsync(request.cartId);
             if(cart == null)

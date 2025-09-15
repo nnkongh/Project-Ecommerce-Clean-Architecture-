@@ -16,20 +16,18 @@ namespace Ecommerce.Application.Common.Command.Products.DeleteProduct
     {
         private readonly IProductRepository _repo;
         private readonly IUnitOfWork _uow;
-        private readonly IMapper _mapper;
 
-        public DeleteProductCommandHandler(IMapper mapper, IProductRepository repo, IUnitOfWork uow)
+        public DeleteProductCommandHandler(IProductRepository repo, IUnitOfWork uow)
         {
-            _mapper = mapper;
             _repo = repo;
             _uow = uow;
         }
 
         public async Task<Result> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
         {
-            if(request.id <= 0)
+            if (request.id <= 0)
             {
-                return Result.Failure(Error.NullValue);
+                return Result.Failure(new Error("", "Id is not found"));
             }
             var deleted = await _repo.Delete(request.id);
             if (!deleted)

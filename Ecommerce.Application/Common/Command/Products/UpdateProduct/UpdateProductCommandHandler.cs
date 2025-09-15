@@ -10,11 +10,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Products.UpdateProduct
 {
-    public sealed class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, Result>
+    public sealed class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, Result<ProductModel>>
     {
         private readonly IProductRepository _repo;
         private readonly IUnitOfWork _uow;
@@ -27,30 +28,25 @@ namespace Ecommerce.Application.Common.Command.Products.UpdateProduct
             _uow = uow;
         }
 
-        public async Task<Result> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
+        public async Task<Result<ProductModel>> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
         {
-            if(string.IsNullOrWhiteSpace(request.update.Name))
+            if (string.IsNullOrWhiteSpace(request.update.Name))
             {
-                return Result.Failure(new Error("","Name can not be null"));
+                return Result.Failure<ProductModel>(new Error("", "Name can not be null"));
             }
-            if(request.update.Price <= 0)
+            if (request.update.Price <= 0)
             {
-                return Result.Failure(new Error("", "Price must be greater than zero"));
+                return Result.Failure<ProductModel>(new Error("", "Price must be greater than zero"));
             }
             var entity = _mapper.Map<Product>(request.update);
-            var updated = await _repo.UpdateAsync(request.id,entity,
+            var updated = await _repo.UpdateAsync(request.id, entity,
                                                     x => x.Name,
                                                     x => x.Price,
                                                     x => x.Description,
                                                     x => x.ImageUrl);
-            if (!updated)
-            {
-                return Result.Failure(new Error("", "An error occur while processing progress"));
-            }
             await _uow.SaveChangesAsync(cancellationToken);
-            return Result.Success();
+            var mapped = _mapper.Map<ProductModel>(updated);
+            return Result.Success(mapped);
         }
-
-        
     }
 }

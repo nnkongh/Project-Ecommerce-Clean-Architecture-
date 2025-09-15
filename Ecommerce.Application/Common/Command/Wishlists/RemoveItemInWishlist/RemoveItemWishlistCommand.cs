@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Application.Common.Command.Products.DeleteProduct
+namespace Ecommerce.Application.Common.Command.Wishlists.RemoveItemInWishlist
 {
-    public sealed record DeleteProductCommand(int id) : IRequest<Result>
+    public sealed record RemoveItemWishlistCommand(int productId, string userId) : IRequest<Result>
     {
     }
 }

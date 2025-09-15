@@ -10,41 +10,34 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Carts.RemoveItemInCart
 {
-    public class RemoveItemCartCommandHandler : IRequestHandler<RemoveItemCartCommand, Result>
+    public sealed class RemoveItemCartCommandHandler : IRequestHandler<RemoveItemCartCommand, Result>
     {
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _uow;
         private readonly ICartRepository _cartRepository;
-        private readonly IProductRepository _productRepository;
 
         public RemoveItemCartCommandHandler(IUnitOfWork unitOfWork, ICartRepository cartRepository, IProductRepository productRepository)
         {
-            _unitOfWork = unitOfWork;
+            _uow = unitOfWork;
             _cartRepository = cartRepository;
-            _productRepository = productRepository;
         }
 
         public async Task<Result> Handle(RemoveItemCartCommand request, CancellationToken cancellationToken)
         {
-            if(request.productId <= 0)
+            if (request.productId <= 0)
             {
                 return Result.Failure(new Error("NotFound", "ProductId must be greater than zero."));
             }
-            if(string.IsNullOrWhiteSpace(request.userId))
+            if (string.IsNullOrWhiteSpace(request.userId))
             {
                 return Result.Failure(new Error("NotFound", "UserId must be provided."));
             }
-            var product = await _productRepository.GetByIdAsync(request.productId);
-            if (product == null)
-            {
-                return Result.Failure(new Error("ProductNotFound", "The specified product does not exist."));
-            }
             var cart = await _cartRepository.GetCartByUserIdAsync(request.userId);
-            if(cart == null)
+            if (cart == null)
             {
                 return Result.Failure(new Error("CartNotFound", "The specified cart does not exist."));
             }
             cart.RemoveItem(request.productId);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }
     }

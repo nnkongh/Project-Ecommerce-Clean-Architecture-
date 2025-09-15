@@ -23,9 +23,9 @@ namespace Ecommerce.Application.Common.Command.Auth.Reset
         {
             if (string.IsNullOrEmpty(request.model.Email)
                 || string.IsNullOrEmpty(request.model.NewPassword)
-                || string.IsNullOrEmpty(request.model.ConfirmPassword)) 
+                || string.IsNullOrEmpty(request.model.ConfirmPassword))
             {
-                return Result.Failure(new Error("","Some information is empty"));
+                return Result.Failure(new Error("", "Some information is empty"));
             }
             if (string.IsNullOrEmpty(request.model.Token))
             {
@@ -38,9 +38,9 @@ namespace Ecommerce.Application.Common.Command.Auth.Reset
             var result = await _authService.ResetPassword(request.model);
             if (result.IsFailure)
             {
-                return result;
+                return Result.Failure(new Error("", "Resetpassword has been failed"));
             }
-            return result;
+            return Result.Success();
         }
     }
 }

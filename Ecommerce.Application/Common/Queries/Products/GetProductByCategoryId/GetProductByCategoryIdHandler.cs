@@ -46,7 +46,7 @@ namespace Ecommerce.Application.Products.Queries.Products.GetProductByCategory
         }
         private async Task<bool> CheckIsExistsCategory(int categoryId)
         {
-            var existing = await _categoryRepo.GetByIdASync(categoryId);
+            var existing = await _categoryRepo.GetByIdAsync(categoryId);
             if (existing == null)
             {
                 return false;

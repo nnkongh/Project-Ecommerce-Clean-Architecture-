@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Products.CreateProduct
 {
-    public sealed class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Result>
+    public sealed class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Result<ProductModel>>
     {
         private readonly IProductRepository _productRepo;
         private readonly ICategoryRepository _categoryRepo;
@@ -27,35 +27,32 @@ namespace Ecommerce.Application.Common.Command.Products.CreateProduct
             _categoryRepo = categoryRepo;
         }
 
-        public async Task<Result> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+        public async Task<Result<ProductModel>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
-            if(string.IsNullOrWhiteSpace(request.create.Name))
+            if (string.IsNullOrWhiteSpace(request.create.Name))
             {
-                return Result.Failure(new Error("","Product name is required"));
+                return Result.Failure<ProductModel>(new Error("", "Product name is required"));
             }
-            if(request.create.Price <= 0){
-                return Result.Failure(new Error("", "Product price must be greater than zero"));
-            }
-            var existing = await CheckIsExistsCategory(request.create.CategoryId);
-            if (existing == false)
+            if (request.create.Price <= 0)
             {
-                return Result.Failure(new Error("", $"The category with id {request.create.CategoryId} is not found"));
+                return Result.Failure<ProductModel>(new Error("", "Product price must be greater than zero"));
             }
+            await CheckIsExistsCategory(request.create.CategoryId);
             var entity = _mapper.Map<Product>(request.create);
             var item = await _productRepo.AddAsync(entity);
             var mapped = _mapper.Map<ProductModel>(item);
             await _uow.SaveChangesAsync(cancellationToken);
-            return Result.Success();
+            return Result.Success(mapped);
         }
 
-        private async Task<bool> CheckIsExistsCategory(int categoryId)
+        private async Task<Result> CheckIsExistsCategory(int categoryId)
         {
             var existing = await _categoryRepo.GetByIdAsync(categoryId);
-            if(existing == null)
+            if (existing == null)
             {
-                return false;
+                return Result.Failure(new Error("", $"The category with id {categoryId} is not found"));
             }
-            return true;
+            return Result.Success();
         }
     }
 }

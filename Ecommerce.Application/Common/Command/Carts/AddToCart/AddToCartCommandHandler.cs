@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Ecommerce.Application.DTOs.CRUD.Cart;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Interfaces.UnitOfWork;
 using Ecommerce.Domain.Models;
@@ -14,36 +15,34 @@ namespace Ecommerce.Application.Common.Command.Carts.AddToCart
 {
     public sealed class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, Result>
     {
-        private readonly IMapper _mapper;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _uow;
         private readonly ICartRepository _cartRepository;
         private readonly IProductRepository _productRepository;
-        public AddToCartCommandHandler(IMapper mapper, IUnitOfWork unitOfWork, ICartRepository cartRepository, IProductRepository productRepository)
+        public AddToCartCommandHandler(IUnitOfWork unitOfWork, ICartRepository cartRepository, IProductRepository productRepository)
         {
-            _mapper = mapper;
-            _unitOfWork = unitOfWork;
+            _uow = unitOfWork;
             _cartRepository = cartRepository;
             _productRepository = productRepository;
         }
 
-        public async Task<Result> Handle(AddToCartCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(AddToCartCommand handler, CancellationToken cancellationToken)
         {
-            var product = await _productRepository.GetByIdAsync(request.ProductId);
-            if(product == null)
+            var product = await _productRepository.GetByIdAsync(handler.request.productId);
+            if (product == null)
             {
                 return Result.Failure(new Error("ProductNotFound", "The specified product does not exist."));
             }
-            var cart = await _cartRepository.GetCartByUserIdAsync(request.UserId);
-            if(cart == null)
+            var cart = await _cartRepository.GetCartByUserIdAsync(handler.request.userId);
+            if (cart == null)
             {
                 cart = new Cart
                 {
-                    UserId = request.UserId,
+                    UserId = handler.request.userId,
                 };
                 await _cartRepository.AddAsync(cart);
             }
-            cart.AddItem(request.ProductId, request.Quantity);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            cart.AddItem(handler.request.productId, handler.request.quantity, product.Price, product.Name);
+            await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }
     }

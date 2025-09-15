@@ -1,0 +1,57 @@
+﻿using AutoMapper;
+using AutoMapper.Configuration.Annotations;
+using Ecommerce.Domain.Interfaces;
+using Ecommerce.Domain.Interfaces.UnitOfWork;
+using Ecommerce.Domain.Models;
+using Ecommerce.Domain.Shared;
+using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Ecommerce.Application.Common.Command.Wishlists.AddToWishlist
+{
+    public sealed class AddToWishListCommandHandler : IRequestHandler<AddToWishListCommand,Result>
+    {
+        private readonly IProductRepository _productRepo;
+        private readonly IWishlistRepository _wishlistRepo;
+        private readonly IUserRepository _userRepo;
+        private readonly IUnitOfWork _uow;
+        public AddToWishListCommandHandler(IProductRepository productRepo, IWishlistRepository wishlistRepo, IUnitOfWork uow, IMapper mapper, IUserRepository userRepo)
+        {
+            _productRepo = productRepo;
+            _wishlistRepo = wishlistRepo;
+            _uow = uow;
+            _userRepo = userRepo;
+        }
+
+        public async Task<Result> Handle(AddToWishListCommand Command, CancellationToken cancellationToken)
+        {
+            var product = await _productRepo.GetByIdAsync(Command.Request.ProductId);
+            if(product == null)
+            {
+                return Result.Failure(new Error("", $"Product with id {Command.Request.ProductId} is not found"));
+            }
+            var existingUser = await _userRepo.GetByIdAsync(Command.Request.UserId);
+            if(existingUser == null)
+            {
+                return Result.Failure(new Error("", $"User does not exist"));
+            }
+            var wishlist = await _wishlistRepo.GetWishlistByUserIdAsync(Command.Request.UserId);
+            if(wishlist == null)
+            {
+                wishlist = new Wishlist
+                {
+                    UserId = Command.Request.UserId,
+                };
+                await _wishlistRepo.AddAsync(wishlist);
+            }
+            wishlist.AddItem(Command.Request.ProductId, product.Name);
+            await _uow.SaveChangesAsync(cancellationToken);
+            return Result.Success();
+
+        }
+    }
+}
