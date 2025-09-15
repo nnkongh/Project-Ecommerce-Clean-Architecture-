@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.DTOs.Product
 {
-    public class OrderItemModel
+    public record OrderItemModel : BaseModel
     {
-        public int Id { get; set; }
         public int ProductId { get; set; }
         public string ProductName { get; set; }
         public decimal UnitPrice { get; set; }

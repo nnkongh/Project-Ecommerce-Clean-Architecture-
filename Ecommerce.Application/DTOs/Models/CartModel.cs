@@ -7,10 +7,9 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.DTOs.Product
 {
-    public class CartModel
+    public record class CartModel : BaseModel
     {
-        public int Id { get; set; }
-        public List<CartItemModel> Items { get; set; } = [];
+        public IReadOnlyList<CartItemModel> Items { get; set; } = [];
         public string UserId { get; set; }
     }
 }

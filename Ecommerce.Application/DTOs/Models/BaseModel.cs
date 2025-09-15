@@ -1,6 +1,6 @@
 ﻿namespace Ecommerce.Application.DTOs.Product
 {
-    public class  BaseProduct
+    public record BaseModel
     {
         public int Id { get; set; }
     }

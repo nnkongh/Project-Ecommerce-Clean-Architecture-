@@ -10,11 +10,10 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Domain.DTOs.Product
 {
-    public class OrderModel : BaseProduct
+    public record OrderModel : BaseModel
     {
-        public int Id { get; set; }
         public int UserId { get; set; }
-        public List<OrderItemModel> orderItems { get; set; } = [];
+        public IReadOnlyList<OrderItemModel> orderItems { get; set; } = [];
         public OrderStatus status { get; set; }
 
     }

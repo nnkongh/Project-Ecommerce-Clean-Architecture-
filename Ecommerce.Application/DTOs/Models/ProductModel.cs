@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.DTOs.Product
 {
-    public class ProductModel : BaseProduct
+    public record ProductModel : BaseModel
     {
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
