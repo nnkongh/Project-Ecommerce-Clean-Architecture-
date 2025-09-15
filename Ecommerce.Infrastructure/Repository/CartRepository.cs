@@ -29,11 +29,5 @@ namespace Ecommerce.Infrastructure.Repository
             var result = await GetAsync(spec);
             return result.Count > 0 ? result[0] : null;
         }
-
-        public async Task<IReadOnlyCollection<CartItem?>> GetCartItemAsync(int cartId)
-        {
-            var list = await _context.Set<CartItem>().Where(c => c.CartId == cartId).AsNoTracking().ToListAsync();
-            return list;
-        }
     }
 }

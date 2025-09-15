@@ -22,29 +22,16 @@ namespace Ecommerce.Infrastructure.Authen
         {
             _userManager = userManager;
         }
-        public async Task<bool> CheckPasswordAsync(string userId, string password)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null) return false;
-            return await _userManager.CheckPasswordAsync(user, password);
-        }
+        public async Task<bool> CheckPasswordAsync(AppUser user, string password)
+            => await _userManager.CheckPasswordAsync(user, password);
 
         public async Task<AppUser?> FindByIdAsync(string id)
-        {
-            var user = await _userManager.FindByIdAsync(id);
-            return user;
-        }
+            => await _userManager.FindByIdAsync(id);
 
         public async Task<AppUser?> FindEmailAsync(string email)
-        {
-            var user = await _userManager.FindByEmailAsync(email);
-            return user;
-        }
+            => await _userManager.FindByEmailAsync(email);
 
         public async Task<AppUser?> FindUserNameAsync(string userName)
-        {
-            var user = await _userManager.FindByNameAsync(userName);
-            return user;
-        }
+            => await _userManager.FindByNameAsync(userName);
     }
 }

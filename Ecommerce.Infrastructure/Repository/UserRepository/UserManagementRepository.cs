@@ -16,15 +16,11 @@ namespace Ecommerce.Infrastructure.Authen
 {
     public class UserManagementRepository : IIdentityManagementUserProvider
     {
-        private readonly IMapper _mapper;
         private readonly UserManager<AppUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public UserManagementRepository(UserManager<AppUser> userManager, RoleManager<IdentityRole> roleManager, IMapper mapper, IUnitOfWork uow)
+        public UserManagementRepository(UserManager<AppUser> userManager)
         {
-            _mapper = mapper;
             _userManager = userManager;
-            _roleManager = roleManager;
         }
 
 
@@ -51,15 +47,14 @@ namespace Ecommerce.Infrastructure.Authen
             return result.Succeeded;
         }
         // LOGIC SAI
-        public async Task UpdateUserAsync(AppUser userDto)
+        public async Task UpdateUserAsync(AppUser appUser)
         {
-            var user = await _userManager.FindByIdAsync(userDto.Id);
+            var user = await _userManager.FindByIdAsync(appUser.Id);
             if (user == null)
             {
                 throw new ArgumentException("User not found");
             }
-            var mapped = _mapper.Map(userDto, user);
-            await _userManager.UpdateAsync(mapped);
+            await _userManager.UpdateAsync(user);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Ecommerce.Application.Interfaces.Authentication;
 using Ecommerce.Infrastructure.Identity;
+using Ecommerce.Infrastructure.Interfaces.Authentication;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -16,11 +17,8 @@ namespace Ecommerce.Infrastructure.Repository.User_Repository
 
         public UserRoleRepository(RoleManager<IdentityRole> roleManager, UserManager<AppUser> userManager) { _roleManager = roleManager; _userManager = userManager; }
 
-        public async Task AddToRoleAsync(string userId, string role)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            await _userManager.AddToRoleAsync(user, role);
-        }
+        public async Task AddToRoleAsync(AppUser user, string role)
+            => await _userManager.AddToRoleAsync(user, role);
 
         public async Task AssignRoleAsync(string role)
         {
@@ -37,10 +35,8 @@ namespace Ecommerce.Infrastructure.Repository.User_Repository
             
         }
 
-        public async Task<bool> IsInRoleAsync(string userId, string role)
+        public async Task<bool> IsInRoleAsync(AppUser user, string role)
         {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null) return false;
             return await _userManager.IsInRoleAsync(user, role);
         }
     }
