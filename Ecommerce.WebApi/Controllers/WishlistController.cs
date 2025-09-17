@@ -7,6 +7,7 @@ using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Ecommerce.WebApi.Controllers
 {
@@ -23,15 +24,20 @@ namespace Ecommerce.WebApi.Controllers
         {
             var command = new AddToWishListCommand(request);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
+            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
         }
         [HttpDelete]
         [Route("delete/{productId}/{userId}")]
-        public async Task<IActionResult> DeleteItemInWishlist(int productId,string userId)
+        public async Task<IActionResult> DeleteItemInWishlist(int productId)
         {
-            var command = new RemoveItemWishlistCommand(productId, userId);
+            var user = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+            var command = new RemoveItemWishlistCommand(productId, user);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
+            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
         }
         [HttpGet]
         [Route("get-by-id/{wishlistId}")]
@@ -39,7 +45,7 @@ namespace Ecommerce.WebApi.Controllers
         {
             var query = new GetItemWishlistByIdQueries(wishlistId);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.IsFailure);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
         }
     }
 }

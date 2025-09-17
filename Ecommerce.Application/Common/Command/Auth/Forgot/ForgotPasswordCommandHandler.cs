@@ -28,7 +28,7 @@ namespace Ecommerce.Application.Common.Command.Auth.Forgot
             var result = await _authService.ForgotPassword(request.model);
             if (result.IsFailure)
             {
-                return Result.Failure<string>(new Error("", "Forgotpassword has been failed"));
+                return Result.Failure<string>(result.Error);
             }
             return Result.Success(result.Value);
         }

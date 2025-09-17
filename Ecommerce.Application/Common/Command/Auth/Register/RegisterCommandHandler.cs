@@ -48,7 +48,7 @@ namespace Ecommerce.Application.Common.Command.Users.RegisterUser
             var result = await _authenticationService.Register(request.register);
             if (result.IsFailure)
             {
-                return Result.Failure(new Error("", "Register has been failed"));
+                return Result.Failure(result.Error);
             }
             var mapped = _mapper.Map<User>(result.Value);
             await _userRepository.AddAsync(mapped);

@@ -38,7 +38,7 @@ namespace Ecommerce.Application.Common.Command.Auth.Reset
             var result = await _authService.ResetPassword(request.model);
             if (result.IsFailure)
             {
-                return Result.Failure(new Error("", "Resetpassword has been failed"));
+                return Result.Failure(result.Error);
             }
             return Result.Success();
         }

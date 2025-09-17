@@ -26,15 +26,19 @@ namespace Ecommerce.Web.Controllers
         {
             var command = new LoginCommand(login);
             var result = await Sender.Send(command);
-            _cookieTokenService.SetTokenInsideCookie(result.Value, HttpContext);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.IsFailure);
+            if (result.IsSuccess)
+            {
+                _cookieTokenService.SetTokenInsideCookie(result.Value, HttpContext);
+                return Ok(result.Value);
+            }
+            return BadRequest(result.Error);
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterModel register)
         {
             var  command = new RegisterCommand(register);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
+            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
         }
         //[HttpPost("logout")]
         //public async Task<IActionResult> Logout(ClaimsPrincipal principal, HttpContext context)
@@ -52,14 +56,14 @@ namespace Ecommerce.Web.Controllers
         {
             var command = new ForgotPasswordCommand(forgotPasswordDto);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result) : BadRequest(result.IsFailure);
+            return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
         }
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordModel resetPasswordDto)
         {
             var command = new ResetPasswordCommand(resetPasswordDto);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
+            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
         }
     }
 }

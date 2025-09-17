@@ -1,12 +1,17 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Ecommerce.WebApi.Controllers.BaseController;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.WebApi.Controllers
 {
-    public class OrderController : Controller
+    [Authorize]
+    [Route("order")]
+    public class OrderController : ApiController
     {
-        public IActionResult Index()
+        public OrderController(ISender sender) : base(sender)
         {
-            return View();
         }
+        
     }
 }

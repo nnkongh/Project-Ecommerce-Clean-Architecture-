@@ -1,4 +1,5 @@
 ﻿using Ecommerce.Application.Common.Command.Carts.AddToCart;
+using Ecommerce.Application.Common.Command.Carts.CheckoutCart;
 using Ecommerce.Application.Common.Command.Carts.RemoveItemInCart;
 using Ecommerce.Application.Common.Queries.Carts.GetCart;
 using Ecommerce.Application.DTOs.CRUD.Cart;
@@ -8,6 +9,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Client;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace Ecommerce.WebApi.Controllers
@@ -37,10 +39,28 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(result.Value) : BadRequest(result.IsFailure);
         }
         [HttpDelete]
-        [Route("delete-item/{productId}/{userId}")]
-        public async Task<IActionResult> DeleteItemInCart([FromRoute]int productId, [FromRoute]string userId)
+        [Route("delete-item/{productId}")]
+        public async Task<IActionResult> DeleteItemInCart([FromRoute]int productId)
         {
-            var command = new RemoveItemCartCommand(productId, userId);
+            var user = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if(user == null)
+            {
+                return Unauthorized();
+            }
+            var command = new RemoveItemCartCommand(productId, user);
+            var result = await Sender.Send(command);
+            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
+        }
+        [HttpPost]
+        [Route("checkout/{userid}")]
+        public async Task<IActionResult> CheckoutCart()
+        {
+            var user = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+            var command = new CheckoutCartCommand(user);
             var result = await Sender.Send(command);
             return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
         }

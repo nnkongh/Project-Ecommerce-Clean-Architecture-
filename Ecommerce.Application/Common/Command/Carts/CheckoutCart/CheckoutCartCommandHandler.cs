@@ -43,19 +43,19 @@ namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
             {
                 return Result.Failure<OrderModel>(new Error("", "Cart not found"));
             }
-            var orderItem = cart.Items.Select(x => new OrderItem
+            var order = new Order {
+                CustomerId = request.userId,
+                OrderDate = DateTime.UtcNow,
+                CustomerName = user.UserName,
+            };
+            foreach(var item in cart.Items)
             {
-                ProductId = x.ProductId,
-                ProductName = x.ProductName,
-                Price = x.UnitPrice,
-                Quantity = x.Quantity,
-                
-            }).ToList();
-            var order = new Order(request.userId, user.Name,orderItem);
-            var mapped = _mapper.Map<OrderModel>(order);
+                order.AddItem(item.ProductId, item.Quantity, item.UnitPrice, item.ProductName);
+            }
             await _orderRepo.AddAsync(order);
             cart.Clear();
             await _uow.SaveChangesAsync(cancellationToken);
+            var mapped = _mapper.Map<OrderModel>(order);
             return Result.Success(mapped);
 
         }

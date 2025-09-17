@@ -25,21 +25,21 @@ namespace Ecommerce.WebApi.Controllers
         {
             var command = new CreateCategoryCommand(model);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
+            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
         }
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             var command = new DeleteCategoryCommand(id);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : NotFound(result.IsFailure);
+            return result.IsSuccess ? Ok(result.IsSuccess) : NotFound(result.Error);
         }
         [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateCategory(int id, UpdateCategoryRequest model)
         {
             var command = new UpdateCategoryCommand(id,model);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : NotFound(result.IsFailure);
+            return result.IsSuccess ? Ok(result.IsSuccess) : NotFound(result.Error);
         }
         [HttpGet("list")]
         public async Task<ActionResult<IEnumerable<CategoryModel>>> GetCategories()
@@ -53,7 +53,7 @@ namespace Ecommerce.WebApi.Controllers
         {
             var query = new GetCategoryByIdQueries(id);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(result.Value) : NotFound(result.IsFailure);
+            return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
         }
     }
 }
