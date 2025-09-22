@@ -14,6 +14,19 @@ namespace Ecommerce.Domain.Models
         public string? ProductName { get; set; }
         public decimal Price { get; set; } 
         public int Quantity { get; set; }
-        
+
+
+        public void IncreasingQuantity(int quantity) => Quantity += quantity;
+        public void DecreasingQuantity(int quantity)
+        {
+            if(quantity >= 0)
+            {
+                Quantity -= quantity;
+            }
+            else
+            {
+                Quantity = 0;
+            }
+        }
     }
 }

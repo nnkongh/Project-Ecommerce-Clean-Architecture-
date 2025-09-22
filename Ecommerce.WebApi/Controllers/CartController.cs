@@ -28,15 +28,15 @@ namespace Ecommerce.WebApi.Controllers
         {
             var command = new AddToCartCommand(request);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
+            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
         }
         [HttpGet]
         [Route("get-cart-id/{id}")]
         public async Task<ActionResult<IReadOnlyList<CartItemModel>>> GetCartItemById(int id)
         {
-            var command = new GetItemQueries(id);
-            var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.IsFailure);
+            var query = new GetItemQuery(id);
+            var result = await Sender.Send(query);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
         }
         [HttpDelete]
         [Route("delete-item/{productId}")]
@@ -49,10 +49,10 @@ namespace Ecommerce.WebApi.Controllers
             }
             var command = new RemoveItemCartCommand(productId, user);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
+            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
         }
         [HttpPost]
-        [Route("checkout/{userid}")]
+        [Route("checkout")]
         public async Task<IActionResult> CheckoutCart()
         {
             var user = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -62,7 +62,7 @@ namespace Ecommerce.WebApi.Controllers
             }
             var command = new CheckoutCartCommand(user);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.IsFailure);
+            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
         }
     }
 }

@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.WebApi.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("category")]
     public class CategoryController : ApiController
     {
@@ -44,14 +44,14 @@ namespace Ecommerce.WebApi.Controllers
         [HttpGet("list")]
         public async Task<ActionResult<IEnumerable<CategoryModel>>> GetCategories()
         {
-            var query = new GetAllCategoriesQueries();
+            var query = new GetAllCategoriesQuery();
             var result = await Sender.Send(query);
             return Ok(result);
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<CategoryModel>>> GetCategoryById(int id)
         {
-            var query = new GetCategoryByIdQueries(id);
+            var query = new GetCategoryByIdQuery(id);
             var result = await Sender.Send(query);
             return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
         }

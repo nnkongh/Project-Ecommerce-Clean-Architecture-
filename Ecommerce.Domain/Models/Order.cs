@@ -13,17 +13,43 @@ namespace Ecommerce.Domain.Models
         public string CustomerId { get; set; }
         public DateTime OrderDate { get; set; } //
         public string CustomerName { get; set; } = null!;
+        public Address? Address { get; set; }
+        public User? User { get; set; }
         public List<OrderItem> Items { get; set; } = [];
         public decimal TotalAmount { get; set; }
         public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending; // Default status is Pending
-        public Order(int id, string customerId, string customerName)
+        public void AddItem(int productId, int quantity, decimal unitPrice, string productName)
         {
-            Id = id;
-            CustomerId = customerId;
-            OrderDate = DateTime.UtcNow;
-            CustomerName = customerName;
-            Items = new List<OrderItem>();
-            TotalAmount = Items.Sum(item => item.Price * item.Quantity);
+            var items = Items.FirstOrDefault(x => x.ProductId == productId);
+            if(items != null)
+            {
+                items.IncreasingQuantity(quantity);
+            }
+            else
+            {
+                var orderItem = new OrderItem
+                {
+                    ProductId = productId,
+                    Quantity = quantity,
+                    Price = unitPrice,
+                    ProductName = productName
+                };
+                Items.Add(orderItem);
+            }
+            CalculateTotal();
+        }
+        public void RemoveItem(int productId)
+        {
+            var items = Items.FirstOrDefault(x => x.ProductId == productId);
+            if(items != null)
+            {
+                Items.Remove(items);
+                CalculateTotal();
+            }
+        }
+        private void CalculateTotal()
+        {
+            TotalAmount = Items.Sum(x => x.Price * x.Quantity);
         }
     }
 }

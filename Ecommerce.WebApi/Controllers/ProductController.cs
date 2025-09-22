@@ -15,7 +15,7 @@ namespace Ecommerce.WebApi.Controllers
 {
 
     [Route("product")]
-    //[Authorize]
+    [Authorize]
     public sealed class ProductController : ApiController
     {
         public ProductController(ISender sender) : base(sender)
@@ -25,28 +25,28 @@ namespace Ecommerce.WebApi.Controllers
         [HttpGet("by-name/{name}")]
         public async Task<IActionResult> SearchProductByName(string name)
         {
-            var query = new GetProductByNameQueries(name);
+            var query = new GetProductByNameQuery(name);
             var result = await Sender.Send(query);
             return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
         }
         [HttpGet("by-category/{id}")]
         public async Task<IActionResult> SearchProductByCategoryId(int id)
         {
-            var query = new GetProductByCategoryIdQueries(id);
+            var query = new GetProductByCategoryIdQuery(id);
             var result = await Sender.Send(query);
             return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
         }
         [HttpGet("search")]
         public async Task<IActionResult> SearchProduct()
         {
-            var query = new GetProductsByCategoryQueries();
+            var query = new GetProductsByCategoryQuery();
             var result = await Sender.Send(query);
             return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
         }
         [HttpGet("list")]
         public async Task<IActionResult> GetList()
         {
-            var query = new GetAllProductsQueries();
+            var query = new GetAllProductsQuery();
             var result = await Sender.Send(query);
             return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
         }

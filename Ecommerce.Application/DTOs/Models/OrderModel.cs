@@ -1,4 +1,5 @@
-﻿using Ecommerce.Application.DTOs.Product;
+﻿using Ecommerce.Application.DTOs.Models;
+using Ecommerce.Application.DTOs.Product;
 using Ecommerce.Domain.Enum;
 using Ecommerce.Domain.Models;
 using System;
@@ -12,9 +13,9 @@ namespace Ecommerce.Domain.DTOs.Product
 {
     public record OrderModel : BaseModel
     {
-        public int UserId { get; set; }
+        public string UserId { get; set; }
+        public AddressModel Address { get; set; }
         public IReadOnlyList<OrderItemModel> orderItems { get; set; } = [];
         public OrderStatus status { get; set; }
-
     }
 }

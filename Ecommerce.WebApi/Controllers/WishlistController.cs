@@ -43,7 +43,7 @@ namespace Ecommerce.WebApi.Controllers
         [Route("get-by-id/{wishlistId}")]
         public async Task<IActionResult> GetItemWishlistById(int wishlistId)
         {
-            var query = new GetItemWishlistByIdQueries(wishlistId);
+            var query = new GetItemWishlistByIdQuery(wishlistId);
             var result = await Sender.Send(query);
             return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
         }
