@@ -1,4 +1,5 @@
 ﻿using Ecommerce.Domain.DTOs.Product;
+using Ecommerce.Domain.Models;
 using Ecommerce.Domain.Shared;
 using MediatR;
 using System;
@@ -7,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
+namespace Ecommerce.Application.Common.Queries.Orders.GetListOrderByUserId
 {
-    public sealed record CheckoutCartCommand(string userId) : IRequest<Result>
+    public sealed record GetListOrderQuery(string userId) : IRequest<Result<IReadOnlyList<OrderModel>>>
     {
     }
 }

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Products.Queries.Products.GetProductByCategory
 {
-    public sealed record GetProductByCategoryIdQueries(int categoryId) : IRequest<Result<IEnumerable<ProductModel>>>
+    public sealed record GetProductByCategoryIdQuery(int categoryId) : IRequest<Result<IEnumerable<ProductModel>>>
     {
     }
 }

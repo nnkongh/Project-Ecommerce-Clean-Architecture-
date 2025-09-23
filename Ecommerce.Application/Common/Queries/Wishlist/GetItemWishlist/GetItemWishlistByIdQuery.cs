@@ -1,5 +1,4 @@
 ﻿using Ecommerce.Application.DTOs.Models;
-using Ecommerce.Application.DTOs.Product;
 using Ecommerce.Domain.Shared;
 using MediatR;
 using System;
@@ -8,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Application.Common.Queries.Carts.GetCart
+namespace Ecommerce.Application.Common.Queries.Wishlist.GetItemWishlist
 {
-    public sealed record GetItemQueries(int id) : IRequest<Result<IReadOnlyList<CartItemModel>>>
+    public sealed record GetItemWishlistByIdQuery(int wishlistId) : IRequest<Result<IReadOnlyList<ItemWishlistModel>>>
     {
     }
 }

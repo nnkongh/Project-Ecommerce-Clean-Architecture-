@@ -17,14 +17,14 @@ namespace Ecommerce.Application.Common.Command.Products.UpdateProduct
 {
     public sealed class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, Result<ProductModel>>
     {
-        private readonly IProductRepository _repo;
+        private readonly IProductRepository _productRepo;
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
 
-        public UpdateProductCommandHandler(IMapper mapper, IProductRepository repo, IUnitOfWork uow)
+        public UpdateProductCommandHandler(IMapper mapper, IProductRepository productRepo, IUnitOfWork uow)
         {
             _mapper = mapper;
-            _repo = repo;
+            _productRepo = productRepo;
             _uow = uow;
         }
 
@@ -38,12 +38,18 @@ namespace Ecommerce.Application.Common.Command.Products.UpdateProduct
             {
                 return Result.Failure<ProductModel>(new Error("", "Price must be greater than zero"));
             }
+            var product = await _productRepo.GetByIdAsync(request.id);
+            if (product == null)
+            {
+                return Result.Failure<ProductModel>(new Error("", $"Product with id {request.id} is not found"));
+            }
             var entity = _mapper.Map<Product>(request.update);
-            var updated = await _repo.UpdateAsync(request.id, entity,
+            var updated = await _productRepo.UpdateAsync(request.id, entity,
                                                     x => x.Name,
                                                     x => x.Price,
                                                     x => x.Description,
-                                                    x => x.ImageUrl);
+                                                    x => x.ImageUrl,
+                                                    x => x.Stock);
             await _uow.SaveChangesAsync(cancellationToken);
             var mapped = _mapper.Map<ProductModel>(updated);
             return Result.Success(mapped);

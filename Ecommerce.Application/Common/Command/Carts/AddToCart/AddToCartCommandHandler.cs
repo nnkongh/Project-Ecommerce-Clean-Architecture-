@@ -32,6 +32,10 @@ namespace Ecommerce.Application.Common.Command.Carts.AddToCart
             {
                 return Result.Failure(new Error("ProductNotFound", "The specified product does not exist."));
             }
+            if(product.Stock < handler.request.quantity)
+            {
+                return Result.Failure(new Error("", $"Product {product.Name} has only {product.Stock} left"));
+            }
             var cart = await _cartRepository.GetCartByUserIdAsync(handler.request.userId);
             if (cart == null)
             {
@@ -42,6 +46,7 @@ namespace Ecommerce.Application.Common.Command.Carts.AddToCart
                 await _cartRepository.AddAsync(cart);
             }
             cart.AddItem(handler.request.productId, handler.request.quantity, product.Price, product.Name);
+            product.Stock -= handler.request.quantity;
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }

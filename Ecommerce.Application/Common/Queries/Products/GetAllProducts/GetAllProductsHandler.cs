@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Products.GetAllProducts
 {
-    public sealed class GetAllProductsHandler : IRequestHandler<GetAllProductsQueries, Result<IEnumerable<ProductModel>>>
+    public sealed class GetAllProductsHandler : IRequestHandler<GetAllProductsQuery, Result<IEnumerable<ProductModel>>>
     {
         private readonly IProductRepository _repo;
         private readonly IMapper _mapper;
@@ -21,7 +21,7 @@ namespace Ecommerce.Application.Common.Queries.Products.GetAllProducts
             _mapper = mapper;
         }
 
-        public async Task<Result<IEnumerable<ProductModel>>> Handle(GetAllProductsQueries request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<ProductModel>>> Handle(GetAllProductsQuery request, CancellationToken cancellationToken)
         {
             var products = await _repo.GetAllAsync();
             if (products is null || !products.Any())

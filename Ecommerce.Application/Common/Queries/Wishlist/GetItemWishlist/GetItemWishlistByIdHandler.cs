@@ -11,17 +11,17 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Wishlist.GetItemWishlist
 {
-    public sealed class GetItemWishlistByIdQueryHandler : IRequestHandler<GetItemWishlistByIdQueries,Result<IReadOnlyList<ItemWishlistModel>>>
+    public sealed class GetItemWishlistByIdHandler : IRequestHandler<GetItemWishlistByIdQuery,Result<IReadOnlyList<ItemWishlistModel>>>
     {
         private readonly IWishlistRepository _wishlistRepo;
         private readonly IMapper _mapper;
-        public GetItemWishlistByIdQueryHandler(IWishlistRepository wishlistRepo, IMapper mapper)
+        public GetItemWishlistByIdHandler(IWishlistRepository wishlistRepo, IMapper mapper)
         {
             _wishlistRepo = wishlistRepo;
             _mapper = mapper;
         }
 
-        public async Task<Result<IReadOnlyList<ItemWishlistModel>>> Handle(GetItemWishlistByIdQueries request, CancellationToken cancellationToken)
+        public async Task<Result<IReadOnlyList<ItemWishlistModel>>> Handle(GetItemWishlistByIdQuery request, CancellationToken cancellationToken)
         {
             var wishlist = await _wishlistRepo.GetWishlistWithItemByIdAsync(request.wishlistId);
             if(wishlist == null)

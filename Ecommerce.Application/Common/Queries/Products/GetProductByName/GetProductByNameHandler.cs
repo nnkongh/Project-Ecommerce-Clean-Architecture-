@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Products.Queries.Products.GetProductByName
 {
-    public sealed class GetProductByNameHandler : IRequestHandler<GetProductByNameQueries, Result<IEnumerable<ProductModel>>>
+    public sealed class GetProductByNameHandler : IRequestHandler<GetProductByNameQuery, Result<IEnumerable<ProductModel>>>
     {
         private readonly IProductRepository _repo;
         private readonly IMapper _mapper;
@@ -23,7 +23,7 @@ namespace Ecommerce.Application.Products.Queries.Products.GetProductByName
             _repo = repo;
             _mapper = mapper;
         }
-        public async Task<Result<IEnumerable<ProductModel>>> Handle(GetProductByNameQueries request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<ProductModel>>> Handle(GetProductByNameQuery request, CancellationToken cancellationToken)
         {
             if (request.name is null)
             {

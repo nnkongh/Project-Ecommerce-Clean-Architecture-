@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Category.GetAllCategories
 {
-    public sealed class GetAllCategoriesHandler : IRequestHandler<GetAllCategoriesQueries, IReadOnlyList<CategoryModel>>
+    public sealed class GetAllCategoriesHandler : IRequestHandler<GetAllCategoriesQuery, IReadOnlyList<CategoryModel>>
     {
         private readonly ICategoryRepository _repo;
         private readonly IMapper _mapper;
@@ -22,7 +22,7 @@ namespace Ecommerce.Application.Common.Queries.Category.GetAllCategories
             _repo = repo;
         }
 
-        public async Task<IReadOnlyList<CategoryModel>> Handle(GetAllCategoriesQueries request, CancellationToken cancellationToken)
+        public async Task<IReadOnlyList<CategoryModel>> Handle(GetAllCategoriesQuery request, CancellationToken cancellationToken)
         {
             var categories = await _repo.GetAllAsync();
             if(categories is null || !categories.Any())

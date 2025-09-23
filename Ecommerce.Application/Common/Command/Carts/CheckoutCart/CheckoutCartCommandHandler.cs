@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using Ecommerce.Application.Common.Command.Orders.CreateOrder;
+using Ecommerce.Application.DTOs.Product;
 using Ecommerce.Domain.DTOs.Product;
+using Ecommerce.Domain.Enum;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Interfaces.UnitOfWork;
 using Ecommerce.Domain.Models;
@@ -14,49 +17,33 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
 {
-    public sealed class CheckoutCartCommandHandler : IRequestHandler<CheckoutCartCommand, Result<OrderModel>>
+    public sealed class CheckoutCartCommandHandler : IRequestHandler<CheckoutCartCommand, Result>
     {
         private readonly ICartRepository _cartRepo;
-        private readonly IOrderRepository _orderRepo;
-        private readonly IUnitOfWork _uow;
-        private readonly IUserRepository _userRepo;
+        private readonly IMediator _mediator;
         private readonly IMapper _mapper;
 
-        public CheckoutCartCommandHandler(ICartRepository cartRepo, IOrderRepository orderRepo, IUserRepository userRepo, IUnitOfWork uow, IMapper mapper)
+        public CheckoutCartCommandHandler(ICartRepository cartRepo, IMapper mapper, IMediator mediator)
         {
             _cartRepo = cartRepo;
-            _orderRepo = orderRepo;
-            _userRepo = userRepo;
-            _uow = uow;
             _mapper = mapper;
+            _mediator = mediator;
         }
 
-        public async Task<Result<OrderModel>> Handle(CheckoutCartCommand request, CancellationToken cancellationToken)
+        public async Task<Result> Handle(CheckoutCartCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userRepo.GetByIdAsync(request.userId);
-            if (user == null)
-            {
-                return Result.Failure<OrderModel>(new Error("", "User not found"));
-            }
             var cart = await _cartRepo.GetCartByUserIdAsync(request.userId);
             if(cart == null)
             {
                 return Result.Failure<OrderModel>(new Error("", "Cart not found"));
             }
-            var order = new Order {
-                CustomerId = request.userId,
-                OrderDate = DateTime.UtcNow,
-                CustomerName = user.UserName,
-            };
-            foreach(var item in cart.Items)
+            if(cart.Items == null || cart.Items.Count == 0)
             {
-                order.AddItem(item.ProductId, item.Quantity, item.UnitPrice, item.ProductName);
+                return Result.Failure<OrderModel>(new Error("", "Cart is empty"));
             }
-            await _orderRepo.AddAsync(order);
-            cart.Clear();
-            await _uow.SaveChangesAsync(cancellationToken);
-            var mapped = _mapper.Map<OrderModel>(order);
-            return Result.Success(mapped);
+            var mapped = _mapper.Map<CartModel>(cart);
+            var result = await _mediator.Send(new CreateOrderCommand(mapped), cancellationToken);
+            return result.IsSuccess ? Result.Success() : Result.Failure(new Error("","Can not create order"));
 
         }
     }

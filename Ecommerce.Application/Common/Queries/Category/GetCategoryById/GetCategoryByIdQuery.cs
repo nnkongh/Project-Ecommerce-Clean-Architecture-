@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Application.Products.Queries.Products.GetProductByName
+namespace Ecommerce.Application.Common.Queries.Category.GetCategoryById
 {
-    public sealed record GetProductByNameQueries(string name) : IRequest<Result<IEnumerable<ProductModel>>>
+    public sealed record GetCategoryByIdQuery(int id) : IRequest<Result<CategoryModel>>
     {
     }
 }

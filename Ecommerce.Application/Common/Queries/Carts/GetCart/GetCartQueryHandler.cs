@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Carts.GetCart
 {
-    public class GetCartQueryHandler : IRequestHandler<GetItemQueries, Result<IReadOnlyList<CartItemModel>>>
+    public class GetCartQueryHandler : IRequestHandler<GetItemQuery, Result<IReadOnlyList<CartItemModel>>>
     {
         private readonly ICartRepository _cartRepository;
         private readonly IMapper _mapper;
@@ -22,7 +22,7 @@ namespace Ecommerce.Application.Common.Queries.Carts.GetCart
             _mapper = mapper;
         }
 
-        public async Task<Result<IReadOnlyList<CartItemModel>>> Handle(GetItemQueries request, CancellationToken cancellationToken)
+        public async Task<Result<IReadOnlyList<CartItemModel>>> Handle(GetItemQuery request, CancellationToken cancellationToken)
         {
             if (request.id <= 0)
             {

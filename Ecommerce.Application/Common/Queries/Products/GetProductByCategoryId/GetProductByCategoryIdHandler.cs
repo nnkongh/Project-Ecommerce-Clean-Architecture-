@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Products.Queries.Products.GetProductByCategory
 {
-    public sealed class GetProductByCategoryIdHandler : IRequestHandler<GetProductByCategoryIdQueries, Result<IEnumerable<ProductModel>>>
+    public sealed class GetProductByCategoryIdHandler : IRequestHandler<GetProductByCategoryIdQuery, Result<IEnumerable<ProductModel>>>
     {
         private readonly IProductRepository _productRepo;
         private readonly ICategoryRepository _categoryRepo;
@@ -25,7 +25,7 @@ namespace Ecommerce.Application.Products.Queries.Products.GetProductByCategory
             _categoryRepo = categoryRepo;
         }
 
-        public async Task<Result<IEnumerable<ProductModel>>> Handle(GetProductByCategoryIdQueries request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<ProductModel>>> Handle(GetProductByCategoryIdQuery request, CancellationToken cancellationToken)
         {
             if(request.categoryId <= 0)
             {
