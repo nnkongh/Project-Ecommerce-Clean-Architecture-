@@ -32,7 +32,7 @@ namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
 
         public async Task<Result> Handle(CheckoutCartCommand request, CancellationToken cancellationToken)
         {
-            var cart = await _cartRepo.GetCartByUserIdAsync(request.userId);
+            var cart = await _cartRepo.GetCartWithItemByUserIdAsync(request.userId);
             if(cart == null)
             {
                 return Result.Failure<OrderModel>(new Error("", "Cart not found"));

@@ -24,14 +24,10 @@ namespace Ecommerce.Application.Common.Command.Carts.RemoveItemInCart
 
         public async Task<Result> Handle(RemoveItemCartCommand request, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(request.userId))
-            {
-                return Result.Failure(new Error("NotFound", "UserId must be provided."));
-            }
-            var cart = await _cartRepo.GetCartByUserIdAsync(request.userId);
+            var cart = await _cartRepo.GetByIdAsync(request.cartId);
             if (cart == null)
             {
-                return Result.Failure(new Error("CartNotFound", "The specified cart does not exist."));
+                return Result.Failure(new Error("CartNotFound", $"Cart with item {request.cartId} does not exist."));
             }
             
             var product = await _productRepo.GetByIdAsync(request.productId);
@@ -40,7 +36,7 @@ namespace Ecommerce.Application.Common.Command.Carts.RemoveItemInCart
                 return Result.Failure(new Error("", "Product not found"));
             }
             var existingItem = cart.Items.Any(x => x.ProductId == request.productId);
-            if (!existingItem)
+            if (!existingItem) 
             {
                 return Result.Failure(new Error("", $"Can not delete because your cart does not contain item {product.Name}"));
             }

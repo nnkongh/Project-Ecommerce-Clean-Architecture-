@@ -34,9 +34,9 @@ namespace Ecommerce.Application.Common.Command.Carts.AddToCart
             }
             if(product.Stock < handler.request.quantity)
             {
-                return Result.Failure(new Error("", $"Product {product.Name} has only {product.Stock} left"));
+                return Result.Failure(new Error("", $"Product {product.Name} has only {product.Stock} items left"));
             }
-            var cart = await _cartRepository.GetCartByUserIdAsync(handler.request.userId);
+            var cart = await _cartRepository.GetCartWithItemByUserIdAsync(handler.request.userId);
             if (cart == null)
             {
                 cart = new Cart
