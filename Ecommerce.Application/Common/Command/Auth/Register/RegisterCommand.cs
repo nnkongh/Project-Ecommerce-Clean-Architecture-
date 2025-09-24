@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Users.CreateUser
 {
-    public sealed record RegisterCommand(RegisterModel register) : IRequest<Result>
+    public sealed record RegisterCommand(RegisterModel register) : IRequest<Result<UserModel>>
     {
     }
 }

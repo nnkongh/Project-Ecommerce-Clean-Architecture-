@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Users.RegisterUser
 {
-    public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result>
+    public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<UserModel>>
     {
         private readonly IAuthenticationService _authenticationService;
         private readonly IUserRepository _userRepository;
@@ -31,29 +31,29 @@ namespace Ecommerce.Application.Common.Command.Users.RegisterUser
             _authenticationService = authenticationService;
         }
 
-        public async Task<Result> Handle(RegisterCommand request, CancellationToken cancellationToken)
+        public async Task<Result<UserModel>> Handle(RegisterCommand request, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(request.register.UserName)
                    || string.IsNullOrWhiteSpace(request.register.Email)
                    || string.IsNullOrWhiteSpace(request.register.Password)
                    || string.IsNullOrWhiteSpace(request.register.ConfirmPassword))
             {
-                return Result.Failure(new Error("", "Can not pass empty"));
+                return Result.Failure<UserModel>(new Error("", "Can not pass empty"));
             }
             // Validation
             if (!string.Equals(request.register.Password, request.register.ConfirmPassword, StringComparison.OrdinalIgnoreCase))
             {
-                return Result.Failure(new Error("", "Password and confirm password do not match"));
+                return Result.Failure<UserModel>(new Error("", "Password and confirm password do not match"));
             }
             var result = await _authenticationService.Register(request.register);
             if (result.IsFailure)
             {
-                return Result.Failure(result.Error);
+                return Result.Failure<UserModel>(result.Error);
             }
             var mapped = _mapper.Map<User>(result.Value);
             await _userRepository.AddAsync(mapped);
             await _uow.SaveChangesAsync(cancellationToken);
-            return Result.Success(result);
+            return Result.Success(result.Value);
         }
     }
 }
