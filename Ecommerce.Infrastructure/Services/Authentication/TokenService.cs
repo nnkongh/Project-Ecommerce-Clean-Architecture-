@@ -5,8 +5,11 @@ using Ecommerce.Application.DTOs.EmailMessage;
 using Ecommerce.Application.Interfaces;
 using Ecommerce.Application.Interfaces.Authentication;
 using Ecommerce.Domain.Entities;
+using Ecommerce.Domain.Interfaces;
+using Ecommerce.Domain.Shared;
 using Ecommerce.Infrastructure.Exceptions;
 using Ecommerce.Infrastructure.Identity;
+using Ecommerce.Infrastructure.Interfaces.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -28,28 +31,24 @@ namespace Ecommerce.Infrastructure.Services.Authen
     public class TokenService : ITokenService
     {
         private readonly IConfiguration _config;
-        private readonly IEmailService _emailService;
-        private readonly IUserAuthenticationService _userAuthenticationService;
-        private readonly IUserManagementService _userManagermentService;
-        private readonly IUserRoleService _userRoleService;
-        private readonly IUserTokenService _userTokenService;
+        private readonly IIdentityUserProvider _userAuthenticationService;
+        private readonly IIdentityManagementUserProvider _userManagermentService;
+        private readonly IIdentityRole _userRoleService;
         private readonly SymmetricSecurityKey _key;
         private readonly IMapper _mapper;
 
-        public TokenService(IUserAuthenticationService userAuthenticationService,
-            IEmailService emailService,
+        public TokenService(IIdentityUserProvider userAuthenticationService,
             IConfiguration config,
-            IUserManagementService userManagermentService,
-            IUserRoleService userRoleService,
+            IIdentityManagementUserProvider userManagermentService,
+            IIdentityRole userRoleService,
             IUserTokenService userTokenService,
-            IMapper mapper)
+            IMapper mapper,
+            IUserRepository userRepository)
         {
             _userManagermentService = userManagermentService;
             _userRoleService = userRoleService;
-            _userTokenService = userTokenService;
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]!));
             _config = config;
-            _emailService = emailService;
             _userAuthenticationService = userAuthenticationService;
             _mapper = mapper;
         }
@@ -112,7 +111,8 @@ namespace Ecommerce.Infrastructure.Services.Authen
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var accessToken = tokenHandler.WriteToken(token);
-            await _userManagermentService.UpdateUserAsync(userDto);
+            var mapped = _mapper.Map<AppUser>(userDto);
+            await _userManagermentService.UpdateUserAsync(mapped);
             return new TokenModel
             {
                 AccessToken = accessToken,
@@ -125,12 +125,12 @@ namespace Ecommerce.Infrastructure.Services.Authen
             var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Email, userDto.Email!),
-                new Claim(JwtRegisteredClaimNames.Sub, userDto.UserName!),
+                new Claim(JwtRegisteredClaimNames.Sub, userDto.Id!),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.NameIdentifier, userDto.Id!),
-                new Claim(ClaimTypes.Name, userDto.UserName!),
+                new Claim(JwtRegisteredClaimNames.Name, userDto.UserName!),
             };
-            var role = await _userRoleService.GetRolesAsync(userDto.Id);
+            var appUser = _mapper.Map<AppUser>(userDto);
+            var role = await _userRoleService.GetRolesAsync(appUser);
             claims.AddRange(role.Select(role => new Claim(ClaimTypes.Role, role)));
             return claims;  
         }
@@ -145,40 +145,15 @@ namespace Ecommerce.Infrastructure.Services.Authen
             return Convert.ToBase64String(randomNumber);
         }
 
-      
-    
-        public async Task Register(RegisterModel register)
-        {
-           
-            try
-            {
-                
-                //var result = await _userManagermentService.CreateUserAsync(user,register.Password);
-                
-            } catch (Exception ex)
-            {
-                // Log the exception (ex) here if needed
-                throw new Exception("An error occurred while processing the registration request.", ex);
-            };
-        }
-
-
-
-        public async Task ResetPassword(ResetPasswordModel resetPasswordDto)
-        {
-           
-        }
-
-
-        public async Task Logout(ClaimsPrincipal principal, HttpContext context)
-        {
-            var userClaim = principal.FindFirst(ClaimTypes.NameIdentifier);
-            var user = await _userAuthenticationService.FindByIdAsync(userClaim.Value);
-            var mapped = _mapper.Map<UserModel>(user);
-            mapped.RefreshToken = null;
-            mapped.ExpiryRefreshToken = DateTime.MinValue;
-
-            await _userManagermentService.UpdateUserAsync(mapped);
-        }
+        //public async Task<Result> RevokeRefreshToken(string userId)
+        //{
+        //    var user = await _userRepository.GetUserByIdAsync(userId);
+        //    if(user == null)
+        //    {
+        //        return Result.Failure(new Error("", "User does not exist"));
+        //    }
+        //    var mapped = _mapper.Map<AppUser>(user);
+        //    await _userRepository.UpdateAsync(userId,mapped, x => x.);
+        //}
     }
 }
