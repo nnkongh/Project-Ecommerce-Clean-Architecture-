@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ecommerce.Application.DTOs.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,10 +12,10 @@ namespace Ecommerce.Application.DTOs
         public string Id { get; set; } = default!;
         public string UserName { get; set; } = default!;
         public string IdentityId { get; set; } = default!;
-        public string Address { get; set; } = default!;
+        public AddressModel Address { get; set; } = default!;
         public string PhoneNumber { get; set; } = default!;
         public string Email { get; set; } = default!;
-        public string Role { get; set; } = default!;
+        public IEnumerable<string> Role { get; set; } = default!;
         public string ImageUrl { get; set; } = default!;
         public string RefreshToken { get; set; } = default!;
         public DateTime ExpiryRefreshToken { get; set; }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.DTOs.CRUD.Product
 {
-    public record UpdateProductRequest(string Name, string Description, string ImageUrl, decimal Price)
+    public record UpdateProductRequest(string Name, string Description, string ImageUrl, decimal Price, int Stock)
     {
 
     }
