@@ -39,7 +39,7 @@ namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
             {
                 return Result.Failure<OrderModel>(new Error("", "User not found"));
             }
-            var cart = await _cartRepo.GetCartByUserIdAsync(request.cart.UserId);
+            var cart = await _cartRepo.GetByIdAsync(request.cart.Id);
             if(cart == null)
             {
                 return Result.Failure<OrderModel>(new Error("", "Cart is not found"));
