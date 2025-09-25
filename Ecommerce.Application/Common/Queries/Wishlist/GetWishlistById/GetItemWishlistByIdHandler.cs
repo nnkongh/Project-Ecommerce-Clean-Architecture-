@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Wishlist.GetItemWishlist
 {
-    public sealed class GetItemWishlistByIdHandler : IRequestHandler<GetItemWishlistByIdQuery,Result<IReadOnlyList<ItemWishlistModel>>>
+    public sealed class GetItemWishlistByIdHandler : IRequestHandler<GetItemWishlistByIdQuery,Result<WishlistModel>>
     {
         private readonly IWishlistRepository _wishlistRepo;
         private readonly IMapper _mapper;
@@ -21,18 +21,18 @@ namespace Ecommerce.Application.Common.Queries.Wishlist.GetItemWishlist
             _mapper = mapper;
         }
 
-        public async Task<Result<IReadOnlyList<ItemWishlistModel>>> Handle(GetItemWishlistByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<WishlistModel>> Handle(GetItemWishlistByIdQuery request, CancellationToken cancellationToken)
         {
             var wishlist = await _wishlistRepo.GetWishlistWithItemByIdAsync(request.wishlistId);
             if(wishlist == null)
             {
-                return Result.Failure<IReadOnlyList<ItemWishlistModel>>(new Error("", "Wishlist is empty"));
+                return Result.Failure<WishlistModel>(new Error("", "Wishlist not found"));
             }
             if(wishlist.Items.Count == 0 || wishlist.Items == null)
             {
-                return Result.Success<IReadOnlyList<ItemWishlistModel>>(new List<ItemWishlistModel>());
+                return Result.Failure<WishlistModel>(new Error("","Wishlist is empty"));
             }
-            var mapped = _mapper.Map<IReadOnlyList<ItemWishlistModel>>(wishlist.Items);
+            var mapped = _mapper.Map<WishlistModel>(wishlist);
             return Result.Success(mapped);
 
         }

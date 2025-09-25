@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Wishlists.RemoveItemInWishlist
 {
-    public sealed record RemoveItemWishlistCommand(int productId, string userId) : IRequest<Result>
+    public sealed record RemoveItemWishlistCommand(int productId, int wishlistId) : IRequest<Result>
     {
     }
 }

@@ -27,12 +27,7 @@ namespace Ecommerce.Application.Common.Command.Wishlists.RemoveItemInWishlist
 
         public async Task<Result> Handle(RemoveItemWishlistCommand request, CancellationToken cancellationToken)
         {
-            var user = await _userRepo.GetByIdAsync(request.userId);
-            if (user == null)
-            {
-                return Result.Failure<UserModel>(new Error("", "User is not found"));
-            }
-            var wishlist = await _wishlistRepo.GetWishlistByUserIdAsync(user.Id);
+            var wishlist = await _wishlistRepo.GetWishlistWithItemByIdAsync(request.wishlistId);
             if (wishlist == null)
             {
                 return Result.Failure(new Error("", "wishlist is empty"));

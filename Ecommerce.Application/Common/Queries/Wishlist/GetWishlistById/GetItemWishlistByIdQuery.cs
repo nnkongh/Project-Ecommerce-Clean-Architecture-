@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Wishlist.GetItemWishlist
 {
-    public sealed record GetItemWishlistByIdQuery(int wishlistId) : IRequest<Result<IReadOnlyList<ItemWishlistModel>>>
+    public sealed record GetItemWishlistByIdQuery(int wishlistId) : IRequest<Result<WishlistModel>>
     {
     }
 }
