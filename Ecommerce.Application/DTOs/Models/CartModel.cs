@@ -10,6 +10,5 @@ namespace Ecommerce.Application.DTOs.Product
     public record class CartModel : BaseModel
     {
         public IReadOnlyList<CartItemModel> Items { get; set; } = [];
-        public string UserId { get; set; }
     }
 }
