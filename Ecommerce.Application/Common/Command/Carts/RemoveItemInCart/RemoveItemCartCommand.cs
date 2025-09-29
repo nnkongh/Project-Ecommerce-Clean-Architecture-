@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Carts.RemoveItemInCart
 {
-    public sealed record RemoveItemCartCommand(int cartId, int productId, int quantity) : IRequest<Result>
+    public sealed record RemoveItemCartCommand(string userId, int productId) : IRequest<Result>
     {
     }
 }

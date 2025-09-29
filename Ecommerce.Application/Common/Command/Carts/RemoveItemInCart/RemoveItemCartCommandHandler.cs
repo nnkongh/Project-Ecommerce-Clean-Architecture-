@@ -24,10 +24,10 @@ namespace Ecommerce.Application.Common.Command.Carts.RemoveItemInCart
 
         public async Task<Result> Handle(RemoveItemCartCommand request, CancellationToken cancellationToken)
         {
-            var cart = await _cartRepo.GetByIdAsync(request.cartId);
+            var cart = await _cartRepo.GetCartWithItemByUserIdAsync(request.userId);
             if (cart == null)
             {
-                return Result.Failure(new Error("CartNotFound", $"Cart with item {request.cartId} does not exist."));
+                return Result.Failure(new Error("", $"Cart not found."));
             }
             
             var product = await _productRepo.GetByIdAsync(request.productId);
@@ -35,13 +35,13 @@ namespace Ecommerce.Application.Common.Command.Carts.RemoveItemInCart
             {
                 return Result.Failure(new Error("", "Product not found"));
             }
-            var existingItem = cart.Items.Any(x => x.ProductId == request.productId);
-            if (!existingItem) 
+            var existingItem = cart.Items.Count(x => x.ProductId == request.productId);
+            if (existingItem == 0) 
             {
                 return Result.Failure(new Error("", $"Can not delete because your cart does not contain item {product.Name}"));
             }
             cart.RemoveItem(request.productId);
-            product.Stock += request.quantity;
+            product.Stock += existingItem;
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }

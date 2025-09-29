@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Carts.AddToCart
 {
-    public sealed record AddToCartCommand(AddToCartRequest request) : IRequest<Result>
+    public sealed record AddToCartCommand(AddToCartRequest request, string userId) : IRequest<Result>
     {
     }
 }

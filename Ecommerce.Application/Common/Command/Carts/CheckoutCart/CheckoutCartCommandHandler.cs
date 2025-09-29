@@ -41,9 +41,9 @@ namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
             {
                 return Result.Failure<OrderModel>(new Error("", "Cart is empty"));
             }
-            var mapped = _mapper.Map<CartModel>(cart);
-            var result = await _mediator.Send(new CreateOrderCommand(mapped), cancellationToken);
-            return result.IsSuccess ? Result.Success() : Result.Failure(new Error("","Can not create order"));
+            var cartDto = _mapper.Map<CartModel>(cart);
+            var result = await _mediator.Send(new CreateOrderByCartCommand(cartDto, request.userId), cancellationToken);
+            return result.IsSuccess ? Result.Success("Order created successfully") : Result.Failure(new Error("","Can not create order"));
 
         }
     }

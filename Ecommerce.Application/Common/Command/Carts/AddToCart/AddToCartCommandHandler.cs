@@ -16,18 +16,25 @@ namespace Ecommerce.Application.Common.Command.Carts.AddToCart
     public sealed class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, Result>
     {
         private readonly IUnitOfWork _uow;
-        private readonly ICartRepository _cartRepository;
-        private readonly IProductRepository _productRepository;
-        public AddToCartCommandHandler(IUnitOfWork unitOfWork, ICartRepository cartRepository, IProductRepository productRepository)
+        private readonly ICartRepository _cartRepo;
+        private readonly IProductRepository _productRepo;
+        private readonly IUserRepository _userRepo;
+        public AddToCartCommandHandler(IUnitOfWork unitOfWork, ICartRepository cartRepo, IProductRepository productRepo, IUserRepository userRepo)
         {
             _uow = unitOfWork;
-            _cartRepository = cartRepository;
-            _productRepository = productRepository;
+            _cartRepo = cartRepo;
+            _productRepo = productRepo;
+            _userRepo = userRepo;
         }
 
         public async Task<Result> Handle(AddToCartCommand handler, CancellationToken cancellationToken)
         {
-            var product = await _productRepository.GetByIdAsync(handler.request.productId);
+            var user = await _userRepo.GetByIdAsync(handler.userId);
+            if(user == null)
+            {
+                return Result.Failure(new Error("", "User not found"));
+            }
+            var product = await _productRepo.GetByIdAsync(handler.request.productId);
             if (product == null)
             {
                 return Result.Failure(new Error("ProductNotFound", "The specified product does not exist."));
@@ -36,14 +43,14 @@ namespace Ecommerce.Application.Common.Command.Carts.AddToCart
             {
                 return Result.Failure(new Error("", $"Product {product.Name} has only {product.Stock} items left"));
             }
-            var cart = await _cartRepository.GetCartWithItemByUserIdAsync(handler.request.userId);
+            var cart = await _cartRepo.GetCartWithItemByUserIdAsync(handler.userId);
             if (cart == null)
             {
                 cart = new Cart
                 {
-                    UserId = handler.request.userId,
+                    UserId = handler.userId,
                 };
-                await _cartRepository.AddAsync(cart);
+                await _cartRepo.AddAsync(cart);
             }
             cart.AddItem(handler.request.productId, handler.request.quantity, product.Price, product.Name);
             product.Stock -= handler.request.quantity;
