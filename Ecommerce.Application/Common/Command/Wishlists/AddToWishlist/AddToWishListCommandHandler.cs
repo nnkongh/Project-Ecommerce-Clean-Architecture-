@@ -38,30 +38,38 @@ namespace Ecommerce.Application.Common.Command.Wishlists.AddToWishlist
             {
                 return Result.Failure<WishlistModel>(new Error("", $"Product with id {Command.Request.ProductId} is not found"));
             }
-            var existingUser = await _userRepo.GetByIdAsync(Command.Request.UserId);
+            var existingUser = await _userRepo.GetByIdAsync(Command.userId);
             if (existingUser == null)
             {
                 return Result.Failure<WishlistModel>(new Error("", $"User does not exist"));
             }
             var wishlist = await _wishlistRepo.GetWishlistWithItemByIdAsync(Command.Request.wishlistId);
 
-            if (wishlist == null)
+            if (wishlist != null)
+            {
+                var existingItem = wishlist.Items.FirstOrDefault(x => x.ProductId == Command.Request.ProductId);
+                if (existingItem != null)
+                {
+                    return Result.Failure<WishlistModel>(new Error("", $"Item {product.Name} has already exist in your wishlist"));
+                }
+                wishlist.AddItem(Command.Request.ProductId, product.Name);
+                await _uow.SaveChangesAsync(cancellationToken);
+                var mapped = _mapper.Map<WishlistModel>(wishlist);
+                return Result.Success(mapped);
+            }
+            else
             {
                 wishlist = new Wishlist
                 {
                     UserId = Command.Request.UserId,
                 };
+
+                wishlist.AddItem(Command.Request.ProductId, product.Name);
+                await _wishlistRepo.AddAsync(wishlist);
+                await _uow.SaveChangesAsync(cancellationToken);
+                var mapped = _mapper.Map<WishlistModel>(wishlist);
+                return Result.Success(mapped);
             }
-            var existingItem = wishlist.Items.FirstOrDefault(x => x.ProductId == Command.Request.ProductId);
-            if (existingItem != null)
-            {
-                return Result.Failure<WishlistModel>(new Error("", $"Item {product.Name} has already exist in your wishlist"));
-            }
-            wishlist.AddItem(Command.Request.ProductId, product.Name);
-            await _wishlistRepo.AddAsync(wishlist);
-            await _uow.SaveChangesAsync(cancellationToken);
-            var mapped = _mapper.Map<WishlistModel>(wishlist);
-            return Result.Success(mapped);
         }
     }
 }

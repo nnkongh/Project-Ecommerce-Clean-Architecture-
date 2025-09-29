@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Wishlists.AddToWishlist
 {
-    public sealed record AddToWishListCommand(AddToWishlistRequest Request) : IRequest<Result<WishlistModel>>
+    public sealed record AddToWishListCommand(AddToWishlistRequest Request, string userId) : IRequest<Result<WishlistModel>>
     {
     }
 }
