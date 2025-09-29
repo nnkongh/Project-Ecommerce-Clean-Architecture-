@@ -44,7 +44,7 @@ namespace Ecommerce.Application.Common.Command.Products.UpdateProduct
                 return Result.Failure<ProductModel>(new Error("", $"Product with id {request.id} is not found"));
             }
             var entity = _mapper.Map<Product>(request.update);
-            var updated = await _productRepo.UpdateAsync(request.id, entity,
+            var updated = await _productRepo.UpdatePartialAsync(request.id, entity,
                                                     x => x.Name,
                                                     x => x.Price,
                                                     x => x.Description,
