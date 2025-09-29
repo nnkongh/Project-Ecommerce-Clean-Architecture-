@@ -19,10 +19,15 @@ namespace Ecommerce.Infrastructure.Repository
         {
         }
 
-        public async Task<IEnumerable<Order>> GetOrdersByUserNameAsync(string userName)
+        public async Task<IReadOnlyList<Order>> GetOrdersByUserIdAsync(string userId)
         {
-            var item = new OrderWithUsernameSpecification(userName);
+            var item = new OrderWithItemSpecification(userId);
             return await GetAsync(item);
+        }
+        public async Task<Order> GetOrderByIdAsync(int orderId)
+        {
+            var item = new OrderWithItemSpecification(orderId);
+            return await GetEnityWithSpecAsync(item);
         }
     }
 }

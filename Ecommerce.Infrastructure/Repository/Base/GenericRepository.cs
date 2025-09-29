@@ -46,8 +46,7 @@ namespace Ecommerce.Infrastructure.Repository.Base
    
         public async Task<IReadOnlyList<T>> GetByAsync(Expression<Func<T, bool>> predicate)
         {
-            return await _context.Set<T>().Where(predicate)
-                .ToListAsync();
+            return await _context.Set<T>().Where(predicate).ToListAsync();
         }
 
         public virtual async Task<T?> GetByIdAsync(TKey id)
@@ -55,10 +54,10 @@ namespace Ecommerce.Infrastructure.Repository.Base
             return await _context.Set<T>().FindAsync(id);
         }
 
-        public virtual async  Task<bool> UpdateAsync(TKey id, T entity, params Expression<Func<T,object>>[] propertiesToUpdate)
+        public virtual async  Task<T?> UpdatePartialAsync(TKey id, T entity, params Expression<Func<T,object>>[] propertiesToUpdate)
         {
             var existing = await _context.Set<T>().FindAsync(id);
-            if (existing == null) return false;
+            if (existing == null) return null;
 
             if(propertiesToUpdate?.Length > 0)
             {
@@ -70,7 +69,7 @@ namespace Ecommerce.Infrastructure.Repository.Base
                     _context.Entry(existing).Property(prop).CurrentValue = newValue;
                 }
             }
-            return true;
+            return entity;
         }
         public async Task<IReadOnlyList<T>> GetAllAsync()
         {
@@ -120,6 +119,12 @@ namespace Ecommerce.Infrastructure.Repository.Base
         public async Task<T?> GetEnityWithSpecAsync(ISpecification<T> spec)
         {
             return await ApplySpecification(spec).FirstOrDefaultAsync();
+        }
+
+        public Task<T> Update(T entity)
+        {
+            _context.Set<T>().Update(entity);
+            return Task.FromResult(entity);
         }
     }
 }

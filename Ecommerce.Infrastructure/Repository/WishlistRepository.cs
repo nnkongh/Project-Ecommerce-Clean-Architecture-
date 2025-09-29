@@ -19,17 +19,23 @@ namespace Ecommerce.Infrastructure.Repository
         {
             
         }
+
         public async Task<Wishlist?> GetWishlistWithItemByIdAsync(int wishListId)
         {
             var spec = new WishListWithItemsSpecification(wishListId);
             return await GetEnityWithSpecAsync(spec);
         }
 
-        public async Task<Wishlist?> GetWishlistByUserIdAsync(string userId)
+        public async Task<IReadOnlyList<Wishlist>> GetWishlistsWithItemByUserIdAsync(string userId)
+        {
+            var spec = new WishListWithItemsSpecification(userId);
+            return await GetAsync(spec);
+        }
+
+        public async Task<Wishlist> GetWishlistWithItemByUserId(string userId)
         {
             var spec = new WishListWithItemsSpecification(userId);
             return await GetEnityWithSpecAsync(spec);
         }
-
     }
 }
