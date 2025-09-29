@@ -1,5 +1,7 @@
 ﻿using Ecommerce.Application.DTOs;
 using Ecommerce.Application.DTOs.Authentication;
+using Ecommerce.Domain.Models;
+using Ecommerce.Domain.Shared;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +12,10 @@ namespace Ecommerce.Application.Interfaces
 {
     public interface IAuthenticationService
     {
-        Task<TokenModel> Login(LoginModel model);
-        Task<UserModel> Register(RegisterModel model);
-        Task ForgotPassword(ForgotPasswordModel model);
-        Task ResetPassword(ResetPasswordModel model);
+        Task<Result<UserModel>> Login(LoginModel model);
+        Task<Result<UserModel>> Register(RegisterModel model);
+        Task<Result> ForgotPassword(ForgotPasswordModel model); 
+        Task<Result> ResetPassword(ResetPasswordModel model);
 
     }
 }
