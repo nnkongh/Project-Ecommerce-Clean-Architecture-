@@ -2,6 +2,7 @@
 using Ecommerce.Application.Interfaces.Authentication;
 using Ecommerce.Domain.Entities;
 using Ecommerce.Infrastructure.Exceptions;
+using Ecommerce.Infrastructure.Interfaces.Authentication;
 using MailKit.Net.Smtp;
 using MimeKit;
 using System;
@@ -18,7 +19,7 @@ namespace Ecommerce.Infrastructure.Services.Email
         private readonly EmailConfiguration _emailConfiguration;
 
         public EmailService(EmailConfiguration emailConfiguration) { _emailConfiguration = emailConfiguration; }
-        public void SendEmail(Message msg)
+        public async Task SendEmail(Message msg)
         {
             var mimeMessage = new MimeMessage();
             mimeMessage.From.Add(new MailboxAddress("",_emailConfiguration.From));
@@ -31,16 +32,16 @@ namespace Ecommerce.Infrastructure.Services.Email
                 try
                 {
                     client.AuthenticationMechanisms.Remove("XOAUTH2");
-                    client.Connect(_emailConfiguration.SmtpServer, _emailConfiguration.Port, true);
-                    client.Authenticate(_emailConfiguration.Username, _emailConfiguration.Password);
-                    client.Send(mimeMessage);
+                    await client.ConnectAsync(_emailConfiguration.SmtpServer, _emailConfiguration.Port, true);
+                    await client.AuthenticateAsync(_emailConfiguration.Username, _emailConfiguration.Password);
+                    await client.SendAsync(mimeMessage);
                 }catch(SmtpCommandException e)
                 {
                     throw new EmailSenderException("Error sending email", e);
                 }
                 finally
                 {
-                    client.Disconnect(true);
+                    await client.DisconnectAsync(true);
                     client.Dispose();
                 }
             }
