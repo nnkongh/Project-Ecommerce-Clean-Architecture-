@@ -36,7 +36,7 @@ namespace Ecommerce.Application.Common.Command.Categories.UpdateCategory
                 return Result.Failure<CategoryModel>(new Error("", $"Category with id {request.id}"));
             }
             var category = _mapper.Map<Category>(request.update);
-            var updated = await _categoryRepository.UpdateAsync(request.id,
+            var updated = await _categoryRepository.UpdatePartialAsync(request.id,
                                                                 category,
                                                                 x => x.Name, x => x.Description);
             var mapped = _mapper.Map<CategoryModel>(updated);
