@@ -10,7 +10,8 @@ namespace Ecommerce.Domain.Interfaces
 {
     public interface IWishlistRepository : IRepositoryBase<Wishlist,int>
     {
-        Task<Wishlist?> GetWishlistWithItemByIdAsync(int id);
-        Task<Wishlist?> GetWishlistByUserIdAsync(string userId);
+        Task<Wishlist?> GetWishlistWithItemByIdAsync(int wishlistId);
+        Task<IReadOnlyList<Wishlist>> GetWishlistsWithItemByUserIdAsync(string userId);
+        Task<Wishlist> GetWishlistWithItemByUserId(string userId);
     }
 }
