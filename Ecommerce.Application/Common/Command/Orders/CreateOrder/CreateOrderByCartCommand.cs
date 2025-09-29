@@ -1,4 +1,4 @@
-﻿using Ecommerce.Application.DTOs.CRUD.Order;
+﻿using Ecommerce.Application.DTOs.Product;
 using Ecommerce.Domain.DTOs.Product;
 using Ecommerce.Domain.Shared;
 using MediatR;
@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
 {
-    public sealed record CreateOrderCommand(CreateOrderRequest request, string userId) : IRequest<Result<OrderModel>>
+    public sealed record CreateOrderByCartCommand(CartModel cart, string userId) : IRequest<Result<OrderModel>>
     {
     }
 }
