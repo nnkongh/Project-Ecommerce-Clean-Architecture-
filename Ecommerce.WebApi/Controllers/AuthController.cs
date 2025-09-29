@@ -38,7 +38,7 @@ namespace Ecommerce.Web.Controllers
         {
             var  command = new RegisterCommand(register);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
         }
         //[HttpPost("logout")]
         //public async Task<IActionResult> Logout(ClaimsPrincipal principal, HttpContext context)

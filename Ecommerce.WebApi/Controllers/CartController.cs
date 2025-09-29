@@ -1,7 +1,9 @@
 ﻿using Ecommerce.Application.Common.Command.Carts.AddToCart;
 using Ecommerce.Application.Common.Command.Carts.CheckoutCart;
 using Ecommerce.Application.Common.Command.Carts.RemoveItemInCart;
+using Ecommerce.Application.Common.Command.Carts.UpdateCart;
 using Ecommerce.Application.Common.Queries.Carts.GetCart;
+using Ecommerce.Application.Common.Queries.Carts.GetCartByUserId;
 using Ecommerce.Application.DTOs.CRUD.Cart;
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.WebApi.Controllers.BaseController;
@@ -15,7 +17,7 @@ using System.Threading.Tasks;
 namespace Ecommerce.WebApi.Controllers
 {
     [Authorize]
-    [Route("Cart")]
+    [Route("cart")]
     public class CartController : ApiController
      {
         public CartController(ISender sender) : base(sender)
@@ -26,28 +28,37 @@ namespace Ecommerce.WebApi.Controllers
         [Route("add-to-cart")]
         public async Task<IActionResult> AddItemToCart(AddToCartRequest request)
         {
-            var command = new AddToCartCommand(request);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) {
+                return Unauthorized();
+            }
+            var command = new AddToCartCommand(request,userId);
             var result = await Sender.Send(command);
             return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
         }
         [HttpGet]
-        [Route("get-cart-id/{id}")]
-        public async Task<ActionResult<IReadOnlyList<CartItemModel>>> GetCartItemById(int id)
-        {
-            var query = new GetItemQuery(id);
-            var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
-        }
-        [HttpDelete]
-        [Route("delete-item/{productId}")]
-        public async Task<IActionResult> DeleteItemInCart([FromRoute]int productId)
+        [Route("get-cart-id/")]
+        public async Task<IActionResult> GetCartItemById()
         {
             var user = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if(user == null)
             {
                 return Unauthorized();
             }
-            var command = new RemoveItemCartCommand(productId, user);
+            var query = new GetCartByUserIdQuery(user);
+            var result = await Sender.Send(query);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+        }
+        [HttpDelete]
+        [Route("delete-item/{productId}/quantity/{quantity}")]
+        public async Task<IActionResult> DeleteItemInCart([FromRoute]int productId, int quantity)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if(userId == null)
+            {
+                return Unauthorized();
+            }
+            var command = new RemoveItemCartCommand(userId, productId);
             var result = await Sender.Send(command);
             return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
         }
@@ -63,6 +74,32 @@ namespace Ecommerce.WebApi.Controllers
             var command = new CheckoutCartCommand(user);
             var result = await Sender.Send(command);
             return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
+        }
+        [HttpGet]
+        [Route("get-list-cart")]
+        public async Task<IActionResult> GetListCartByUserId()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if(userId == null)
+            {
+                return Unauthorized();
+            }
+            var query = new GetCartByUserIdQuery(userId);
+            var result = await Sender.Send(query);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+        }
+        [HttpPut]
+        [Route("reduce-item/{productId}/{quantity}")]
+        public async Task<IActionResult> ReduceItemInCart(int productId, int quantity)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if(userId == null)
+            {
+                return Unauthorized();
+            }
+            var command = new UpdateCartCommand(productId, quantity, userId);
+            var result = await Sender.Send(command);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
         }
     }
 }

@@ -1,6 +1,9 @@
-﻿using Ecommerce.Application.Common.Queries.Orders;
+﻿using Ecommerce.Application.Common.Command.Orders.CreateOrder;
+using Ecommerce.Application.Common.Queries.Orders;
 using Ecommerce.Application.Common.Queries.Orders.GetListOrderByUserId;
 using Ecommerce.Application.Common.Queries.Orders.GetOrderById;
+using Ecommerce.Application.DTOs.CRUD.Order;
+using Ecommerce.Application.DTOs.Product;
 using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -34,6 +37,18 @@ namespace Ecommerce.WebApi.Controllers
             var query = new GetOrderByIdQuery(orderId);
             var result = await Sender.Send(query);
             return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+        }
+        [HttpPost("create-order")]
+        public async Task<IActionResult> CreateOrder(CreateOrderRequest order)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var command = new CreateOrderCommand(order,userId);
+            var result = await Sender.Send(command);
+            return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
         }
         
     }
