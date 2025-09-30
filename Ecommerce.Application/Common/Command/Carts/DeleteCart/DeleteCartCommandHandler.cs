@@ -38,7 +38,7 @@ namespace Ecommerce.Application.Common.Command.Carts.DeleteCart
                     product.Stock += item.Quantity;
                 }
             }
-            await _cartRepository.Delete(cart.Id);
+            await _cartRepository.Delete(cart);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }
