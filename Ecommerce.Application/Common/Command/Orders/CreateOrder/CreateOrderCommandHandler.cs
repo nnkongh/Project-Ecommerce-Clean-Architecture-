@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
 {
-    public sealed class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Result<OrderModel>>
+    public sealed class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Result<Domain.DTOs.Product.OrderModel>>
     {
         private readonly IProductRepository _productRepo;
         private readonly IOrderRepository _orderRepo;
@@ -30,17 +30,17 @@ namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
             _uow = uow;
         }
 
-        public async Task<Result<OrderModel>> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
+        public async Task<Result<Domain.DTOs.Product.OrderModel>> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
         {
             var product = await _productRepo.GetByIdAsync(command.request.ProductId);
             if (product == null)
             {
-                return Result.Failure<OrderModel>(new Error("", $"Product not found"));
+                return Result.Failure<Domain.DTOs.Product.OrderModel>(new Error("", $"Product not found"));
             }
             var user = await _userRepo.GetByIdAsync(command.userId);
             if (user == null)
             {
-                return Result.Failure<OrderModel>(new Error("", "User not found"));
+                return Result.Failure<Domain.DTOs.Product.OrderModel>(new Error("", "User not found"));
             }
             var order = new Order
             {
@@ -54,7 +54,7 @@ namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
             await _orderRepo.AddAsync(order);
             product.Stock -= command.request.Quantity;
             await _uow.SaveChangesAsync(cancellationToken);
-            var orderDto = _mapper.Map<OrderModel>(order);
+            var orderDto = _mapper.Map<Domain.DTOs.Product.OrderModel>(order);
             return Result.Success(orderDto);
 
 

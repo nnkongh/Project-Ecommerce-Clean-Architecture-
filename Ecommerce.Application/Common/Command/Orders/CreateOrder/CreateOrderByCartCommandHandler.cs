@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
 {
-    public sealed class CreateOrderByCartCommandHandler : IRequestHandler<CreateOrderByCartCommand, Result<OrderModel>>
+    public sealed class CreateOrderByCartCommandHandler : IRequestHandler<CreateOrderByCartCommand, Result<Domain.DTOs.Product.OrderModel>>
     {
         private readonly IOrderRepository _orderRepo;
         private readonly IMapper _mapper;
@@ -57,6 +57,7 @@ namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
                 order.AddItem(item.ProductId,item.Quantity ,item.UnitPrice, item.ProductName!);
             }
             cart.Clear();
+            await _cartRepo.Delete(cart);
             await _orderRepo.AddAsync(order);
             await _uow.SaveChangesAsync(cancellationToken);
             var mapped = _mapper.Map<OrderModel>(order);
