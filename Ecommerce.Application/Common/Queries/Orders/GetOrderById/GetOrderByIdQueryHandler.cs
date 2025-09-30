@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Ecommerce.Domain.DTOs.Product;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Models;
 using Ecommerce.Domain.Shared;
@@ -12,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Orders.GetOrderById
 {
-    public sealed class GetOrderByIdQueryHandler : IRequestHandler<GetOrderByIdQuery, Result<Order>>
+    public sealed class GetOrderByIdQueryHandler : IRequestHandler<GetOrderByIdQuery, Result<OrderModel>>
     {
         private readonly IOrderRepository _orderRepo;
         private readonly IMapper _mapper;
@@ -22,14 +23,14 @@ namespace Ecommerce.Application.Common.Queries.Orders.GetOrderById
             _mapper = mapper;
         }
 
-        public async Task<Result<Order>> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<OrderModel>> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken)
         {
             var order = await _orderRepo.GetOrderByIdAsync(request.orderId);
             if(order == null)
             {
-                return Result.Failure<Order>(new Error("", "Order is not found"));
+                return Result.Failure<OrderModel>(new Error("", "Order is not found"));
             }
-            var mapped = _mapper.Map<Order>(order);
+            var mapped = _mapper.Map<OrderModel>(order);
             return Result.Success(mapped);
         }
     }
