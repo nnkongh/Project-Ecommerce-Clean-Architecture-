@@ -13,9 +13,8 @@ namespace Ecommerce.Domain.DTOs.Product
 {
     public record OrderModel : BaseModel
     {
-        public string UserId { get; set; }
         public AddressModel Address { get; set; }
-        public IReadOnlyList<OrderItemModel> orderItems { get; set; } = [];
+        public IReadOnlyList<OrderItemModel> Items { get; set; } = [];
         public OrderStatus status { get; set; }
     }
 }
