@@ -14,12 +14,12 @@ namespace Ecommerce.Application.Common.Command.Products.DeleteProduct
 {
     public sealed class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand, Result>
     {
-        private readonly IProductRepository _repo;
+        private readonly IProductRepository _productRepo;
         private readonly IUnitOfWork _uow;
 
-        public DeleteProductCommandHandler(IProductRepository repo, IUnitOfWork uow)
+        public DeleteProductCommandHandler(IProductRepository productRepo, IUnitOfWork uow)
         {
-            _repo = repo;
+            _productRepo = productRepo;
             _uow = uow;
         }
 
@@ -29,10 +29,10 @@ namespace Ecommerce.Application.Common.Command.Products.DeleteProduct
             {
                 return Result.Failure(new Error("", "Id is not found"));
             }
-            var deleted = await _repo.Delete(request.id);
-            if (!deleted)
+            var product = await _productRepo.GetByIdAsync(request.id);
+            if (product == null)
             {
-                return Result.Failure(new Error("Not Found", $"Can not delete product with id {request.id} cause its not found"));
+                return Result.Failure(new Error("", "Item not found"));
             }
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success();
