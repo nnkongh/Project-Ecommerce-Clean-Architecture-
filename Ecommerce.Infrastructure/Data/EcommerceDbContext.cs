@@ -28,6 +28,24 @@ namespace Ecommerce.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
             // Nếu không có dòng này thì migration sẽ tạo lại các bảng đã có
+
+            modelBuilder.Entity<Order>()
+                .HasOne(x => x.User)
+                .WithMany(x => x.Orders)
+                .HasForeignKey(x => x.CustomerId);
+
+            modelBuilder.Entity<Order>()
+                .OwnsOne(x => x.Address); 
+
+            modelBuilder.Entity<User>()
+                .OwnsOne(x => x.Address);
+
+            modelBuilder.Entity<Wishlist>()
+                .HasMany(x => x.Items)
+                .WithOne(x => x.WishList)
+                .HasForeignKey(x => x.WishListId)
+                .OnDelete(DeleteBehavior.Cascade);
+                
         }
     }
 }
