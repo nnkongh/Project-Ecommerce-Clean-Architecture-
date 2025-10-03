@@ -10,9 +10,9 @@ namespace Ecommerce.Web.Controllers
     [ApiController]
     public class TokenController : ControllerBase
     {
-        private readonly IAuthenticationService _authService;
+        private readonly IAuthService _authService;
 
-        public TokenController(IAuthenticationService authService)
+        public TokenController(IAuthService authService)
         {
             _authService = authService;
         }

@@ -40,6 +40,18 @@ namespace Ecommerce.Web.Controllers
             var result = await Sender.Send(command);
             return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
         }
+        [HttpPost("login-external")]
+        public async Task<IActionResult> LoginExternal(ExternalLoginModel model)
+        {
+            var command = new LoginExternalCommand(model);
+            var result = await Sender.Send(command);
+            if (result.IsSuccess)
+            {
+                _cookieTokenService.SetTokenInsideCookie(result.Value, HttpContext);
+                return Ok(result.Value);
+            }
+            return BadRequest(result.Error);
+        }
         //[HttpPost("logout")]
         //public async Task<IActionResult> Logout(ClaimsPrincipal principal, HttpContext context)
         //{
