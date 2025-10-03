@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs;
+using Ecommerce.Domain.Models;
 using Ecommerce.Infrastructure.Identity;
 using System;
 using System.Collections.Generic;
@@ -15,12 +16,12 @@ namespace Ecommerce.Infrastructure.Mapper
         {
             CreateMap<AppUser, UserModel>().ForMember(dest => dest.Role, opt => opt.Ignore());
             CreateMap<UserModel, AppUser>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore())
                 .ForMember(dest => dest.SecurityStamp, opt => opt.Ignore())
                 .ForMember(dest => dest.ConcurrencyStamp, opt => opt.Ignore())
                 .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
                 .ForMember(dest => dest.NormalizedEmail, opt => opt.Ignore())
                 .ForMember(dest => dest.NormalizedUserName, opt => opt.Ignore());
+
 
         }
     }

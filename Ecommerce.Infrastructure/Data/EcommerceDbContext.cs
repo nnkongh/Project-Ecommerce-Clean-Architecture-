@@ -45,7 +45,11 @@ namespace Ecommerce.Infrastructure.Data
                 .WithOne(x => x.WishList)
                 .HasForeignKey(x => x.WishListId)
                 .OnDelete(DeleteBehavior.Cascade);
-                
+
+            modelBuilder.Entity<Wishlist>()
+                .HasOne(x => x.User)
+                .WithMany(x => x.Wishlist)
+                .HasForeignKey(x => x.UserId);
         }
     }
 }

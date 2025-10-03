@@ -202,21 +202,18 @@ namespace Ecommerce.Infrastructure.Services.Authentication
                 {
                     user = new AppUser
                     {
-                        UserName = externalUser.Name,
+                        UserName = externalUser.Email,
                         Email = externalUser.Email,
                         EmailConfirmed = true,
                     };
                     var result = await _userManagementService.CreateUserExternalAsync(user);
-                    var mapped = _mapper.Map<User>(result);
-                    await _userRepository.AddAsync(mapped);
-                    await _uow.SaveChangesAsync(cancellationToken);
                 }
                 var loginInfo = new UserLoginInfo(
                     loginProvider: model.ProviderType.ToString(),
                     providerKey: externalUser.ProviderId,
                     displayName: model.ProviderType.ToString());
                 var addLoginResult = await _userManagementService.AddLoginAsync(user, loginInfo);
-                if (addLoginResult.Succeeded)
+                if (!addLoginResult.Succeeded)
                 {
                     return Result.Failure<UserModel>(new Error("", "Failed to link external login"));
                 }
