@@ -27,15 +27,10 @@ namespace Ecommerce.Infrastructure.Repository.Base
 
         }
 
-        public virtual async Task<bool> Delete(TKey id)
+        public virtual Task Delete(T entity)
         {
-            var entity = await _context.Set<T>().FindAsync(id);
-            if(entity != null)
-            {
-                _context.Set<T>().Remove(entity);
-                return true;
-            }
-            return false;
+             _context.Set<T>().Remove(entity);
+            return Task.FromResult(entity);
         }
 
         public async Task<IReadOnlyList<T>> GetAll()

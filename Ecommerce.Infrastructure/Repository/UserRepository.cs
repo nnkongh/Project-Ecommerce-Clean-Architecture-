@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Ecommerce.Application.Interfaces.Base;
+using Ecommerce.Domain.Enum;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Models;
 using Ecommerce.Infrastructure.Data;
@@ -15,27 +15,18 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Infrastructure.Repository
 {
-    public class UserRepository : GenericRepository<User,string>, IUserRepository
+    public class UserRepository : GenericRepository<User, string>, IUserRepository
     {
 
         public UserRepository(EcommerceDbContext context) : base(context)
         {
         }
 
+        public async Task<User?> FindByEmailAsync(string email)
+        {
+            return await _context.User.FirstOrDefaultAsync(x => x.Email == email);
+        }
 
-
-        //public async Task<User?> GetUserByIdAsync(string id)
-        //{
-        //    var user = await _context.Set<User>().FirstOrDefaultAsync(x => x.Id == id);
-        //    if (user == null) return null;
-        //    return user;
-        //}
-
-        //public async Task<User?> GetUserByUsernameAsync(string username)
-        //{
-        //    var user = await _context.Set<User>().FirstOrDefaultAsync(x => string.Equals(x.UserName,username,StringComparison.OrdinalIgnoreCase));
-        //    if (user == null) return null;
-        //    return user;
-        //}
+       
     }
 }
