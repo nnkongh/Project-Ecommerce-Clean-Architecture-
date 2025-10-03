@@ -1,4 +1,6 @@
-﻿namespace Ecommerce.Domain.Models
+﻿using System.Text.Json.Serialization;
+
+namespace Ecommerce.Domain.Models
 {
     public class ItemWishList
     {

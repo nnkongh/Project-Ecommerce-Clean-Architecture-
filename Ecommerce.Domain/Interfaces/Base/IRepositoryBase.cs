@@ -23,6 +23,6 @@ namespace Ecommerce.Domain.Interfaces.Base
         Task<T> AddAsync(T entity);
         Task<T?> UpdatePartialAsync(TKey id, T entity, params Expression<Func<T, object>>[] propertiesToUpdate);
         Task<T> Update(T entity);
-        Task<bool> Delete(TKey id);
+        Task Delete(T entity);
     }
 }

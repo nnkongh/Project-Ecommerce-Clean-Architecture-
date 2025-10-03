@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs;
 using Ecommerce.Application.Interfaces.Authentication;
+using Ecommerce.Domain.Enum;
 using Ecommerce.Domain.Models;
 using Ecommerce.Infrastructure.Identity;
 using Microsoft.AspNetCore.Http;
@@ -33,5 +34,10 @@ namespace Ecommerce.Infrastructure.Services.Authentication
 
         public async Task<AppUser?> FindUserNameAsync(string userName)
             => await _userManager.FindByNameAsync(userName);
+
+        public async Task<AppUser?> GetProviderAsync(ProviderType providerType, string providerUserId)
+        {
+            return await _userManager.FindByLoginAsync(providerType.ToString(), providerUserId);
+        }
     }
 }

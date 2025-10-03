@@ -1,4 +1,5 @@
-﻿using Ecommerce.Domain.Interfaces.Base;
+﻿using Ecommerce.Domain.Enum;
+using Ecommerce.Domain.Interfaces.Base;
 using Ecommerce.Domain.Models;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,6 @@ namespace Ecommerce.Domain.Interfaces
 {
     public interface IUserRepository : IRepositoryBase<User, string>
     {
-        //Task<User?> GetUserByUsernameAsync(string username);
-        //Task<User?> GetUserByIdAsync(string id);
+        Task<User?> FindByEmailAsync(string email);
     }
 }

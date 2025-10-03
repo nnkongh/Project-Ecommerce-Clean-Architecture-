@@ -40,6 +40,18 @@ namespace Ecommerce.Domain.Models
                 item.DecreaseQuantity(item.Quantity);
             }
         }
+        public void ReduceQuantityItem(int productId,int quantity) {
+            var item = Items.FirstOrDefault(x => x.ProductId == productId);
+            if(item != null)
+            {
+                if(item.Quantity == 1)
+                {
+                    Items.Remove(item);
+                }
+                item.DecreaseQuantity(quantity);
+                
+            }
+        }
         public void Clear()
         {
             Items.Clear();

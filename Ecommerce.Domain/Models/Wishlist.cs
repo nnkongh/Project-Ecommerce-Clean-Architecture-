@@ -6,6 +6,8 @@ namespace Ecommerce.Domain.Models
     {
         public int Id { get; set; }
         public string? UserId { get; set; }
+        public DateTime CreatedDate { get; set; }
+        public string Name { get; set; } = string.Empty;
         public User? User { get; set; }
         public List<ItemWishList> Items { get; set; } = new List<ItemWishList>();
 
@@ -20,6 +22,7 @@ namespace Ecommerce.Domain.Models
                     ProductName = productName,
                 });
             }
+       
         }
         public void RemoveItem(int ProductId)
         {

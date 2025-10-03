@@ -23,17 +23,24 @@ namespace Ecommerce.Infrastructure.Services.Authentication
             _userManager = userManager;
         }
 
+        public async Task<IdentityResult> AddLoginAsync(AppUser user, UserLoginInfo loginInfo)
+        {
+            return await _userManager.AddLoginAsync(user, loginInfo);
+        }
 
         public async Task<AppUser> CreateUserAsync(AppUser Appuser, string password)
         {
             var result = await _userManager.CreateAsync(Appuser,password);
             var role = await _userManager.AddToRoleAsync(Appuser, "User");
-            if (!result.Succeeded)
-            {
-                throw new Exception("User creation failed: " + string.Join(", ", result.Errors.Select(e => e.Description)));
-            }
             return Appuser;
             
+        }
+
+        public async Task<AppUser> CreateUserExternalAsync(AppUser user)
+        {
+            var result = await _userManager.CreateAsync(user);
+            var role = await _userManager.AddToRoleAsync(user, "User");
+            return user;
         }
 
         public async Task<bool> DeleteUserAsync(string userId)
