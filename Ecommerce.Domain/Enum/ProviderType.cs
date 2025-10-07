@@ -8,8 +8,8 @@ namespace Ecommerce.Domain.Enum
 {
     public enum ProviderType
     {
-        Email,
-        Facebook,
-        Google
+        Email = 0,
+        Facebook = 1,
+        Google = 3
     }
 }
