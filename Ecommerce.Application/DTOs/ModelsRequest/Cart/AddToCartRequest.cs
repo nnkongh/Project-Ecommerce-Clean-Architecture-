@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.DTOs.CRUD.Cart
 {
-    public sealed record AddToCartRequest(string userId, int productId, int quantity)
+    public sealed record AddToCartRequest(int productId, int quantity)
     {
     }
 }

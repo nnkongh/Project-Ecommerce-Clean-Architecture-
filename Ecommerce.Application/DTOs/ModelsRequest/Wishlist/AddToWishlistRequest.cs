@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.DTOs.ModelsRequest.Wishlist
 {
-    public record AddToWishlistRequest(int ProductId, string UserId)
+    public record AddToWishlistRequest(int ProductId, string UserId, int wishlistId)
     {
     }
 }
