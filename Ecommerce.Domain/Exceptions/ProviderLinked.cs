@@ -12,4 +12,8 @@ namespace Ecommerce.Domain.Exceptions
         {
         }
     }
+    public class DuplicateProductException : Exception
+    {
+        public DuplicateProductException(int productId) : base($"Product with ID {productId} already exists in wishlist") { }
+    }
 }
