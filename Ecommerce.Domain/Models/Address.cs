@@ -20,5 +20,27 @@ namespace Ecommerce.Domain.Models
             }
             return District == other.District && City == other.City && PostalCode == other.PostalCode && Ward == other.Ward;
         }
+        public static Address Create(string? district, string? city, string postalcode, string? ward)
+        {
+            var address = new Address()
+            {
+                District = district,
+                City = city,
+                PostalCode = postalcode,
+                Ward = ward
+            };
+            return address;
+        }
+        public static Address Update(string? district, string? city, string postalcode, string? ward)
+        {
+            var address = new Address()
+            {
+                District = district,
+                City = city,
+                PostalCode = postalcode,
+                Ward = ward
+            };
+            return address;
+        }
     }
 }

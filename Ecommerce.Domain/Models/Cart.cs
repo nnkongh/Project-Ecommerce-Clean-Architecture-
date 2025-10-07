@@ -13,8 +13,21 @@ namespace Ecommerce.Domain.Models
         public string? UserId { get; set; }
         public List<CartItem> Items { get; set; } = [];
 
+
+        public static Cart CreateCart(string UserId)
+        {
+            var cart = new Cart()
+            {
+                UserId = UserId,
+            };
+            return cart;
+        }
         public void AddItem(int productId, int quantity, decimal unitPrice, string productName)
         {
+            if(quantity < 0 || unitPrice < 0)
+            {
+                throw new ArgumentException("Quantity/Price cannot be negative");
+            }
             var existingItem = Items.FirstOrDefault(i => i.ProductId == productId);
             if(existingItem != null)
             {
@@ -40,16 +53,11 @@ namespace Ecommerce.Domain.Models
                 item.DecreaseQuantity(item.Quantity);
             }
         }
-        public void ReduceQuantityItem(int productId,int quantity) {
+        public void ReduceItemQuantity(int productId,int quantity) {
             var item = Items.FirstOrDefault(x => x.ProductId == productId);
             if(item != null)
             {
-                if(item.Quantity == 1)
-                {
-                    Items.Remove(item);
-                }
                 item.DecreaseQuantity(quantity);
-                
             }
         }
         public void Clear()

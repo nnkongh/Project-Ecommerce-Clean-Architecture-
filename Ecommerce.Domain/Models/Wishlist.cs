@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using Ecommerce.Domain.Exceptions;
+using System.Text.Json.Serialization;
 
 namespace Ecommerce.Domain.Models
 {
@@ -11,6 +12,16 @@ namespace Ecommerce.Domain.Models
         public User? User { get; set; }
         public List<ItemWishList> Items { get; set; } = new List<ItemWishList>();
 
+
+        public static Wishlist Create(string userId, string name)
+        {
+            var wishlist = new Wishlist()
+            {
+                UserId = userId,
+                Name = name
+            };
+            return wishlist;
+        }
         public void AddItem(int ProductId, string productName)
         {
             var existing = Items.FirstOrDefault(x => x.ProductId == ProductId);
@@ -21,6 +32,10 @@ namespace Ecommerce.Domain.Models
                     ProductId = ProductId,
                     ProductName = productName,
                 });
+            }
+            else
+            {
+                throw new DuplicateProductException(ProductId);
             }
        
         }
