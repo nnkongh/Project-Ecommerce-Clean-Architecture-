@@ -46,10 +46,7 @@ namespace Ecommerce.Application.Common.Command.Carts.AddToCart
             var cart = await _cartRepo.GetCartWithItemByUserIdAsync(handler.userId);
             if (cart == null)
             {
-                cart = new Cart
-                {
-                    UserId = handler.userId,
-                };
+                cart = Cart.CreateCart(handler.userId);
                 await _cartRepo.AddAsync(cart);
             }
             cart.AddItem(handler.request.productId, handler.request.quantity, product.Price, product.Name);
