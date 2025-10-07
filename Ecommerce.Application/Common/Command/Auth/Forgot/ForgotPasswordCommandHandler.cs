@@ -12,9 +12,9 @@ namespace Ecommerce.Application.Common.Command.Auth.Forgot
 {
     public sealed class ForgotPasswordCommandHandler : IRequestHandler<ForgotPasswordCommand, Result>
     {
-        private readonly IAuthenticationService _authService;
+        private readonly IAuthService _authService;
 
-        public ForgotPasswordCommandHandler(IAuthenticationService authService)
+        public ForgotPasswordCommandHandler(IAuthService authService)
         {
             _authService = authService;
         }

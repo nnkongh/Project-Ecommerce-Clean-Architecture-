@@ -12,9 +12,9 @@ namespace Ecommerce.Application.Common.Command.Auth.Reset
 {
     public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand, Result>
     {
-        private readonly IAuthenticationService _authService;
+        private readonly IAuthService _authService;
 
-        public ResetPasswordCommandHandler(IAuthenticationService authService)
+        public ResetPasswordCommandHandler(IAuthService authService)
         {
             _authService = authService;
         }

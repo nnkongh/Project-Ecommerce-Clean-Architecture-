@@ -18,12 +18,12 @@ namespace Ecommerce.Application.Common.Command.Users.RegisterUser
 {
     public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<UserModel>>
     {
-        private readonly IAuthenticationService _authenticationService;
+        private readonly IAuthService _authenticationService;
         private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _uow;
 
-        public RegisterCommandHandler(IUnitOfWork uow, IMapper mapper, IUserRepository userRepository, IAuthenticationService authenticationService)
+        public RegisterCommandHandler(IUnitOfWork uow, IMapper mapper, IUserRepository userRepository, IAuthService authenticationService)
         {
             _uow = uow;
             _mapper = mapper;

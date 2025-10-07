@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Ecommerce.Application.DTOs;
+﻿using Ecommerce.Application.DTOs;
 using Ecommerce.Application.DTOs.Authentication;
 using Ecommerce.Application.Interfaces;
 using Ecommerce.Domain.Interfaces;
@@ -15,9 +14,9 @@ namespace Ecommerce.Application.Common.Command.Auth.Login
 {
     public sealed class LoginCommandHandler : IRequestHandler<LoginCommand, Result<TokenModel>>
     {
-        private readonly IAuthenticationService _authService;
+        private readonly IAuthService _authService;
         private readonly ITokenService _tokenService;
-        public LoginCommandHandler(IAuthenticationService authService, ITokenService tokenService)
+        public LoginCommandHandler(IAuthService authService, ITokenService tokenService)
         {
             _authService = authService;
             _tokenService = tokenService;
