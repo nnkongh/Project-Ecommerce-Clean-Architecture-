@@ -14,13 +14,13 @@ namespace Ecommerce.Application.Common.Command.Categories.DeleteCategory
 {
     public sealed class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryCommand, Result>
     {
-        private readonly ICategoryRepository _repository;
+        private readonly ICategoryRepository _categoryRepo;
         private readonly IUnitOfWork _uow;
 
 
-        public DeleteCategoryCommandHandler(ICategoryRepository repository, IUnitOfWork unitOfWork)
+        public DeleteCategoryCommandHandler(ICategoryRepository cartRepo, IUnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _categoryRepo = cartRepo;
             _uow = unitOfWork;
         }
 
@@ -30,11 +30,12 @@ namespace Ecommerce.Application.Common.Command.Categories.DeleteCategory
             {
                 return Result.Failure<Result>(Error.NullValue);
             }
-            var deleted = await _repository.Delete(request.id);
-            if (!deleted)
+            var category = await _categoryRepo.GetByIdAsync(request.id);
+            if (category == null)
             {
-                return Result.Failure(new Error("404", "Not Found"));
+                return Result.Failure(new Error("", "Category not found"));
             }
+            await _categoryRepo.Delete(category);
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }
