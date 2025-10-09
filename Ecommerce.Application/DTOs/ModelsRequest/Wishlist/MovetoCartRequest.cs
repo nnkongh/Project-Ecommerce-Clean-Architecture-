@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.DTOs.ModelsRequest.Wishlist
 {
-    public record AddToWishlistRequest(int ProductId, int wishlistId)
+    public sealed record MovetoCartRequest
     {
+        public int ProductId { get; set; }
     }
 }

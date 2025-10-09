@@ -12,6 +12,7 @@ namespace Ecommerce.Application.DTOs.Models
 {
     public sealed record WishlistModel  : BaseModel
     {
+        public string Name { get; set; } = string.Empty;
         public IReadOnlyList<ItemWishlistModel> Items { get; set; } = new List<ItemWishlistModel>();
     }
 
