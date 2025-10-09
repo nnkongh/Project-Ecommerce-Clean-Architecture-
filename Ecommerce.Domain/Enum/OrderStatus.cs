@@ -12,4 +12,9 @@ namespace Ecommerce.Domain.Enum
         Processing,    // Order is being prepared
         Finished,      // Order has been completed
     }
+    public enum CartStatus
+    {
+        Active,
+        Expired
+    }
 }

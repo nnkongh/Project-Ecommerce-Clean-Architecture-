@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Ecommerce.Domain.Enum;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,10 @@ namespace Ecommerce.Domain.Models
         public int Id { get; set; }
         public User? User { get; set; }        
         public string? UserId { get; set; }
+        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
+        public DateTime? ExpiredAt { get;private set; } = DateTime.UtcNow.AddMinutes(2);
+        public CartStatus Status { get; set; } = CartStatus.Active;
         public List<CartItem> Items { get; set; } = [];
 
 
@@ -43,6 +48,28 @@ namespace Ecommerce.Domain.Models
                     UnitPrice = unitPrice,
                 });
             }
+            MarkAsUpdated();
+        }
+        public void AddItemFromWishlist(int productId, string productName, decimal unitPrice, int quantity = 1)  // 1 Wishlist không chứa nhiều product có cùng 1 id
+        {
+            var existingItem = Items.FirstOrDefault(x => x.ProductId == productId);
+            if (existingItem != null)
+            {
+                existingItem.IncreaseQuantity(quantity);
+               
+            }
+            else
+            {
+                Items.Add(new CartItem()
+                {
+                    ProductId = productId,
+                    ProductName = productName,
+                    Quantity = quantity,
+                    UnitPrice = unitPrice,
+
+                });
+            }
+            MarkAsUpdated();
         }
         public void RemoveItem(int productId)
         {
@@ -52,6 +79,7 @@ namespace Ecommerce.Domain.Models
                 Items.Remove(item);
                 item.DecreaseQuantity(item.Quantity);
             }
+            MarkAsUpdated();
         }
         public void ReduceItemQuantity(int productId,int quantity) {
             var item = Items.FirstOrDefault(x => x.ProductId == productId);
@@ -59,10 +87,21 @@ namespace Ecommerce.Domain.Models
             {
                 item.DecreaseQuantity(quantity);
             }
+            MarkAsUpdated();
         }
         public void Clear()
         {
             Items.Clear();
+        }
+        public void MarkAsExpired()
+        {
+            Status = CartStatus.Expired;
+            UpdatedAt = DateTime.UtcNow;
+        }
+        private void MarkAsUpdated()
+        {
+            UpdatedAt = DateTime.UtcNow;
+            ExpiredAt = DateTime.UtcNow.AddDays(1);
         }
     }
 }

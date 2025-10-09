@@ -10,12 +10,12 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Interfaces
 {
-    public interface IAuthenticationService
+    public interface IAuthService
     {
         Task<Result<UserModel>> Login(LoginModel model);
         Task<Result<UserModel>> Register(RegisterModel model);
         Task<Result> ForgotPassword(ForgotPasswordModel model); 
         Task<Result> ResetPassword(ResetPasswordModel model);
-
+        Task<Result<UserModel>> LoginExternalProvider(ExternalLoginModel model,CancellationToken cancellationToken); 
     }
 }

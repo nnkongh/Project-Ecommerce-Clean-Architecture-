@@ -7,5 +7,12 @@ namespace Ecommerce.Domain.Interfaces
     {
         Task<Cart?> GetCartWithItemByUserIdAsync(string userId);
         Task<Cart?> GetCartWithItemByIdAsync(int cartId);
+
+
+        //System
+        Task<List<Cart>> GetExpiredCartsAsync(DateTime currentTime, CancellationToken cancellationToken);
+        void UpdateRange(IEnumerable<Cart> carts, CancellationToken cancellationToken);
+        void DeleteRange(IEnumerable<Cart> carts, CancellationToken cancellationToken);
+
     }
 }
