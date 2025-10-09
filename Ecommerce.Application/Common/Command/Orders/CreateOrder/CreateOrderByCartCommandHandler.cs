@@ -39,22 +39,19 @@ namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
             {
                 return Result.Failure<OrderModel>(new Error("", "User not found"));
             }
+            if(user.Address == null)
+            {
+                return Result.Failure<OrderModel>(new Error("", "User address not found"));
+            }
             var cart = await _cartRepo.GetByIdAsync(request.cart.Id);
             if(cart == null)
             {
-                return Result.Failure<OrderModel>(new Error("", "Cart is not found"));
+                return Result.Failure<OrderModel>(new Error("", "Cart not found"));
             }
-            var order = new Order
+            var order = Order.CreateOrder(request.userId, user.UserName!, user.Address!);
+            foreach(var item in cart.Items)
             {
-                CustomerId = user.Id,
-                Address = user.Address,
-                OrderDate = DateTime.Now,
-                CustomerName = user.UserName!,
-                OrderStatus = OrderStatus.Pending,
-            };
-            foreach(var item in request.cart.Items)
-            {
-                order.AddItem(item.ProductId,item.Quantity ,item.UnitPrice, item.ProductName!);
+                order.AddItem(item.ProductId, item.Quantity, item.UnitPrice, item.ProductName!);
             }
             cart.Clear();
             await _cartRepo.Delete(cart);

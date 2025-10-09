@@ -8,17 +8,15 @@ namespace Ecommerce.Domain.Models
         public int Id { get; set; }
         public string? UserId { get; set; }
         public DateTime CreatedDate { get; set; }
-        public string Name { get; set; } = string.Empty;
         public User? User { get; set; }
         public List<ItemWishList> Items { get; set; } = new List<ItemWishList>();
 
 
-        public static Wishlist Create(string userId, string name)
+        public static Wishlist Create(string userId)
         {
             var wishlist = new Wishlist()
             {
                 UserId = userId,
-                Name = name
             };
             return wishlist;
         }
