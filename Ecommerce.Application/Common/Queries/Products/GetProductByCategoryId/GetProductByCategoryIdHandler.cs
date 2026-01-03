@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Ecommerce.Application.DTOs.Product;
+using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Interfaces.Base;
 using Ecommerce.Domain.Shared;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Application.Products.Queries.Products.GetProductByCategory
+namespace Ecommerce.Application.Common.Queries.Products.GetProductByCategoryId
 {
     public sealed class GetProductByCategoryIdHandler : IRequestHandler<GetProductByCategoryIdQuery, Result<IEnumerable<ProductModel>>>
     {

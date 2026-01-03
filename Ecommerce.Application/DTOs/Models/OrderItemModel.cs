@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Application.DTOs.Product
+namespace Ecommerce.Application.DTOs.Models
 {
     public record OrderItemModel : BaseModel
     {

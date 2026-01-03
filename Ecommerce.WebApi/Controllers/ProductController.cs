@@ -2,14 +2,14 @@
 using Ecommerce.Application.Common.Command.Products.DeleteProduct;
 using Ecommerce.Application.Common.Command.Products.UpdateProduct;
 using Ecommerce.Application.Common.Queries.Products.GetAllProducts;
-using Ecommerce.Application.DTOs.CRUD.Product;
-using Ecommerce.Application.Products.Queries.Products.GetProductByCategory;
-using Ecommerce.Application.Products.Queries.Products.GetProductById;
-using Ecommerce.Application.Products.Queries.Products.GetProductByName;
+using Ecommerce.Application.DTOs.ModelsRequest.Product;
+using Ecommerce.Application.Common.Queries.Products.GetProductByCategoryId;
 using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Ecommerce.Application.Common.Queries.Products.GetProductByName;
+using Ecommerce.Application.Common.Queries.Products.GetProductsCategory;
 
 namespace Ecommerce.WebApi.Controllers
 {

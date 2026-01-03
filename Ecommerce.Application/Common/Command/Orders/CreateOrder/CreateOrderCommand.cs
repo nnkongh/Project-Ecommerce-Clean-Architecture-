@@ -1,5 +1,5 @@
-﻿using Ecommerce.Application.DTOs.CRUD.Order;
-using Ecommerce.Domain.DTOs.Product;
+﻿using Ecommerce.Application.DTOs.Models;
+using Ecommerce.Application.DTOs.ModelsRequest.Order;
 using Ecommerce.Domain.Shared;
 using MediatR;
 using System;

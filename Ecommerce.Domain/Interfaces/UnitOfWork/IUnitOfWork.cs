@@ -9,7 +9,7 @@ namespace Ecommerce.Domain.Interfaces.UnitOfWork
 {
     public interface IUnitOfWork
     {
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken);
+        Task SaveChangesAsync(CancellationToken cancellationToken);
         IProductRepository ProductRepository { get; }
         ICartRepository CartRepository { get; }
         IOrderRepository OrderRepository { get; }

@@ -17,10 +17,11 @@
       "applicationUrl": "http://localhost:5019",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
+        
       }
     },
     "https": {
-      "commandName": "Project",
+      "commandName": "Project", 
       "dotnetRunMessages": true,
       "launchBrowser": false,
       "launchUrl": "weatherforecast",

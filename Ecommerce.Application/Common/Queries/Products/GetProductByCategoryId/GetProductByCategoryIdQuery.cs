@@ -1,5 +1,4 @@
-﻿
-using Ecommerce.Application.DTOs.Product;
+﻿using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Domain.Shared;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -9,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Application.Products.Queries.Products.GetProductByCategory
+namespace Ecommerce.Application.Common.Queries.Products.GetProductByCategoryId
 {
     public sealed record GetProductByCategoryIdQuery(int categoryId) : IRequest<Result<IEnumerable<ProductModel>>>
     {

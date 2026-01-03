@@ -1,6 +1,4 @@
-﻿using Ecommerce.Application.DTOs.CRUD.Category;
-using Ecommerce.Application.DTOs.Product;
-using Ecommerce.Domain.Shared;
+﻿using Ecommerce.Domain.Shared;
 using MediatR;
 using System;
 using System.Collections.Generic;

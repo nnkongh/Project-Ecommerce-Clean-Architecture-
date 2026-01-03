@@ -14,7 +14,7 @@ namespace Ecommerce.Infrastructure.Data
     {
         public static async Task SeedRoleAsync(IServiceProvider serviceProvider)
         {
-            var context = serviceProvider.GetRequiredService<EcommerceDbContext>();
+            var context = serviceProvider.GetRequiredService<AppIdentityDbContext>();
             var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
             var userManager = serviceProvider.GetRequiredService<UserManager<AppUser>>();
             var logger = serviceProvider.GetRequiredService<ILogger<SeedRole>>();
@@ -24,23 +24,23 @@ namespace Ecommerce.Infrastructure.Data
                 await AddRolesAsync(roleManager, "Admin");
                 await AddRolesAsync(roleManager, "User");
 
-                var admin = new AppUser
+                string adminuser = "admin";
+                var admin = await userManager.FindByNameAsync(adminuser);
+                if(admin == null)
                 {
-                    UserName = "admin",
-                    Email = "",
-                    EmailConfirmed = true,
-                    NormalizedEmail = "",
-                    NormalizedUserName = "",
-                };
-                var result = await userManager.CreateAsync(admin, "Admin123@");
-                if (result.Succeeded)
-                {
-                    await userManager.AddToRoleAsync(admin, "Admin");
-                    logger.LogWarning("Admin user created successfully with username: {UserName}", admin.UserName);
-                }
-                else
-                {
-                    logger.LogError("Failed to create admin user: {Errors}", string.Join(", ", result.Errors.Select(e => e.Description)));
+                    admin = new AppUser
+                    {
+                        UserName = "admin",
+                        Email = "",
+                        EmailConfirmed = true,
+                        NormalizedEmail = "",
+                        NormalizedUserName = "",
+                    };
+                    var result = await userManager.CreateAsync(admin, "Admin123@");
+                    if (!result.Succeeded)
+                    {
+                        logger.LogError("Failed to create admin user: {Errors}", string.Join(", ", result.Errors.Select(e => e.Description)));
+                    }
                 }
             }
             catch (Exception ex)

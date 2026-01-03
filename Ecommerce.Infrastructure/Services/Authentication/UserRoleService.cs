@@ -1,4 +1,4 @@
-﻿using Ecommerce.Application.Interfaces.Authentication;
+﻿using Ecommerce.Application.Interfaces;
 using Ecommerce.Infrastructure.Identity;
 using Ecommerce.Infrastructure.Interfaces.Authentication;
 using Microsoft.AspNetCore.Identity;
@@ -27,9 +27,9 @@ namespace Ecommerce.Infrastructure.Services.Authentication
             await _roleManager.CreateAsync(identityRole);
         }
 
-        public async Task<IEnumerable<string>> GetRolesAsync(AppUser user)
+        public async Task<IEnumerable<string>> GetRolesAsync(AppUser appuser)
         {
-            var roles = await _userManager.GetRolesAsync(user);
+            var roles = await _userManager.GetRolesAsync(appuser);
             return roles;
         }
 

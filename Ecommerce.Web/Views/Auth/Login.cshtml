@@ -1,0 +1,78 @@
+﻿@using Ecommerce.WebApi.ViewModels.AuthView
+@model LoginPageViewModel
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow">
+            <div class="card-body p-5">
+                <h2 class="text-center mb-4">@ViewData["Title"]</h2>
+
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show">
+                        @TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show">
+                        @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                <form asp-action="Login" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                    <input type="hidden" />
+
+                    <div class="mb-3">
+                        <label asp-for="Login.Email" class="form-label">Email</label>
+                        <input asp-for="Login.Email" class="form-control" placeholder="email@example.com" autofocus />
+                        <span asp-validation-for="Login.Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Login.Password" class="form-label">Mật khẩu</label>
+                        <input asp-for="Login.Password" class="form-control" placeholder="Nhập mật khẩu" />
+                        <span asp-validation-for="Login.Password" class="text-danger"></span>
+                    </div>
+
+                    <div class="d-grid mb-3">
+                        <button type="submit" class="btn btn-primary btn-lg">Đăng nhập</button>
+                    </div>
+
+                    <div class="text-center mb-3">
+                        <a asp-action="ForgotPassword">Quên mật khẩu?</a>
+                    </div>
+
+                    <hr />
+                </form>
+                <a class="btn btn-danger w-100"
+                   href="@Url.Action("ExternalLogin", "Auth", new { provider = "Google" , redirectUri = "/"})">
+                    Login with Google
+                </a>
+
+                <div class="text-center mt-3">
+                    <p>Chưa có tài khoản? <a asp-action="Register">Đăng ký ngay</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function loginWithGoogle() {
+            window.location.href = '@Url.Action("ExternalLogin", new { provider = "Google", returnUrl = ViewData["ReturnUrl"] })';
+        }
+
+        function loginWithFacebook() {
+            window.location.href = '@Url.Action("ExternalLogin", new { provider = "Facebook", returnUrl = ViewData["ReturnUrl"] })';
+        }
+    </script>
+}

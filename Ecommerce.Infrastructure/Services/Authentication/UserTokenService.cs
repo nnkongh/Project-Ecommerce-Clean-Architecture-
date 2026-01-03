@@ -1,5 +1,5 @@
 ﻿using Ecommerce.Application.DTOs;
-using Ecommerce.Application.Interfaces.Authentication;
+using Ecommerce.Application.Interfaces;
 using Ecommerce.Infrastructure.Identity;
 using Ecommerce.Infrastructure.Interfaces.Authentication;
 using Microsoft.AspNetCore.Identity;

@@ -5,7 +5,7 @@
         public string UserName { get; set; }
         public List<CartItemViewModel> Items { get; set; } = new List<CartItemViewModel>();
 
-        public decimal GrandTotla
+        public decimal GrandTotal
         {
             get
             {

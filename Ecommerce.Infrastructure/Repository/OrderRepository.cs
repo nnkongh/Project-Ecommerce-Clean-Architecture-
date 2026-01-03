@@ -15,7 +15,7 @@ namespace Ecommerce.Infrastructure.Repository
 {
     public class OrderRepository : GenericRepository<Order, int>, IOrderRepository
     {
-        public OrderRepository(EcommerceDbContext context) : base(context)
+        public OrderRepository(ApplicationDbContext context) : base(context)
         {
         }
 

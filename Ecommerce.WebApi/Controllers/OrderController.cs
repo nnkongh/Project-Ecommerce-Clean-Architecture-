@@ -2,8 +2,7 @@
 using Ecommerce.Application.Common.Queries.Orders;
 using Ecommerce.Application.Common.Queries.Orders.GetListOrderByUserId;
 using Ecommerce.Application.Common.Queries.Orders.GetOrderById;
-using Ecommerce.Application.DTOs.CRUD.Order;
-using Ecommerce.Application.DTOs.Product;
+using Ecommerce.Application.DTOs.ModelsRequest.Order;
 using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

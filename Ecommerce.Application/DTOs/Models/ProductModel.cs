@@ -1,5 +1,4 @@
-﻿using Ecommerce.Application.DTOs.Product;
-using Ecommerce.Domain.Models;
+﻿using Ecommerce.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +6,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Application.DTOs.Product
+namespace Ecommerce.Application.DTOs.Models
 {
     public record ProductModel : BaseModel
     {

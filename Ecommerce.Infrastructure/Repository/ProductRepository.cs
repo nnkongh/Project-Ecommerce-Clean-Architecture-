@@ -14,7 +14,7 @@ namespace Ecommerce.Infrastructure.Repository
 {
     public class ProductRepository : GenericRepository<Product, int>, IProductRepository
     {
-        public ProductRepository(EcommerceDbContext context) : base(context)
+        public ProductRepository(ApplicationDbContext context) : base(context)
         {
         }
 

@@ -9,7 +9,10 @@ namespace Ecommerce.Application.DTOs.Authentication
 {
     public class ExternalLoginModel
     {
-        public ProviderType ProviderType { get; set; }
-        public string Token { get; set; } = default!;
+        //public string Code { get; set; }
+        public string RedirectUri { get; set; }
+        public string Provider { get; set; }
+
+
     }
 }

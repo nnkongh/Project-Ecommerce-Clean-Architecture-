@@ -1,10 +1,7 @@
 ﻿using AutoMapper;
-using Ecommerce.Application.DTOs;
-using Ecommerce.Application.DTOs.CRUD.Category;
-using Ecommerce.Application.DTOs.CRUD.Product;
 using Ecommerce.Application.DTOs.Models;
-using Ecommerce.Application.DTOs.Product;
-using Ecommerce.Domain.DTOs.Product;
+using Ecommerce.Application.DTOs.ModelsRequest.Category;
+using Ecommerce.Application.DTOs.ModelsRequest.Product;
 using Ecommerce.Domain.Models;
 using System;
 using System.Collections.Generic;

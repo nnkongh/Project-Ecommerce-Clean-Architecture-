@@ -12,5 +12,11 @@ namespace Ecommerce.Domain.Models
         public string Name { get; set; } = null!;
         public ICollection<Product> Products { get; set; } = new List<Product>();
         public string Description { get; set; } = null!;
+
+        public Category(string name, string description)
+        {
+            Name = name;
+            Description = description;
+        }
     }
 }

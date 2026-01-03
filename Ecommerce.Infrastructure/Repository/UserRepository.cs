@@ -18,13 +18,13 @@ namespace Ecommerce.Infrastructure.Repository
     public class UserRepository : GenericRepository<User, string>, IUserRepository
     {
 
-        public UserRepository(EcommerceDbContext context) : base(context)
+        public UserRepository(ApplicationDbContext context) : base(context)
         {
         }
 
         public async Task<User?> FindByEmailAsync(string email)
         {
-            return await _context.User.FirstOrDefaultAsync(x => x.Email == email);
+            return await _context.User.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email);
         }
 
        

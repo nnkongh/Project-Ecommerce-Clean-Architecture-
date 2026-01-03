@@ -11,10 +11,15 @@ namespace Ecommerce.Infrastructure.Interfaces.Authentication
 {
     public interface IIdentityManagementUserProvider
     {
-        Task<AppUser> CreateUserAsync(AppUser user,string password);
+        Task<AppUser> CreateUserAsync(AppUser user,string? password);
         Task UpdateUserAsync(AppUser user);
         Task<bool> DeleteUserAsync(string userId);
-        Task<AppUser> CreateUserExternalAsync(AppUser user);
+        Task<IdentityResult> CreateUserExternalAsync(AppUser user);
         Task<IdentityResult> AddLoginAsync(AppUser user, UserLoginInfo loginInfo);
+        
+        Task<SignInResult> ExternalLoginSignInAsync(ExternalLoginInfo info);
+        Task SignInAsync(AppUser user, bool IsPersistent);
+        Task<ExternalLoginInfo> GetExternalLoginInformationAsync();
+        Task<IList<UserLoginInfo>> GetLoginAsync(AppUser user);
     }
 }

@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Application.Common.Queries.Wishlist.GetItemWishlist
+namespace Ecommerce.Application.Common.Queries.Wishlist.GetWishlistById
 {
     public sealed record GetItemWishlistByIdQuery(int wishlistId) : IRequest<Result<WishlistModel>>
     {

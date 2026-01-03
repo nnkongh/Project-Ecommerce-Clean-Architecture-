@@ -19,13 +19,14 @@ namespace Ecommerce.Domain.Models
         public List<Wishlist> Wishlists { get; set; } = [];
 
 
+        public Product() { }
         public Product(string name, string description, string imageUrl, decimal price, int stock, int categoryId)
         {
-            if(price < 0)
+            if (price < 0)
             {
                 throw new ArgumentException("Price cannot be negative");
             }
-            if(stock < 0)
+            if (stock < 0)
             {
                 throw new ArgumentException("Stock cannot be negative");
             }
@@ -36,6 +37,29 @@ namespace Ecommerce.Domain.Models
             Stock = stock;
             CategoryId = categoryId;
         }
+        public static Product Create(string name, string description, string imageUrl, decimal price, int stock, int categoryId)
+        {
+            if (price < 0)
+            {
+                throw new ArgumentException("Price cannot be negative");
+            }
+            if (stock < 0)
+            {
+                throw new ArgumentException("Stock cannot be negative");
+            }
+            var product = new Product()
+            {
+                Name = name,
+                Description = description,
+                ImageUrl = imageUrl,
+                Price = price,
+                Stock = stock,
+                CategoryId = categoryId,
+            };
+            return product;
+        }
+
+
         public void UpdatePrice(decimal newPrice)
         {
             if (newPrice < 0) throw new ArgumentException("Price cannot be negative");
@@ -43,7 +67,7 @@ namespace Ecommerce.Domain.Models
         }
         public void AdjustStock(int stock)
         {
-            if(stock < 0) throw new ArgumentException("Price cannot be negative");
+            if (stock < 0) throw new ArgumentException("Price cannot be negative");
             Stock += stock;
         }
     }

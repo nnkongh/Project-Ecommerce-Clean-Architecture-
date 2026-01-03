@@ -10,9 +10,9 @@ namespace Ecommerce.Domain.Interfaces
 
 
         //System
-        Task<List<Cart>> GetExpiredCartsAsync(DateTime currentTime, CancellationToken cancellationToken);
-        void UpdateRange(IEnumerable<Cart> carts, CancellationToken cancellationToken);
-        void DeleteRange(IEnumerable<Cart> carts, CancellationToken cancellationToken);
+        Task<List<Cart>> GetExpiredCartsAsync(DateTime currentTime);
+        void UpdateRange(IEnumerable<Cart> carts);
+        void DeleteRange(IEnumerable<Cart> carts);
 
     }
 }

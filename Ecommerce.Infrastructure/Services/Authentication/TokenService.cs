@@ -1,10 +1,8 @@
 ﻿using AutoMapper;
-using Ecommerce.Application.DTOs;
 using Ecommerce.Application.DTOs.Authentication;
 using Ecommerce.Application.DTOs.EmailMessage;
+using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.Interfaces;
-using Ecommerce.Application.Interfaces.Authentication;
-using Ecommerce.Domain.Entities;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Shared;
 using Ecommerce.Infrastructure.Exceptions;
@@ -16,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -26,7 +25,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Infrastructure.Services.Authen
+namespace Ecommerce.Infrastructure.Services.Authentication
 {
     public class TokenService : ITokenService
     {
@@ -34,16 +33,19 @@ namespace Ecommerce.Infrastructure.Services.Authen
         private readonly IIdentityUserProvider _userAuthenticationService;
         private readonly IIdentityManagementUserProvider _userManagermentService;
         private readonly IIdentityRole _userRoleService;
+        private readonly UserManager<AppUser> _userManager;
         private readonly SymmetricSecurityKey _key;
         private readonly IMapper _mapper;
-
+        private readonly ILogger<TokenService> _logger;
         public TokenService(IIdentityUserProvider userAuthenticationService,
             IConfiguration config,
             IIdentityManagementUserProvider userManagermentService,
             IIdentityRole userRoleService,
             IUserTokenService userTokenService,
             IMapper mapper,
-            IUserRepository userRepository)
+            IUserRepository userRepository,
+            ILogger<TokenService> logger,
+            UserManager<AppUser> userManager)
         {
             _userManagermentService = userManagermentService;
             _userRoleService = userRoleService;
@@ -51,9 +53,11 @@ namespace Ecommerce.Infrastructure.Services.Authen
             _config = config;
             _userAuthenticationService = userAuthenticationService;
             _mapper = mapper;
+            _logger = logger;
+            _userManager = userManager;
         }
 
-        public async Task<TokenModel> CreateRefreshToken(TokenModel tokenDto)
+        public async Task<TokenModel> RefreshAccessTokenAsync(TokenModel tokenDto)
         {
             var principal = GetPrincipalFromExpiredToken(tokenDto.AccessToken);
             var user = await _userAuthenticationService.FindUserNameAsync(principal.Identity?.Name!);
@@ -65,7 +69,7 @@ namespace Ecommerce.Infrastructure.Services.Authen
             return await CreateToken(mapped, populateExp: false);
         }
 
-        private ClaimsPrincipal GetPrincipalFromExpiredToken(string accessToken)
+        public ClaimsPrincipal GetPrincipalFromExpiredToken(string accessToken)
         {
             var tokenParams = new TokenValidationParameters
             {
@@ -90,9 +94,11 @@ namespace Ecommerce.Infrastructure.Services.Authen
         public async Task<TokenModel> CreateToken(UserModel userDto, bool populateExp)
         {
 
+            _logger.LogInformation("Bên trong hàm createtoken");
             // Tạo claim cho token
             var claims = await GetClaims(userDto);
             var refreshToken = GenerateRefreshToken();
+            Console.WriteLine($"Tạo refresh token: {refreshToken}");
             userDto.RefreshToken = refreshToken;
             if (populateExp)
             {
@@ -111,8 +117,16 @@ namespace Ecommerce.Infrastructure.Services.Authen
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var accessToken = tokenHandler.WriteToken(token);
-            var mapped = _mapper.Map<AppUser>(userDto);
-            await _userManagermentService.UpdateUserAsync(mapped);
+            Console.WriteLine($"Tạo access token: {accessToken}");
+
+            var user = await _userManager.FindByIdAsync(userDto.Id);
+            user.RefreshToken = refreshToken;
+            user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+
+            await _userManager.UpdateAsync(user);
+            //var mapped = _mapper.Map<AppUser>(userDto);
+            //await _userManagermentService.UpdateUserAsync(mapped);
+            _logger.LogInformation("Cập nhật thành công");
             return new TokenModel
             {
                 AccessToken = accessToken,
@@ -120,22 +134,22 @@ namespace Ecommerce.Infrastructure.Services.Authen
             };
         }
 
-        private async Task<List<Claim>> GetClaims(UserModel userDto)
+        private async Task<List<Claim>> GetClaims(UserModel userModel)
         {
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Email, userDto.Email!),
-                new Claim(JwtRegisteredClaimNames.Sub, userDto.Id!),
+                new Claim(JwtRegisteredClaimNames.Email, userModel.Email),
+                new Claim(JwtRegisteredClaimNames.Sub, userModel.UserName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Name, userDto.UserName!),
+                new Claim(JwtRegisteredClaimNames.Name, userModel.UserName),
             };
-            var appUser = _mapper.Map<AppUser>(userDto);
+            var appUser = _mapper.Map<AppUser>(userModel);
             var role = await _userRoleService.GetRolesAsync(appUser);
             claims.AddRange(role.Select(role => new Claim(ClaimTypes.Role, role)));
             return claims;  
         }
 
-        private string GenerateRefreshToken()
+        public string GenerateRefreshToken()
         {
             var randomNumber = new byte[32];
             using (var rng = RandomNumberGenerator.Create())
@@ -143,6 +157,22 @@ namespace Ecommerce.Infrastructure.Services.Authen
                 rng.GetBytes(randomNumber);
             }
             return Convert.ToBase64String(randomNumber);
+        }
+
+        public ClaimsPrincipal GetPrincipalFromToken(string accessToken)
+        {
+            var tokenParams = new TokenValidationParameters
+            {
+                ValidateAudience = true,
+                ValidateIssuer = true,
+                ValidateLifetime = true,
+                ValidAudience = _config["Jwt:Audience"],
+                ValidIssuer = _config["Jwt:Issuer"],
+                IssuerSigningKey = _key
+            };
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(accessToken, tokenParams, out SecurityToken token);
+            return principal;
         }
 
         //public async Task<Result> RevokeRefreshToken(string userId)

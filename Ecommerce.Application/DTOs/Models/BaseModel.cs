@@ -1,4 +1,4 @@
-﻿namespace Ecommerce.Application.DTOs.Product
+﻿namespace Ecommerce.Application.DTOs.Models
 {
     public record BaseModel
     {

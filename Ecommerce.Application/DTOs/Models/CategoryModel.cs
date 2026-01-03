@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Application.DTOs.Product
+namespace Ecommerce.Application.DTOs.Models
 {
     public record class CategoryModel : BaseModel
     {

@@ -12,10 +12,10 @@ namespace Ecommerce.Domain.Models
         public int Id { get; set; }
         public User? User { get; set; }        
         public string? UserId { get; set; }
-        public DateTime? CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public DateTime? ExpiredAt { get;private set; } = DateTime.UtcNow.AddMinutes(2);
-        public CartStatus Status { get; set; } = CartStatus.Active;
+        public DateTime? ExpiredAt { get;set; }
+        public CartStatus Status { get; set; }
         public List<CartItem> Items { get; set; } = [];
 
 
@@ -24,6 +24,10 @@ namespace Ecommerce.Domain.Models
             var cart = new Cart()
             {
                 UserId = UserId,
+                CreatedAt = DateTime.Now,
+                ExpiredAt = DateTime.Now,
+                UpdatedAt = DateTime.Now,
+                Status = CartStatus.Active
             };
             return cart;
         }

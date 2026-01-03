@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Ecommerce.Domain.DTOs.Product;
+using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Domain.Enum;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Interfaces.UnitOfWork;
@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
 {
-    public sealed class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Result<Domain.DTOs.Product.OrderModel>>
+    public sealed class CreateOrderCommandHandler : IRequestHandler<CreateOrderCommand, Result<OrderModel>>
     {
         private readonly IProductRepository _productRepo;
         private readonly IOrderRepository _orderRepo;

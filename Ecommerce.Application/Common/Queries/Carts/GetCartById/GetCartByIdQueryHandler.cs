@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs.Models;
-using Ecommerce.Application.DTOs.Product;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Shared;
 using MediatR;
@@ -10,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Application.Common.Queries.Carts.GetCart
+namespace Ecommerce.Application.Common.Queries.Carts.GetCartById
 {
     public class GetCartByIdQueryHandler : IRequestHandler<GetCartByIdQuery, Result<IReadOnlyList<CartItemModel>>>
     {

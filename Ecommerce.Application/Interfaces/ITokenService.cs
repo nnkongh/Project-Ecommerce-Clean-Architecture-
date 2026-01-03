@@ -1,5 +1,5 @@
-﻿using Ecommerce.Application.DTOs;
-using Ecommerce.Application.DTOs.Authentication;
+﻿using Ecommerce.Application.DTOs.Authentication;
+using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Domain.Shared;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -14,6 +14,10 @@ namespace Ecommerce.Application.Interfaces;
 public interface ITokenService
 {
     Task<TokenModel> CreateToken(UserModel user, bool populateExp);
-    Task<TokenModel> CreateRefreshToken(TokenModel tokenDto);
+    Task<TokenModel> RefreshAccessTokenAsync(TokenModel tokenDto);
+
+    ClaimsPrincipal GetPrincipalFromExpiredToken(string accessToken);
+    ClaimsPrincipal GetPrincipalFromToken(string accessToken);
+   // string CreateRefreshToken();
     //Task<Result> RevokeRefreshToken(string userId);
 }

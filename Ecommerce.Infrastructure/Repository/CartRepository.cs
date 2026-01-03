@@ -16,7 +16,7 @@ namespace Ecommerce.Infrastructure.Repository
 {
     public class CartRepository : GenericRepository<Cart,int>, ICartRepository
     {
-        public CartRepository(EcommerceDbContext context) : base(context)
+        public CartRepository(ApplicationDbContext context) : base(context)
         {
         }
         public async Task<Cart?> GetCartWithItemByUserIdAsync(string userId)
@@ -32,19 +32,19 @@ namespace Ecommerce.Infrastructure.Repository
             return result.Count > 0 ? result[0] : null;
         }
 
-        public async Task<List<Cart>> GetExpiredCartsAsync(DateTime currentTime, CancellationToken cancellationToken)
+        public async Task<List<Cart>> GetExpiredCartsAsync(DateTime currentTime)
         {
             return await _context.Carts.Where(x => x.ExpiredAt <= currentTime && x.Status == CartStatus.Active).ToListAsync();
         }
 
-        public void UpdateRange(IEnumerable<Cart> carts, CancellationToken cancellationToken)
+        public void UpdateRange(IEnumerable<Cart> carts)
         {
-            _context.UpdateRange(carts, cancellationToken);
+            _context.UpdateRange(carts);
         }
 
-        public void DeleteRange(IEnumerable<Cart> carts, CancellationToken cancellationToken)
+        public void DeleteRange(IEnumerable<Cart> carts)
         {
-            _context.RemoveRange(carts, cancellationToken);
+            _context.RemoveRange(carts);
         }
     }
 }

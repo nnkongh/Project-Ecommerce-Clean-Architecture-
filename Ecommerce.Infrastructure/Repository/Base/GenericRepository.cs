@@ -15,8 +15,8 @@ namespace Ecommerce.Infrastructure.Repository.Base
 {
     public class GenericRepository<T,TKey> : IRepositoryBase<T,TKey> where T : class
     {
-        protected readonly EcommerceDbContext _context;
-        public GenericRepository(EcommerceDbContext context)
+        protected readonly ApplicationDbContext _context;
+        public GenericRepository(ApplicationDbContext context)
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
         }
@@ -83,7 +83,7 @@ namespace Ecommerce.Infrastructure.Repository.Base
             }
             if(order != null)
             {
-                return await order(query).ToListAsync();
+                query = order(query);
             }
             if(includes != null)
             {
@@ -101,7 +101,7 @@ namespace Ecommerce.Infrastructure.Repository.Base
             }
             if(orderBy != null)
             {
-                return await orderBy(query).ToListAsync();
+                query = orderBy(query);
             }
             return await query.ToListAsync();
         }

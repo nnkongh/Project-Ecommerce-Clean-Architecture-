@@ -10,9 +10,10 @@ namespace Ecommerce.Infrastructure.Interfaces.Authentication;
 
 public interface IIdentityRole
 {
-    Task<IEnumerable<string>> GetRolesAsync(AppUser user);
+    Task<IEnumerable<string>> GetRolesAsync(AppUser appuser);
     Task<bool> IsInRoleAsync(AppUser user, string role);
     Task AddToRoleAsync(AppUser user, string role);
     Task AssignRoleAsync(string role);
+
 
 }

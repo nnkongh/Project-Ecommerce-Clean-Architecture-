@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Ecommerce.Application.DTOs.Product;
+using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Interfaces.UnitOfWork;
 using Ecommerce.Domain.Models;

@@ -1,26 +1,31 @@
 ﻿using Ecommerce.Application.DTOs.Authentication;
+using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.Interfaces;
-using Ecommerce.Application.Interfaces.Authentication;
+using Ecommerce.WebApi.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ecommerce.Web.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("token")]
     [ApiController]
     public class TokenController : ControllerBase
     {
-        private readonly IAuthService _authService;
-
-        public TokenController(IAuthService authService)
+        private readonly ITokenService _tokenService;
+        private readonly ILogger<TokenController> _logger;
+        public TokenController(ITokenService tokenService, ILogger<TokenController> logger)
         {
-            _authService = authService;
+            _tokenService = tokenService;
+            _logger = logger;
         }
         [HttpPost]
-        public async Task<IActionResult> RefreshToken([FromBody] TokenModel tokenDto)
+        [Route("create-token")]
+        public async Task<IActionResult> CreateToken([FromBody]UserModel user)
         {
-            //var tokenRef = await _authService.CreateRefreshToken(tokenDto);
-            return Ok();
+            _logger.LogInformation("Creating token..");
+            var tokenResult = await _tokenService.CreateToken(user, true);
+            _logger.LogInformation($"access token: {tokenResult.AccessToken} refresh token: {tokenResult.RefreshToken}");
+            return Ok(tokenResult);
         } 
     }
 }

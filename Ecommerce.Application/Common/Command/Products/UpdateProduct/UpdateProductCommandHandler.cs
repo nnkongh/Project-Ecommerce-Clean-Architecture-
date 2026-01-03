@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Ecommerce.Application.DTOs.Product;
+using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Interfaces.Base;
 using Ecommerce.Domain.Interfaces.UnitOfWork;
@@ -54,5 +54,7 @@ namespace Ecommerce.Application.Common.Command.Products.UpdateProduct
             var mapped = _mapper.Map<ProductModel>(updated);
             return Result.Success(mapped);
         }
+        
     }
+    
 }

@@ -1,9 +1,9 @@
 ﻿using Ecommerce.Application.DTOs.EmailMessage;
-using Ecommerce.Application.Interfaces.Authentication;
-using Ecommerce.Domain.Entities;
+using Ecommerce.Application.Interfaces;
 using Ecommerce.Infrastructure.Exceptions;
 using Ecommerce.Infrastructure.Interfaces.Authentication;
 using MailKit.Net.Smtp;
+using Microsoft.Extensions.Options;
 using MimeKit;
 using System;
 using System.Collections.Generic;
@@ -18,11 +18,14 @@ namespace Ecommerce.Infrastructure.Services.Email
     {
         private readonly EmailConfiguration _emailConfiguration;
 
-        public EmailService(EmailConfiguration emailConfiguration) { _emailConfiguration = emailConfiguration; }
+        public EmailService(IOptions<EmailConfiguration> opt) 
+        { 
+            _emailConfiguration = opt.Value ?? throw new InvalidOperationException("Emailconfig not load"); 
+        }
         public async Task SendEmail(Message msg)
         {
             var mimeMessage = new MimeMessage();
-            mimeMessage.From.Add(new MailboxAddress("",_emailConfiguration.From));
+            mimeMessage.From.Add(new MailboxAddress("",_emailConfiguration.FromAddress));
             mimeMessage.To.AddRange(msg.To.Select(x => MailboxAddress.Parse(x)));
             mimeMessage.Subject = msg.Subject;
             mimeMessage.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = msg.Body };
@@ -42,7 +45,6 @@ namespace Ecommerce.Infrastructure.Services.Email
                 finally
                 {
                     await client.DisconnectAsync(true);
-                    client.Dispose();
                 }
             }
         }

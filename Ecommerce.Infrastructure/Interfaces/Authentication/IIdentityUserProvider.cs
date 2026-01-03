@@ -1,6 +1,4 @@
-﻿using Ecommerce.Application.DTOs;
-using Ecommerce.Domain.Enum;
-using Ecommerce.Domain.Models;
+﻿using Ecommerce.Domain.Models;
 using Ecommerce.Infrastructure.Identity;
 using System;
 using System.Collections.Generic;
@@ -9,7 +7,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Application.Interfaces.Authentication
+namespace Ecommerce.Infrastructure.Interfaces.Authentication
 {
     public interface IIdentityUserProvider
     {
@@ -18,6 +16,6 @@ namespace Ecommerce.Application.Interfaces.Authentication
         Task<AppUser?> FindEmailAsync(string email);
         Task<AppUser?> FindByIdAsync(string id);
         Task<bool> CheckPasswordAsync(AppUser user, string password);
-        Task<AppUser?> GetProviderAsync(ProviderType providerType, string providerUserId);
+        Task<AppUser?> GetProviderAsync(string providerType, string providerUserId);
     }
 }

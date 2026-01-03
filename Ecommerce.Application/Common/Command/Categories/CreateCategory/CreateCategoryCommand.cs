@@ -1,5 +1,5 @@
-﻿using Ecommerce.Application.DTOs.CRUD.Category;
-using Ecommerce.Application.DTOs.Product;
+﻿using Ecommerce.Application.DTOs.Models;
+using Ecommerce.Application.DTOs.ModelsRequest.Category;
 using Ecommerce.Domain.Shared;
 using MediatR;
 using System;

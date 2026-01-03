@@ -1,4 +1,6 @@
-﻿using Ecommerce.WebApi.Interfaces;
+﻿using Ecommerce.Application.Interfaces;
+using Ecommerce.Application.Services;
+using Ecommerce.WebApi.Interfaces;
 using Ecommerce.WebApi.Services;
 
 namespace Ecommerce.WebApi.DependencyInjection
@@ -7,7 +9,9 @@ namespace Ecommerce.WebApi.DependencyInjection
     {
         public static IServiceCollection AddAdapterServices(this IServiceCollection services)
         {
-            services.AddScoped<ICookieTokenService,CookieTokenService>();
+            //Register background service
+            services.AddScoped<ICartExpirationService, CartExpirationService>();
+            services.AddHostedService<CartBackgroundService>();
             return services;
         }
     }

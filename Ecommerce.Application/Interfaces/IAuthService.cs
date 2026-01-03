@@ -1,5 +1,6 @@
-﻿using Ecommerce.Application.DTOs;
+﻿using Ecommerce.Application.Common.Command.AuthenticationExternal;
 using Ecommerce.Application.DTOs.Authentication;
+using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Domain.Models;
 using Ecommerce.Domain.Shared;
 using System;
@@ -16,6 +17,7 @@ namespace Ecommerce.Application.Interfaces
         Task<Result<UserModel>> Register(RegisterModel model);
         Task<Result> ForgotPassword(ForgotPasswordModel model); 
         Task<Result> ResetPassword(ResetPasswordModel model);
-        Task<Result<UserModel>> LoginExternalProvider(ExternalLoginModel model,CancellationToken cancellationToken); 
+        //Task<ExternalLoginResult> LoginExternal(ExternalUserInfo model);
+
     }
 }

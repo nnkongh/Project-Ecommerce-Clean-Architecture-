@@ -1,4 +1,4 @@
-﻿using Ecommerce.Application.Common.Command.Users;
+﻿using Ecommerce.Application.Common.Command.Profile;
 using Ecommerce.Application.Common.Queries.Profile.GetProfile;
 using Ecommerce.Application.DTOs.ModelsRequest.User;
 using Ecommerce.WebApi.Controllers.BaseController;
@@ -16,6 +16,9 @@ namespace Ecommerce.WebApi.Controllers
         public ProfileController(ISender sender) : base(sender)
         {
         }
+
+        
+
 
         [HttpPut]
         [Route("update")]

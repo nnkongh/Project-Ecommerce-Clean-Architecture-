@@ -1,6 +1,7 @@
 ﻿using Ecommerce.Application.Common.Command.Wishlists.AddToWishlist;
+using Ecommerce.Application.Common.Command.Wishlists.MoveItemToCart;
 using Ecommerce.Application.Common.Command.Wishlists.RemoveItemInWishlist;
-using Ecommerce.Application.Common.Queries.Wishlist.GetItemWishlist;
+using Ecommerce.Application.Common.Queries.Wishlist.GetWishlistById;
 using Ecommerce.Application.Common.Queries.Wishlist.GetWishlistsByUserId;
 using Ecommerce.Application.DTOs.ModelsRequest.Wishlist;
 using Ecommerce.Domain.Models;
@@ -53,13 +54,26 @@ namespace Ecommerce.WebApi.Controllers
         [Route("get-wishlists")]
         public async Task<IActionResult> GetWishlistsByUserId()
         {
-            var user = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (user == null)
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
             {
                 return Unauthorized();
             }
-            var query = new GetWishlistsByUserIdQuery(user);
+            var query = new GetWishlistsByUserIdQuery(userId);
             var result = await Sender.Send(query);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+        }
+        [HttpPost]
+        [Route("move-to-cart/{wishlistId}")]
+        public async Task<IActionResult> MoveItemToCart(int wishlistId, [FromBody]MovetoCartRequest request)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var command = new MoveItemToCartCommand(userId, wishlistId, request);
+            var result = await Sender.Send(command);
             return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
         }
     }

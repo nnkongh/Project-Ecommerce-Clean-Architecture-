@@ -59,11 +59,7 @@ namespace Ecommerce.Application.Common.Command.Wishlists.AddToWishlist
             }
             else
             {
-                wishlist = new Wishlist
-                {
-                    UserId = Command.Request.UserId,
-                };
-
+                wishlist = Wishlist.Create(Command.userId);
                 wishlist.AddItem(Command.Request.ProductId, product.Name);
                 await _wishlistRepo.AddAsync(wishlist);
                 await _uow.SaveChangesAsync(cancellationToken);
