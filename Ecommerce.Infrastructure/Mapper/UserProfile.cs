@@ -22,14 +22,6 @@ namespace Ecommerce.Infrastructure.Mapper
                 .ForMember(dest => dest.NormalizedEmail, opt => opt.Ignore())
                 .ForMember(dest => dest.NormalizedUserName, opt => opt.Ignore());
 
-            CreateMap<AppUser, User>().ForMember(dest => dest.Role, opt => opt.Ignore());
-            CreateMap<User, AppUser>()
-                .ForMember(dest => dest.SecurityStamp, opt => opt.Ignore())
-                .ForMember(dest => dest.ConcurrencyStamp, opt => opt.Ignore())
-                .ForMember(dest => dest.PasswordHash, opt => opt.Ignore())
-                .ForMember(dest => dest.NormalizedEmail, opt => opt.Ignore())
-                .ForMember(dest => dest.NormalizedUserName, opt => opt.Ignore());
-
             CreateMap<User, UserModel>().ReverseMap();
 
         }

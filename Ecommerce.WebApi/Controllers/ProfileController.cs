@@ -1,6 +1,8 @@
 ﻿using Ecommerce.Application.Common.Command.Profile;
 using Ecommerce.Application.Common.Queries.Profile.GetProfile;
+using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.User;
+using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -13,12 +15,11 @@ namespace Ecommerce.WebApi.Controllers
     [Route("profile")]
     public class ProfileController : ApiController
     {
-        public ProfileController(ISender sender) : base(sender)
+        private readonly ILogger<ProfileController> logger;
+        public ProfileController(ISender sender, ILogger<ProfileController> logger) : base(sender)
         {
+            this.logger = logger;
         }
-
-        
-
 
         [HttpPut]
         [Route("update")]
@@ -38,6 +39,7 @@ namespace Ecommerce.WebApi.Controllers
         public async Task<IActionResult> GetProfile()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            logger.LogWarning($"userId: {userId}");
             if (userId == null)
             {
                 return Unauthorized();

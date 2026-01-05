@@ -1,41 +1,26 @@
-﻿using Ecommerce.Application.DTOs.Authentication;
+﻿using AutoMapper;
+using Ecommerce.Application.DTOs.Authentication;
 using Ecommerce.Application.DTOs.Models;
+using Ecommerce.Domain.Shared;
 using Ecommerce.Web.Interface;
+using Ecommerce.Web.Models;
+using Ecommerce.Web.ViewModels;
 using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.WebApi.ViewModels.AuthView;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Ecommerce.Web.Services
 {
     public class AuthClient : IAuthClient
     {
         private readonly HttpClient _httpClient;
-
-        public AuthClient(HttpClient httpClient)
+        private readonly IMapper _mapper;
+        public AuthClient(HttpClient httpClient, IMapper mapper)
         {
             _httpClient = httpClient;
+            _mapper = mapper;
         }
 
-        //public async Task<ApiResponse<LoginResponse>> ExternalLoginAsync(ExternalLoginViewModel model)
-        //{
-        //    try
-        //    {
-        //        var request = new ExternalLoginModel
-        //        {
-        //            ProviderType = model.Provider.ToString(),
-        //            Token = model.IdToken,
-        //        };
-        //        var response = await _httpClient.PostAsJsonAsync("auth/login-external", request);
-        //        return await response.Content.ReadFromJsonAsync<ApiResponse<LoginResponse>>();
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return new ApiResponse<LoginResponse>
-        //        {
-        //            IsSuccess = false,
-        //            Error = new ApiError { Message = ex.Message }
-        //        };
-        //    }
-        //}
 
         public async Task<ApiResponse<string>> ForgotPasswordAsync(ForgotPasswordViewModel model)
         {
@@ -51,34 +36,41 @@ namespace Ecommerce.Web.Services
             }
             catch (Exception ex)
             {
-                return new ApiResponse<string>
-                {
-                    IsSuccess = false,
-                    Error = new ApiError { Message = ex.Message }
-                };
+                return ApiResponse<string>.Fail("Failed");
             }
         }
 
-        public async Task<ApiResponse<LoginResponse>> LoginAsync(LoginViewModel model)
+        public async Task<Result<ProfileModel>> GetProfileAsync()
+        {
+            var response = await _httpClient.GetAsync("profile/view");
+            if (!response.IsSuccessStatusCode)
+            {
+                return Result.Failure<ProfileModel>(Error.NullValue);
+            }
+            var apiResponse = await response.Content.ReadFromJsonAsync<ProfileModel>();
+            if(apiResponse == null)
+            {
+                return Result.Failure<ProfileModel>(Error.NullValue);
+            }
+            var viewModel = _mapper.Map<ProfileModel>(apiResponse);
+            return Result.Success(viewModel);
+        }
+
+        public async Task<ApiResponse<TokenModel>> LoginAsync(LoginPageViewModel model)
         {
             try
             {
                 var request = new LoginModel
                 {
                     Email = model.Email,
-                    Password = model.Password
+                    Password = model.Password,
                 };
                 var response = await _httpClient.PostAsJsonAsync("auth/login", request);
-                return await response.Content.ReadFromJsonAsync<ApiResponse<LoginResponse>>();
+                return await response.Content.ReadFromJsonAsync<ApiResponse<TokenModel>>();
             }
             catch (Exception ex)
             {
-                return new ApiResponse<LoginResponse>
-                {
-                    IsSuccess = false,
-                    Error = new ApiError { Message = ex.Message },
-                    
-                };
+                return ApiResponse<TokenModel>.Fail("Failed"); 
             }
         }
 
@@ -103,11 +95,7 @@ namespace Ecommerce.Web.Services
             }
             catch (Exception ex)
             {
-                return new ApiResponse<UserModel>
-                {
-                    IsSuccess = false,
-                    Error = new ApiError { Message = ex.Message }
-                };
+                return ApiResponse<UserModel>.Fail("Failed");
             }
         }
 
@@ -128,11 +116,7 @@ namespace Ecommerce.Web.Services
 
             catch (Exception ex)
             {
-                return new ApiResponse<bool>
-                {
-                    IsSuccess = false,
-                    Error = new ApiError { Message = ex.Message }
-                };
+                return ApiResponse<bool>.Fail("Failed");
             }
         }
     }

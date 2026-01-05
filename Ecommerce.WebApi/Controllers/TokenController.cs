@@ -1,7 +1,6 @@
 ﻿using Ecommerce.Application.DTOs.Authentication;
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.Interfaces;
-using Ecommerce.WebApi.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,6 +1,7 @@
 ﻿using Ecommerce.Application.DTOs.Authentication;
+using Microsoft.AspNetCore.Http;
 
-namespace Ecommerce.Web.Interface
+namespace Ecommerce.Infrastructure
 {
     public interface ICookieTokenService
     {

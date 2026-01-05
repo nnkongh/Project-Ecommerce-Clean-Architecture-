@@ -1,6 +1,5 @@
 ﻿using Ecommerce.Application.Interfaces;
 using Ecommerce.Application.Services;
-using Ecommerce.WebApi.Interfaces;
 using Ecommerce.WebApi.Services;
 
 namespace Ecommerce.WebApi.DependencyInjection

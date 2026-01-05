@@ -6,27 +6,22 @@ using Ecommerce.Application.Common.Command.AuthenticationExternal;
 using Ecommerce.Application.DTOs.Authentication;
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.Interfaces;
+using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.Identity;
 using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.WebApi.Controllers.BaseController;
-using Ecommerce.WebApi.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace Ecommerce.Web.Controllers
+namespace Ecommerce.WebApi.Controllers
 {
     [Route("auth")]
     public class AuthController : ApiController
     {
-        private readonly ICookieTokenService _cookieTokenService;
-        private readonly SignInManager<AppUser> _signInManager;
-        private readonly IAuthService _authService;
-        public AuthController(ISender sender, ICookieTokenService cookieTokenService, SignInManager<AppUser> signInManager) : base(sender)
+        public AuthController(ISender sender) : base(sender)
         {
-            _cookieTokenService = cookieTokenService;
-            _signInManager = signInManager;
         }
 
         [HttpPost("login")]
@@ -36,13 +31,11 @@ namespace Ecommerce.Web.Controllers
             var result = await Sender.Send(command);
             if (result.IsSuccess)
             {
-                _cookieTokenService.SetTokenInsideCookie(result.Value, HttpContext);
                 return Ok(new ApiResponse<TokenModel>
                 {
                     IsSuccess = true,
-                    Value = result.Value,
-                }
-                );
+                    Value = result.Value
+                });
             }
             return BadRequest(result.Error);
         }
@@ -75,7 +68,6 @@ namespace Ecommerce.Web.Controllers
         public IActionResult Logout(ClaimsPrincipal principal, HttpContext context)
         {
             var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            _cookieTokenService.RemoveTokenFromCookie(context);
             if (userId == null)
             {
                 return BadRequest();

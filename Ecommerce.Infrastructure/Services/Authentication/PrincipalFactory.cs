@@ -1,4 +1,5 @@
 ﻿using Ecommerce.Infrastructure.Interfaces.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -36,7 +37,9 @@ namespace Ecommerce.Infrastructure.Services.Authentication
             };
             var tokenHandler = new JwtSecurityTokenHandler();
             var principal = tokenHandler.ValidateToken(token, tokenParams, out SecurityToken _);
-            return principal;
+
+            var identity = new ClaimsIdentity(principal.Claims,CookieAuthenticationDefaults.AuthenticationScheme);
+            return new ClaimsPrincipal(identity);
         }
     }
 }

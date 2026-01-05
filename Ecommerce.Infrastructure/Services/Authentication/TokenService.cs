@@ -138,6 +138,9 @@ namespace Ecommerce.Infrastructure.Services.Authentication
         {
             var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.Name,userModel.UserName),
+                new Claim(ClaimTypes.NameIdentifier,userModel.Id),
+                new Claim(ClaimTypes.Email,userModel.Email),
                 new Claim(JwtRegisteredClaimNames.Email, userModel.Email),
                 new Claim(JwtRegisteredClaimNames.Sub, userModel.UserName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),

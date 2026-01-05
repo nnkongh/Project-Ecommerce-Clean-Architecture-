@@ -19,9 +19,9 @@
                         <i class="fas fa-user-circle"></i> @User.Identity.Name
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">Thông tin cá nhân</a></li>
+                        <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">Thông tin cá nhân</a></li>
                         <li><a class="dropdown-item" asp-controller="Orders" asp-action="Index">Đơn hàng</a></li>
-                        <li><hr class="dropdown-d   ivider"></li>
+                        <li><hr class="dropdown-divider"></li>
                         <li>
                             <form asp-controller="Auth" asp-action="Logout" method="post">
                                 <button type="submit" class="dropdown-item">
@@ -55,7 +55,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2025 - Ecommerce.Web - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                © 2026 - Simple Ecommerce
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

@@ -52,15 +52,15 @@ namespace Ecommerce.Infrastructure.Services.ExternalAuth
             _dbcontext.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Detached;  
         }
 
-        public async Task<UserModel> CreateUserFromExternalAsync(ExternalUserInfo externalUserInfo, ExternalIdentity externalIdentity, CancellationToken cancellationToken)
-        {
-            var appUser = new AppUser
+            public async Task<UserModel> CreateUserFromExternalAsync(ExternalUserInfo externalUserInfo, ExternalIdentity externalIdentity, CancellationToken cancellationToken)
             {
-                UserName = externalUserInfo.Name,
-                Email = externalUserInfo.Email,
-                EmailConfirmed = true
-            };
-            var result = await _userManager.CreateAsync(appUser);
+                var appUser = new AppUser
+                {
+                    UserName = externalUserInfo.Email,
+                    Email = externalUserInfo.Email,
+                    EmailConfirmed = true,
+                };
+                var result = await _userManager.CreateAsync(appUser);
             if (!result.Succeeded)
             {
                 throw new InvalidOperationException($"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}");

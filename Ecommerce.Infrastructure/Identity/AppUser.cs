@@ -15,8 +15,6 @@ namespace Ecommerce.Infrastructure.Identity
         public string? RefreshToken { get; set; }
         public DateTime? RefreshTokenExpiryTime { get; set; }
         
-        public string GoogleId { get; set; }
         public bool EmailConfirmed { get; set; }
-        public string FullName { get; set; }
     }
 }

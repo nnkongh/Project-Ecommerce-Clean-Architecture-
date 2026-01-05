@@ -16,16 +16,16 @@ namespace Ecommerce.WebApi.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("Background service start");
-            while (!stoppingToken.IsCancellationRequested)
-            {
-                using (var scope = _provider.CreateScope())
-                {
-                    var cartServicce = scope.ServiceProvider.GetRequiredService<ICartExpirationService>();
-                    await cartServicce.HandleExpiredCartAsync(stoppingToken);
-                }
-                await Task.Delay(_time,stoppingToken);
-            }
+            //_logger.LogInformation("Background service start");
+            //while (!stoppingToken.IsCancellationRequested)
+            //{
+            //    using (var scope = _provider.CreateScope())
+            //    {
+            //        var cartServicce = scope.ServiceProvider.GetRequiredService<ICartExpirationService>();
+            //        await cartServicce.HandleExpiredCartAsync(stoppingToken);
+            //    }
+            //    await Task.Delay(_time,stoppingToken);
+            //}
         }
     }
 }

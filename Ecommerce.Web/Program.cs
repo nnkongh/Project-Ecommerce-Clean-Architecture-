@@ -1,4 +1,5 @@
-﻿using Ecommerce.Application.Common.Command.AuthenticationExternal;
+﻿using Ecommerce.Application.Common.Command.Authentication.Login;
+using Ecommerce.Application.Common.Command.AuthenticationExternal;
 using Ecommerce.Application.Dependency;
 using Ecommerce.Application.Interfaces;
 using Ecommerce.Domain.Interfaces;
@@ -14,6 +15,7 @@ using Ecommerce.Infrastructure.Repository.UnitOfWork;
 using Ecommerce.Infrastructure.Services.Authentication;
 using Ecommerce.Infrastructure.Services.Email;
 using Ecommerce.Web.Interface;
+using Ecommerce.Web.Mapping;
 using Ecommerce.Web.Services;
 using Ecommerce.Web.ViewModels.ApiResponse;
 using Microsoft.AspNetCore.Authentication;
@@ -49,11 +51,11 @@ namespace Ecommerce.Web
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IPrincipalFactory, PrincipalFactory>();
             builder.Services.AddRepositories();
-            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(ExternalLoginCommand).Assembly,
-                                                                                  typeof(ExternalLoginCommandHandler).Assembly));
+            builder.Services.AddMediatRServices();
             //builder.Services.AddMediatRServices();
 
             builder.Services.AddAutoMapper(typeof(UserProfile).Assembly);
+            builder.Services.AddAutoMapper(typeof(ModelMapping).Assembly);
 
             
             //AddIdentity tự động đăng ký các scheme như ApplicationScheme, ExternalScheme, TwoFactorRememberMeScheme
@@ -85,16 +87,7 @@ namespace Ecommerce.Web
                     context.Response.ContentType = "application/json";
                     context.Response.StatusCode = 500;
 
-                    var error = new ApiResponse<string>
-                    {
-                        IsSuccess = false,
-                        Error = new ApiError
-                        {
-                            Message = "Internal server error"
-                        }
-                    };
-
-                    await context.Response.WriteAsJsonAsync(error);
+                    ApiResponse<string>.Fail("Failed");
                 });
             });
 

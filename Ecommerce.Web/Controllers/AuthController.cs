@@ -17,6 +17,8 @@ using System.Threading.Tasks;
 using MediatR;
 using System.Runtime.CompilerServices;
 using Ecommerce.Infrastructure.Data;
+using Ecommerce.Web.Models;
+using Ecommerce.Infrastructure;
 
 namespace Ecommerce.Web.Controllers
 {
@@ -26,7 +28,7 @@ namespace Ecommerce.Web.Controllers
         private readonly IMediator _mediator;
         private readonly IPrincipalFactory _principalFactory;
         private readonly SignInManager<AppUser> _signinManager;
-        private readonly ICookieTokenService _cookieService;
+        private readonly ICookieTokenService _cookieTokenService;
         private readonly IMapper _mapper;
         private readonly HttpClient _httpClient;
         private readonly ILogger<AuthController> _logger;
@@ -34,19 +36,19 @@ namespace Ecommerce.Web.Controllers
             IMediator mediator,
             HttpClient httpClient,
             SignInManager<AppUser> signinManager,
-            ICookieTokenService cookieService,
             IPrincipalFactory principalFactory,
             ILogger<AuthController> logger,
-            IMapper mapper)
+            IMapper mapper,
+            ICookieTokenService cookieTokenService)
         {
             _authClient = authClient;
             _mediator = mediator;
             _httpClient = httpClient;
             _signinManager = signinManager;
-            _cookieService = cookieService;
             _principalFactory = principalFactory;
             _logger = logger;
             _mapper = mapper;
+            _cookieTokenService = cookieTokenService;
         }
 
         public IActionResult Index()
@@ -60,19 +62,25 @@ namespace Ecommerce.Web.Controllers
             return View();
         }
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login(LoginPageViewModel model)
         {
             if (!ModelState.IsValid)
             {
                 return View(model);
             }
+
             var result = await _authClient.LoginAsync(model);
             if (!result.IsSuccess)
             {
                 ModelState.AddModelError(string.Empty, "Đăng nhập thất bại.");
                 return View(model);
             }
-            // Lấy token từ cookie
+            _logger.LogWarning("Qua duoc result");
+            if (!result.IsSuccess)
+            {
+                ModelState.AddModelError(string.Empty, "Đăng nhập thất bại.");
+                return View(model);
+            }
             var token = result.Value.AccessToken;
             if (string.IsNullOrEmpty(token))
             {
@@ -86,7 +94,7 @@ namespace Ecommerce.Web.Controllers
                 ModelState.AddModelError(string.Empty, "Token không hợp lệ.");
                 return View(model);
             }
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
+            await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, principal,
                 new AuthenticationProperties
                 {
                     IsPersistent = model.RememberMe,
@@ -126,26 +134,15 @@ namespace Ecommerce.Web.Controllers
                     Name = info.Principal.FindFirstValue(ClaimTypes.Name)!
                 }
             };
-            _logger.LogWarning($"Name: {command.info.Name}, Email: {command.info.Email}, Provider: {command.info.Provider}, Key: {command.info.ProviderKey}");
 
             try
             {
                 var result = await _mediator.Send(command);
-
-                _logger.LogInformation($"Result: {result.IsSuccess}");
                 var tokenResponse = await _httpClient.PostAsJsonAsync("https://localhost:7021/token/create-token", result.User);
-
-                var token = await tokenResponse.Content.ReadAsStringAsync();
-                _logger.LogError("Token API failed. Status: {Status}, Body: {Body}", tokenResponse.StatusCode,token);
+                var token = await tokenResponse.Content.ReadFromJsonAsync<TokenModel>();
                 var mapped = _mapper.Map<AppUser>(result.User);
-
-                _logger.LogWarning("Chuan bi set token");
-
-                //_cookieService.SetTokenInsideCookie(token, HttpContext);
-
-                _logger.LogWarning("Set token inside cookie");
+                _cookieTokenService.SetTokenInsideCookie(token!, HttpContext);
                 await _signinManager.SignInAsync(mapped, isPersistent: false);
-                _logger.LogWarning("Chuan bi redirect");
                 return Redirect($"{redirectUri}#accesstoken={token}");
 
             }

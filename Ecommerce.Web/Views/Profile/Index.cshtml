@@ -1,4 +1,135 @@
-﻿@using Ecommerce.Web.ViewModels
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>User Profile</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            margin: 0;
+            padding: 0;
+        }
 
+        .profile-container {
+            max-width: 700px;
+            margin: 40px auto;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
 
-<h2>Hiii</h2>
+        .profile-header {
+            display: flex;
+            gap: 20px;
+            padding: 24px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #ddd;
+        }
+
+        .profile-info h2 {
+            margin: 0 0 8px;
+        }
+
+        .profile-info p {
+            margin: 4px 0;
+            color: #555;
+        }
+
+        .profile-body {
+            padding: 24px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+            .section h3 {
+                margin-bottom: 8px;
+                font-size: 16px;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 4px;
+            }
+
+            .section p {
+                margin: 6px 0;
+                color: #444;
+            }
+
+        .profile-footer {
+            padding: 16px 24px;
+            background: #fafafa;
+            text-align: right;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            background: #007bff;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+            .btn:hover {
+                background: #0056b3;
+            }
+    </style>
+</head>
+<body>
+
+    <div class="profile-container">
+
+        <!-- HEADER -->
+        <div class="profile-header">
+            <img class="avatar"
+                 src="https://via.placeholder.com/100"
+                 alt="Avatar" />
+
+            <div class="profile-info">
+                <h2>@Model.UserName</h2>
+                <p>Email: @Model.Email</p>
+                <p>Phone: @Model.PhoneNumber</p>
+            </div>
+        </div>
+
+        <!-- BODY -->
+        <div class="profile-body">
+
+            <div class="section">
+                <h3>Address</h3>
+                @if (Model.Address != null)
+                {
+                    <p>@Model.Address.Street</p>
+                    <p>@Model.Address.City, @Model.Address.Country</p>
+                }
+                else
+                {
+                    <p>No address provided</p>
+                }
+            </div>
+
+            <div class="section">
+                <h3>Account Info</h3>
+                <p>Member since: @Model.CreatedAt.ToString("dd/MM/yyyy")</p>
+            </div>
+
+        </div>
+
+        <!-- FOOTER -->
+        <div class="profile-footer">
+            <button class="btn">Edit Profile</button>
+        </div>
+
+    </div>
+
+</body>
+</html>
