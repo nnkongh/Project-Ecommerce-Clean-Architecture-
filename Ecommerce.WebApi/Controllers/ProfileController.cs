@@ -2,6 +2,7 @@
 using Ecommerce.Application.Common.Queries.Profile.GetProfile;
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.User;
+using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -31,21 +32,22 @@ namespace Ecommerce.WebApi.Controllers
             }
             var command = new UpdateAddressCommand(user, request);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest();
+            return result.IsSuccess ? Ok(new ApiResponse<AddressModel> { IsSuccess = true, Value = result.Value})
+                                    : BadRequest(new ApiResponse<AddressModel> { IsSuccess = false, Error = result.Error });
         }
         [HttpGet]
         [Route("view")]
         public async Task<IActionResult> GetProfile()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            logger.LogWarning($"userId: {userId}");
             if (userId == null)
             {
                 return Unauthorized();
             }
             var query = new GetProfileQuery(userId);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest();
+            return result.IsSuccess ? Ok(new ApiResponse<ProfileModel> { IsSuccess = true, Value = result.Value })
+                                     : BadRequest(new ApiResponse<ProfileModel> { IsSuccess = false, Error = result.Error });
         }
 
     }

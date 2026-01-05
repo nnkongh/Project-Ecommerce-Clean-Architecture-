@@ -2,7 +2,9 @@
 using Ecommerce.Application.Common.Queries.Orders;
 using Ecommerce.Application.Common.Queries.Orders.GetListOrderByUserId;
 using Ecommerce.Application.Common.Queries.Orders.GetOrderById;
+using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.Order;
+using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -28,14 +30,16 @@ namespace Ecommerce.WebApi.Controllers
             }
             var query = new GetListOrderQuery(userId);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<OrderModel>> { IsSuccess = true, Value = result.Value })
+                                    : BadRequest(new ApiResponse<OrderModel> { IsSuccess = false, Error = result.Error });
         }
         [HttpGet("get-order/{orderId}")]
         public async Task<IActionResult> GetOrderById(int orderId)
         {
             var query = new GetOrderByIdQuery(orderId);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<OrderModel> { IsSuccess = true, Value = result.Value })
+                                    : BadRequest(new ApiResponse<OrderModel> { IsSuccess = false, Error = result.Error });
         }
         [HttpPost("create-order")]
         public async Task<IActionResult> CreateOrder(CreateOrderRequest order)
@@ -47,7 +51,8 @@ namespace Ecommerce.WebApi.Controllers
             }
             var command = new CreateOrderCommand(order,userId);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<OrderModel> { IsSuccess = true, Value = result.Value })
+                                    : BadRequest(new ApiResponse<OrderModel> { IsSuccess = false, Error = result.Error });
         }
         
     }

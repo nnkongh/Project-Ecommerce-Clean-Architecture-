@@ -23,7 +23,6 @@ namespace Ecommerce.WebApi.Controllers
         {
             _logger.LogInformation("Creating token..");
             var tokenResult = await _tokenService.CreateToken(user, true);
-            _logger.LogInformation($"access token: {tokenResult.AccessToken} refresh token: {tokenResult.RefreshToken}");
             return Ok(tokenResult);
         } 
     }

@@ -5,6 +5,7 @@ using Ecommerce.Application.Common.Queries.Category.GetAllCategories;
 using Ecommerce.Application.Common.Queries.Category.GetCategoryById;
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.Category;
+using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -24,35 +25,40 @@ namespace Ecommerce.WebApi.Controllers
         {
             var command = new CreateCategoryCommand(model);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<CategoryModel> { IsSuccess = true, Value = result.Value })
+                                    : BadRequest(new ApiResponse<CategoryModel> { IsSuccess = false, Error = result.Error });
         }
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
             var command = new DeleteCategoryCommand(id);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : NotFound(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<CategoryModel> { IsSuccess = true })
+                                    : BadRequest(new ApiResponse<CategoryModel> { IsSuccess = false, Error = result.Error });
         }
         [HttpPut("update/{id}")]
         public async Task<IActionResult> UpdateCategory(int id, UpdateCategoryRequest model)
         {
             var command = new UpdateCategoryCommand(id,model);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : NotFound(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<CategoryModel> { IsSuccess = true, Value = result.Value })
+                                    : BadRequest(new ApiResponse<CategoryModel> { IsSuccess = false, Error = result.Error });
         }
         [HttpGet("list")]
         public async Task<ActionResult<IEnumerable<CategoryModel>>> GetCategories()
         {
             var query = new GetAllCategoriesQuery();
             var result = await Sender.Send(query);
-            return Ok(result);
+            return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<CategoryModel>> { IsSuccess = true, Value = result.Value})
+                                    : BadRequest(new ApiResponse<CategoryModel> { IsSuccess = false, Error = result.Error });
         }
         [HttpGet("{id}")]
         public async Task<ActionResult<IEnumerable<CategoryModel>>> GetCategoryById(int id)
         {
             var query = new GetCategoryByIdQuery(id);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(result.Value) : NotFound(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<CategoryModel> { IsSuccess = true, Value = result.Value })
+                                    : BadRequest(new ApiResponse<CategoryModel> { IsSuccess = false, Error = result.Error });
         }
     }
 }

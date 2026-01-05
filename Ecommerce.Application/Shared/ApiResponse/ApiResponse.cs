@@ -1,11 +1,13 @@
-﻿namespace Ecommerce.Web.ViewModels.ApiResponse
+﻿using Ecommerce.Domain.Shared;
+
+namespace Ecommerce.Web.ViewModels.ApiResponse
 {
     public class ApiResponse<T>
     {
         public bool IsSuccess { get; set; }
         public T? Value { get; set; }
         public string Message { get; set; }
-        public ApiError Error { get; set; }
+        public Error Error { get; set; }
 
         public ApiResponse() { }
         public static ApiResponse<T> Success(T data, string? message = null)
@@ -17,7 +19,7 @@
                 Message = message
             }; 
         }
-        public static ApiResponse<T> Fail(string message, ApiError? error)
+        public static ApiResponse<T> Fail(string message, Error? error)
         {
             return new ApiResponse<T>
             {

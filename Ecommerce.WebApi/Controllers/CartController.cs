@@ -4,8 +4,10 @@ using Ecommerce.Application.Common.Command.Carts.RemoveItemInCart;
 using Ecommerce.Application.Common.Command.Carts.UpdateCart;
 using Ecommerce.Application.Common.Queries.Carts.GetCartById;
 using Ecommerce.Application.Common.Queries.Carts.GetCartByUserId;
+using Ecommerce.Application.DTOs.Authentication;
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.Cart;
+using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -34,7 +36,8 @@ namespace Ecommerce.WebApi.Controllers
             }
             var command = new AddToCartCommand(request,userId);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<CartModel> { Value = result.Value ,IsSuccess = true} ) 
+                                    : BadRequest(new ApiResponse<CartModel> { IsSuccess = false, Error = result.Error});
         }
         [HttpGet]
         [Route("get-cart-id/")]
@@ -47,7 +50,8 @@ namespace Ecommerce.WebApi.Controllers
             }
             var query = new GetCartByUserIdQuery(user);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<CartModel> { Value = result.Value, IsSuccess = true}) 
+                                    : BadRequest(new ApiResponse<CartModel> {IsSuccess = false, Error = result.Error});
         }
         [HttpDelete]
         [Route("delete-item/{productId}/quantity/{quantity}")]
@@ -60,7 +64,8 @@ namespace Ecommerce.WebApi.Controllers
             }
             var command = new RemoveItemCartCommand(userId, productId);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<CartModel> { IsSuccess = true }) 
+                                    : BadRequest(new ApiResponse<CartModel> { IsSuccess = false, Error = result.Error});
         }
         [HttpPost]
         [Route("checkout")]
@@ -73,7 +78,8 @@ namespace Ecommerce.WebApi.Controllers
             }
             var command = new CheckoutCartCommand(user);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<OrderModel> { Value = result.Value, IsSuccess = true}) 
+                                    : BadRequest(new ApiResponse<OrderModel> { IsSuccess = false, Error = result.Error});
         }
         [HttpGet]
         [Route("get-list-cart")]
@@ -86,7 +92,8 @@ namespace Ecommerce.WebApi.Controllers
             }
             var query = new GetCartByUserIdQuery(userId);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<CartModel> { Value = result.Value, IsSuccess = true }) 
+                                    : BadRequest(new ApiResponse<CartModel> { IsSuccess = false, Error = result.Error});
         }
         [HttpPut]
         [Route("reduce-item/{productId}/{quantity}")]
@@ -99,7 +106,8 @@ namespace Ecommerce.WebApi.Controllers
             }
             var command = new UpdateCartCommand(productId, quantity, userId);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<CartModel> { Value = result.Value, IsSuccess = true }) 
+                                    : BadRequest(new ApiResponse<CartModel> { IsSuccess = false, Error = result.Error });
         }
     }
 }

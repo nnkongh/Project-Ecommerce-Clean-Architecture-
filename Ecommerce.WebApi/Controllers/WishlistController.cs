@@ -3,8 +3,10 @@ using Ecommerce.Application.Common.Command.Wishlists.MoveItemToCart;
 using Ecommerce.Application.Common.Command.Wishlists.RemoveItemInWishlist;
 using Ecommerce.Application.Common.Queries.Wishlist.GetWishlistById;
 using Ecommerce.Application.Common.Queries.Wishlist.GetWishlistsByUserId;
+using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.Wishlist;
 using Ecommerce.Domain.Models;
+using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -31,7 +33,8 @@ namespace Ecommerce.WebApi.Controllers
             }
             var command = new AddToWishListCommand(request,userId);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<WishlistModel> { IsSuccess = true, Value = result.Value })
+                                      : BadRequest(new ApiResponse<WishlistModel> { IsSuccess = false, Error = result.Error });
         }
         [HttpDelete]
         [Route("{wishlistId}/delete/{productId}")]
@@ -39,7 +42,8 @@ namespace Ecommerce.WebApi.Controllers
         {
             var command = new RemoveItemWishlistCommand(productId, wishlistId);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.IsSuccess) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<WishlistModel> { IsSuccess = true })
+                                     : BadRequest(new ApiResponse<WishlistModel> { IsSuccess = false, Error = result.Error });
         }
         [HttpGet]
         [Route("get-by-id/{wishlistId}")]
@@ -48,7 +52,8 @@ namespace Ecommerce.WebApi.Controllers
 
             var query = new GetItemWishlistByIdQuery(wishlistId);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<WishlistModel> { IsSuccess = true, Value = result.Value })
+                                       : BadRequest(new ApiResponse<WishlistModel> { IsSuccess = false, Error = result.Error });
         }
         [HttpGet]
         [Route("get-wishlists")]
@@ -61,7 +66,8 @@ namespace Ecommerce.WebApi.Controllers
             }
             var query = new GetWishlistsByUserIdQuery(userId);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<WishlistModel>> { IsSuccess = true, Value = result.Value })
+                                      : BadRequest(new ApiResponse<WishlistModel> { IsSuccess = false, Error = result.Error });
         }
         [HttpPost]
         [Route("move-to-cart/{wishlistId}")]
@@ -74,7 +80,8 @@ namespace Ecommerce.WebApi.Controllers
             }
             var command = new MoveItemToCartCommand(userId, wishlistId, request);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok(new ApiResponse<CartModel> { IsSuccess = true, Value = result.Value })
+                                      : BadRequest(new ApiResponse<CartModel> { IsSuccess = false, Error = result.Error });
         }
     }
 }
