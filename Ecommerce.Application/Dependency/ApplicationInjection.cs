@@ -12,25 +12,13 @@ namespace Ecommerce.Application.Dependency
 {
     public static class ApplicationInjection
     {
-        public static IServiceCollection AddMediatRServices(this IServiceCollection services)
+        public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
+            services.AddAutoMapper(typeof(ObjectMapper));
+
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(AssemblyReference).Assembly));
 
             return services;
-
-
-
-            // Checklist
-            // Kiểm tra các dependency và đổi tên method nếu cần thiết
-            // 
-
-
-            // AddRepositoryServices
-            // AddMediatRServices
-            // AddExternalServices
-            // AddObjectMapping
-            //
-
         }
       
     }

@@ -1,12 +1,12 @@
 ﻿using Ecommerce.Application.DTOs.Authentication;
 using Microsoft.AspNetCore.Http;
 
-namespace Ecommerce.Infrastructure
+namespace Ecommerce.Web.Interface
 {
     public interface ICookieTokenService
     {
         string? GetAccessToken();
-        void RemoveTokenFromCookie(HttpContext httpContext);
-        void SetTokenInsideCookie(TokenModel token, HttpContext httpContext);
+        void RemoveTokenFromCookie();
+        void SetTokenInsideCookie(TokenModel token);
     }
 }

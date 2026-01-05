@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Ecommerce.Application;
 using Ecommerce.Application.DTOs.Authentication;
 using Ecommerce.Application.DTOs.EmailMessage;
 using Ecommerce.Application.DTOs.Models;
@@ -36,7 +37,7 @@ namespace Ecommerce.Infrastructure.Services
         private readonly IEmailService _emailService;
         private readonly IMapper _mapper;
         private readonly IIdentityRole _roleManagement;
-        private readonly IEnumerable<Application.Interfaces.IExternalLoginService> _externalAuthProvider;
+        private readonly IEnumerable<IExternalLoginService> _externalAuthProvider;
 
         public AuthService(IIdentityUserProvider userAuthenticationService,
             IUserTokenService userTokenService,
@@ -44,7 +45,7 @@ namespace Ecommerce.Infrastructure.Services
             IMapper mapper,
             IIdentityManagementUserProvider userManagementService,
             IIdentityRole roleManagement,
-            IEnumerable<Application.Interfaces.IExternalLoginService> externalAuthProvider
+            IEnumerable<IExternalLoginService> externalAuthProvider
             )
         {
             _userAuthenticationService = userAuthenticationService;
@@ -176,58 +177,10 @@ namespace Ecommerce.Infrastructure.Services
             }
         }
 
-        //public async Task<Result<UserModel>> LoginExternalProvider(ExternalLoginModel model, CancellationToken cancellationToken)
-        //{
-        //    //Get Provider authentication
-        //    var provider = _externalAuthProvider.FirstOrDefault(p => p.ProviderType.ToString() == model.ProviderType);
-        //    if (provider == null)
-        //    {
-        //        return Result.Failure<UserModel>(new Error("", "Provider not supported"));
-        //    }
-        //    ExternalUserInfo externalUser;
-        //    try
-        //    {
-        //        externalUser = await provider.ValidateAndGetUserInfoAsync(model.Token);
-        //    }
-        //    catch (AuthenticationException ex)
-        //    {
-        //        return Result.Failure<UserModel>(new Error("", $"{ex.Message}"));
-        //    }  
-        //    // find user
-        //    var user = await _userAuthenticationService.GetProviderAsync(model.ProviderType, externalUser.ProviderId);
-        //    if (user == null && !string.IsNullOrEmpty(externalUser.Email))
-        //    {
-        //        user = await _userAuthenticationService.FindEmailAsync(externalUser.Email);
-        //        if (user == null)
-        //        {
-        //            user = new AppUser
-        //            {
-        //                UserName = externalUser.Email,
-        //                Email = externalUser.Email,
-        //                EmailConfirmed = true,
-        //            };
-        //            var result = await _userManagementService.CreateUserExternalAsync(user);
-        //        }
-        //        var loginInfo = new UserLoginInfo(
-        //            loginProvider: model.ProviderType.ToString(),
-        //            providerKey: externalUser.ProviderId,
-        //            displayName: model.ProviderType.ToString());
-        //        var addLoginResult = await _userManagementService.AddLoginAsync(user, loginInfo);
-        //        if (!addLoginResult.Succeeded)
-        //        {
-        //            return Result.Failure<UserModel>(new Error("", "Failed to link external login"));
-        //        }
-        //    }
-        //    var userDto = _mapper.Map<UserModel>(user);
-        //    return Result.Success(userDto);
-        //}
+        
 
-        public async Task<ExternalLoginResult> ExternalLoginCallback(string returnUrl, string remoteError)
+        public async Task<ExternalLoginResult> ExternalLoginCallback(string returnUrl)
         {
-            if (remoteError != null)
-            {                                         
-                throw new Exception($"Error from external provider: {remoteError}");
-            }
             var info = await _userManagementService.GetExternalLoginInformationAsync();
             var loginResult = await _userManagementService.ExternalLoginSignInAsync(info);
             if (loginResult.Succeeded)
@@ -236,9 +189,8 @@ namespace Ecommerce.Infrastructure.Services
                 var existingUser = await _userAuthenticationService.GetProviderAsync(
                     info.LoginProvider,
                     info.ProviderKey);
-                var usermodel = _mapper.Map<UserModel>(existingUser);
-
-                return ExternalLoginResult.Success(usermodel, ExternalLoginStatus.UserExisted);
+                var userModel = _mapper.Map<UserModel>(existingUser);
+                return ExternalLoginResult.Success(userModel, ExternalLoginStatus.UserExisted);
             }
 
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
@@ -253,15 +205,16 @@ namespace Ecommerce.Infrastructure.Services
             {
                 return ExternalLoginResult.Failure("Failed to create user account");
             }
-            var mapped = _mapper.Map<UserModel>(createduser);
             var login = await _userManagementService.AddLoginAsync(user, info);
             if (!login.Succeeded)
             {
                 return ExternalLoginResult.Failure("Failed to link external login");
             }
-            await _userManagementService.SignInAsync(user, false);
-            return ExternalLoginResult.Success(mapped, ExternalLoginStatus.UserCreated);
+            var userMod = _mapper.Map<UserModel>(user);
+            return ExternalLoginResult.Success(userMod, ExternalLoginStatus.UserCreated);
 
         }
+
+    
     }
 }

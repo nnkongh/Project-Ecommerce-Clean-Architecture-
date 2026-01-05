@@ -1,7 +1,7 @@
 ﻿using Ecommerce.WebApi.ViewModels.AuthView;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
-namespace Ecommerce.Web.Models
+namespace Ecommerce.Web.ViewModels
 {
     public class LoginPageViewModel
     {

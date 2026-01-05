@@ -3,9 +3,10 @@ using Ecommerce.Application.Dependency;
 using Ecommerce.Application.Interfaces;
 using Ecommerce.Application.Mappers;
 using Ecommerce.Infrastructure;
+using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Dependency_Injection;
 using Ecommerce.Infrastructure.Services.ExternalAuth;
-using Ecommerce.WebApi.DependencyInjection;
+using Ecommerce.WebApi.Dependencies;
 using Ecommerce.WebApi.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -24,17 +25,21 @@ namespace Ecommerce.WebApi
             // Add services to the container.
             builder.Configuration.AddUserSecrets<Program>(optional: true).AddEnvironmentVariables();
 
-            //builder.Services.AddApplicationServices();
-            builder.Services.AddControllers();
+            //Shared layer
+            builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructure(builder.Configuration);
-            builder.Services.AddMediatRServices();
-            builder.Services.AddAdapterServices();
-            builder.Services.AddScoped<IExternalLoginService, ExternalLoginService>();
-            builder.Services.AddScoped<ICookieTokenService, CookieTokenService>();
-            builder.Services.AddAutoMapper(typeof(ObjectMapper));
+
+            //API-specific
+            builder.Services.AddWebApiServices(builder.Configuration);
+            builder.Services.AddControllers();
+
+            //Background services            
+            builder.Services.AddHostedService<RoleSeederHostedService>();
+
             var app = builder.Build();
 
-         
+
+
             // Configure the HTTP request pipeline.
 
             app.UseHttpsRedirection();

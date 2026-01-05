@@ -8,9 +8,9 @@ namespace Ecommerce.Web.Controllers
     [Authorize]
     public class ProfileController : Controller
     {
-        private readonly IProfileService _profileService;
+        private readonly IProfileClient _profileService;
 
-        public ProfileController(IProfileService profileService)
+        public ProfileController(IProfileClient profileService)
         {
             _profileService = profileService;
         }

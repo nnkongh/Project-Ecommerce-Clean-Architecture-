@@ -8,7 +8,6 @@ using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.Interfaces;
 using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.Identity;
-using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -20,10 +19,8 @@ namespace Ecommerce.WebApi.Controllers
     [Route("auth")]
     public class AuthController : ApiController
     {
-        private readonly ICookieTokenService _cookieService;
-        public AuthController(ISender sender, ICookieTokenService cookieService) : base(sender)
+        public AuthController(ISender sender) : base(sender)
         {
-            _cookieService = cookieService;
         }
 
         [HttpPost("login")]
@@ -31,50 +28,21 @@ namespace Ecommerce.WebApi.Controllers
         {
             var command = new LoginCommand(login);
             var result = await Sender.Send(command);
-            if (result.IsSuccess)
-            {
-                return Ok(new ApiResponse<TokenModel>
-                {
-                    IsSuccess = true,
-                    Value = result.Value
-                });
-            }
-            return BadRequest(result.Error);
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterModel register)
         {
             var command = new RegisterCommand(register);
             var result = await Sender.Send(command);
-            if (result.IsFailure)
-            {
-                return BadRequest(new ApiResponse<string>
-                {
-                    IsSuccess = false,
-                    Error = new ApiError
-                    {
-                        Code = result.Error.Code,
-                        Message = result.Error.Message,
-                    }
-                });
-            }
-            return Ok(new ApiResponse<UserModel>
-            {
-                IsSuccess = true,
-                Value = result.Value,
-            });
+            return result.IsSuccess ? Ok(result.Value) : BadRequest(result.Error);
         }
-
      
         [HttpPost("logout")]
         public IActionResult Logout(ClaimsPrincipal principal, HttpContext context)
         {
             var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (userId == null)
-            {
-                return BadRequest();
-            }
-            return Ok();
+            return userId == null ? BadRequest() : Ok();
         }
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordModel forgotPasswordDto)
@@ -88,7 +56,7 @@ namespace Ecommerce.WebApi.Controllers
         {
             var command = new ResetPasswordCommand(resetPasswordDto);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(new ApiResponse<bool> { IsSuccess = true }) : BadRequest(result.Error);
+            return result.IsSuccess ? Ok() : BadRequest(result.Error);
         }
     }
 }

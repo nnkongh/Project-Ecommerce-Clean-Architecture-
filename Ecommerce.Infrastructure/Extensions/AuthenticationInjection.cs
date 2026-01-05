@@ -1,5 +1,6 @@
 ﻿using Ecommerce.Application.Interfaces;
 using Ecommerce.Infrastructure.Interfaces.Authentication;
+using Ecommerce.Infrastructure.Services;
 using Ecommerce.Infrastructure.Services.Authentication;
 using Ecommerce.Infrastructure.Services.ExternalAuth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -48,6 +49,7 @@ namespace Ecommerce.Infrastructure.Dependency_Injection
             services.AddScoped<IIdentityRole, UserRoleService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ITokenService, TokenService>();
+
             return services;
         }
     }

@@ -1,6 +1,10 @@
-﻿using Ecommerce.Infrastructure.Data;
+﻿using Ecommerce.Application.Interfaces;
+using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Identity;
+using Ecommerce.Infrastructure.Interfaces.Authentication;
 using Ecommerce.Infrastructure.Mapper;
+using Ecommerce.Infrastructure.Services;
+using Ecommerce.Infrastructure.Services.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -13,7 +17,7 @@ namespace Ecommerce.Infrastructure.Dependency_Injection
 {
     public static class IdentityInjection
     {
-        public static IServiceCollection AddIdentityServices(this IServiceCollection services)
+        public static IServiceCollection AddIdentityCore(this IServiceCollection services)
         {
             services.AddIdentityCore<AppUser>(x =>
             {
@@ -25,10 +29,10 @@ namespace Ecommerce.Infrastructure.Dependency_Injection
             })
                .AddDefaultTokenProviders()
                .AddRoles<IdentityRole>()
-               .AddSignInManager()
                .AddEntityFrameworkStores<AppIdentityDbContext>();
 
-            services.AddAutoMapper(typeof(UserProfile).Assembly);
+
+            
 
             /// Figure Identity Token Lifetime
             services.Configure<DataProtectionTokenProviderOptions>(opt =>
@@ -37,5 +41,7 @@ namespace Ecommerce.Infrastructure.Dependency_Injection
             });
             return services;
         }
+
+        
     }
 }

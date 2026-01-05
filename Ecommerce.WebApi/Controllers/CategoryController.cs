@@ -5,7 +5,6 @@ using Ecommerce.Application.Common.Queries.Category.GetAllCategories;
 using Ecommerce.Application.Common.Queries.Category.GetCategoryById;
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.Category;
-using Ecommerce.Web.ViewModels;
 using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

@@ -1,4 +1,5 @@
 ﻿using Ecommerce.Application.DTOs.Authentication;
+using Ecommerce.Web.Interface;
 using Microsoft.AspNetCore.Http;
 
 namespace Ecommerce.Infrastructure;
@@ -23,16 +24,21 @@ public class CookieTokenService : ICookieTokenService
         return token;
     }
 
-    public void RemoveTokenFromCookie(HttpContext httpContext)
+    public void RemoveTokenFromCookie()
     {
-        httpContext.Response.Cookies.Append("refresh_token", "", new CookieOptions
+        var context = _contextAccessor.HttpContext;
+        if (context == null)
+        {
+            throw new InvalidOperationException("Httpcontext is not available");
+        }
+        context.Response.Cookies.Append("refresh_token", "", new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,
             Expires = DateTime.UtcNow.AddDays(-1)
         });
-        httpContext.Response.Cookies.Append("access_token", "", new CookieOptions
+        context.Response.Cookies.Append("access_token", "", new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
@@ -41,16 +47,21 @@ public class CookieTokenService : ICookieTokenService
         });
     }
 
-    public void SetTokenInsideCookie(TokenModel token, HttpContext httpContext)
+    public void SetTokenInsideCookie(TokenModel token)
     {
-        httpContext.Response.Cookies.Append("access_token", token.AccessToken, new CookieOptions
+        var context = _contextAccessor.HttpContext;
+        if (context == null)
+        {
+            throw new InvalidOperationException("Httpcontext is not available");
+        }
+        context.Response.Cookies.Append("access_token", token.AccessToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,
             Expires = DateTime.UtcNow.AddMinutes(15)
         });
-        httpContext.Response.Cookies.Append("refresh_token", token.RefreshToken, new CookieOptions
+        context.Response.Cookies.Append("refresh_token", token.RefreshToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,

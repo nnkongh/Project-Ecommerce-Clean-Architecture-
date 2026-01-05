@@ -3,7 +3,6 @@ using Ecommerce.Application.DTOs.Authentication;
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Domain.Shared;
 using Ecommerce.Web.Interface;
-using Ecommerce.Web.Models;
 using Ecommerce.Web.ViewModels;
 using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.WebApi.ViewModels.AuthView;
@@ -11,11 +10,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace Ecommerce.Web.Services
 {
-    public class AuthClient : IAuthClient
+    public class AuthenticationClient : IAuthenticationClient
     {
         private readonly HttpClient _httpClient;
         private readonly IMapper _mapper;
-        public AuthClient(IMapper mapper, IHttpClientFactory httpClientFactory)
+        public AuthenticationClient(IMapper mapper, IHttpClientFactory httpClientFactory)
         {
             _mapper = mapper;
             _httpClient = httpClientFactory.CreateClient("ApiClient");
@@ -32,6 +31,10 @@ namespace Ecommerce.Web.Services
                     ClientUrl = model.ClientUrl
                 };
                 var response = await _httpClient.PostAsJsonAsync("auth/forgot-password", request);
+                //if(!response.IsSuccessStatusCode)
+                //{
+                //    return 
+                //}
                 return await response.Content.ReadFromJsonAsync<ApiResponse<string>>();
             }
             catch (Exception ex)

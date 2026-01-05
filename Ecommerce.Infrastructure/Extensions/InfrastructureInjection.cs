@@ -42,13 +42,9 @@ namespace Ecommerce.Infrastructure.Dependency_Injection
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration config)
         {
             services.AddConnectionDatabase(config)
-                    .AddIdentityServices()
-                    .AddJwtAuthentication(config)
-                    .AddIdentityService()
                     .AddEmailService(config)
                     .AddRepositories();
 
-            services.AddHostedService<RoleSeederHostedService>();
             return services;
         }
        

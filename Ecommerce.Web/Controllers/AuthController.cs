@@ -6,7 +6,6 @@ using Ecommerce.Domain.Enum;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Infrastructure.Identity;
 using Ecommerce.Infrastructure.Interfaces.Authentication;
-using Ecommerce.Web.Interface;
 using Ecommerce.WebApi.ViewModels.AuthView;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -17,14 +16,14 @@ using System.Threading.Tasks;
 using MediatR;
 using System.Runtime.CompilerServices;
 using Ecommerce.Infrastructure.Data;
-using Ecommerce.Web.Models;
-using Ecommerce.Infrastructure;
+using Ecommerce.Web.Interface;
+using Ecommerce.Web.ViewModels;
 
 namespace Ecommerce.Web.Controllers
 {
     public class AuthController : Controller
     {
-        private readonly IAuthClient _authClient;
+        private readonly IAuthenticationClient _authClient;
         private readonly IMediator _mediator;
         private readonly IPrincipalFactory _principalFactory;
         private readonly SignInManager<AppUser> _signinManager;
@@ -32,7 +31,7 @@ namespace Ecommerce.Web.Controllers
         private readonly IMapper _mapper;
         private readonly HttpClient _httpClient;
         private readonly ILogger<AuthController> _logger;
-        public AuthController(IAuthClient authClient,
+        public AuthController(IAuthenticationClient authClient,
             IMediator mediator,
             HttpClient httpClient,
             SignInManager<AppUser> signinManager,
@@ -75,7 +74,6 @@ namespace Ecommerce.Web.Controllers
                 ModelState.AddModelError(string.Empty, "Đăng nhập thất bại.");
                 return View(model);
             }
-            _logger.LogWarning("Qua duoc result");
             if (!result.IsSuccess)
             {
                 ModelState.AddModelError(string.Empty, "Đăng nhập thất bại.");
@@ -83,19 +81,20 @@ namespace Ecommerce.Web.Controllers
             }
 
             var token = result.Value.AccessToken;
-            _logger.LogWarning($"Token: {token} ");
             if (string.IsNullOrEmpty(token))
             {
                 ModelState.AddModelError(string.Empty, "Token không hợp lệ.");
                 return View(model);
             }
-            _cookieTokenService.SetTokenInsideCookie(result.Value,HttpContext);
+            _cookieTokenService.SetTokenInsideCookie(result.Value);
+
             var principal = _principalFactory.CreatePrincipalFromToken(token);
             if (principal == null)
             {
                 ModelState.AddModelError(string.Empty, "Token không hợp lệ.");
                 return View(model);
             }
+
             await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, principal,
                 new AuthenticationProperties
                 {
@@ -109,14 +108,18 @@ namespace Ecommerce.Web.Controllers
         public IActionResult ExternalLogin([FromQuery] string provider, [FromQuery] string redirectUri)
         {
             redirectUri = redirectUri ?? Url.Content("~/");
+
             var callback = Url.Action(nameof(ExternalLoginCallback), "Auth", new { redirectUri = redirectUri }, Request.Scheme);
+
             var properties = _signinManager.ConfigureExternalAuthenticationProperties(provider, callback);
+
             return Challenge(properties, provider);
         }
         [HttpGet("external-login-callback")]
         public async Task<IActionResult> ExternalLoginCallback([FromQuery] string redirectUri, [FromQuery] string remoteError = null)
         {
             var info = await _signinManager.GetExternalLoginInfoAsync();
+
             var command = new ExternalLoginCommand
             {
                 info = new ExternalUserInfo
@@ -130,12 +133,17 @@ namespace Ecommerce.Web.Controllers
             try
             {
                 var result = await _mediator.Send(command);
+
                 var tokenResponse = await _httpClient.PostAsJsonAsync("https://localhost:7021/token/create-token", result.User);
+
                 var token = await tokenResponse.Content.ReadFromJsonAsync<TokenModel>();
-                _logger.LogWarning($"Token: {token.AccessToken} ");
+
                 var mapped = _mapper.Map<AppUser>(result.User);
-                _cookieTokenService.SetTokenInsideCookie(token!, HttpContext);
+
+                _cookieTokenService.SetTokenInsideCookie(token!);
+
                 await _signinManager.SignInAsync(mapped, isPersistent: false);
+
                 return Redirect($"{redirectUri}#accesstoken={token.AccessToken}");
 
             }
@@ -238,7 +246,7 @@ namespace Ecommerce.Web.Controllers
         {
             await _authClient.LogoutAsync();
             await _signinManager.SignOutAsync();
-            _cookieTokenService.RemoveTokenFromCookie(HttpContext);
+            _cookieTokenService.RemoveTokenFromCookie();
             return RedirectToAction("Index", "Home");
         }
     }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Ecommerce.WebApi.ViewModels.AuthView
+namespace Ecommerce.Web.ViewModels.AuthView
 {
     public class LoginViewModel
     {

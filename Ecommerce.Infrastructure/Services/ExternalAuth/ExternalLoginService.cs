@@ -28,12 +28,10 @@ namespace Ecommerce.Infrastructure.Services.ExternalAuth
     {
         private readonly UserManager<AppUser> _userManager;
         private readonly IMapper _mapper;
-        private readonly ApplicationDbContext _dbcontext;
-        public ExternalLoginService(IMapper mapper, UserManager<AppUser> userManager, IUnitOfWork uow, IUserRepository userRepository, ApplicationDbContext dbcontext)
+        public ExternalLoginService(IMapper mapper, UserManager<AppUser> userManager, IUserRepository userRepository)
         {
             _mapper = mapper;
             _userManager = userManager;
-            _dbcontext = dbcontext;
         }
 
         public async Task AddExternalLoginToExistingUserAsync(string userId, ExternalIdentity externalIdentity)
@@ -49,7 +47,6 @@ namespace Ecommerce.Infrastructure.Services.ExternalAuth
             {
                 throw new InvalidOperationException($"Failed to add external login: {string.Join(", ", result.Errors.Select(e => e.Description))}");
             }
-            _dbcontext.Entry(user).State = Microsoft.EntityFrameworkCore.EntityState.Detached;  
         }
 
             public async Task<UserModel> CreateUserFromExternalAsync(ExternalUserInfo externalUserInfo, ExternalIdentity externalIdentity, CancellationToken cancellationToken)

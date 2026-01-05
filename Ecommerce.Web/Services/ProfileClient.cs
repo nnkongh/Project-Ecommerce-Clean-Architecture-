@@ -4,11 +4,11 @@ using Ecommerce.Web.Interface;
 
 namespace Ecommerce.Web.Services
 {
-    public class ProfileService : IProfileService
+    public class ProfileClient : IProfileClient
     {
         private readonly HttpClient _httpClient;
 
-        public ProfileService(IHttpClientFactory httpClientFactory)
+        public ProfileClient(IHttpClientFactory httpClientFactory)
         {
             _httpClient = httpClientFactory.CreateClient("ApiClient");
         }

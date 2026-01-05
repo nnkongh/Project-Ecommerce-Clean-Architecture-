@@ -1,8 +1,9 @@
 ﻿using Ecommerce.Application.Interfaces;
 using Ecommerce.Application.Services;
+using Ecommerce.Infrastructure.Dependency_Injection;
 using Ecommerce.WebApi.Services;
 
-namespace Ecommerce.WebApi.DependencyInjection
+namespace Ecommerce.WebApi.Dependencies
 {
     public static class DependencyInjection
     {
@@ -11,6 +12,19 @@ namespace Ecommerce.WebApi.DependencyInjection
             //Register background service
             services.AddScoped<ICartExpirationService, CartExpirationService>();
             services.AddHostedService<CartBackgroundService>();
+            return services;
+        }
+
+        public static IServiceCollection AddWebApiServices(this IServiceCollection services, IConfiguration configuration)
+        {
+
+            services.AddIdentityCore()
+                    .AddIdentityService();
+
+            services.AddJwtAuthentication(configuration);
+
+            services.AddAdapterServices();
+
             return services;
         }
     }

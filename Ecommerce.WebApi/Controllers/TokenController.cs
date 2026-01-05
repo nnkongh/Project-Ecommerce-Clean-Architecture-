@@ -4,7 +4,7 @@ using Ecommerce.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Ecommerce.Web.Controllers
+namespace Ecommerce.WebApi.Controllers
 {
     [Route("token")]
     [ApiController]
