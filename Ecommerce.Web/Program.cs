@@ -1,7 +1,9 @@
-﻿using Ecommerce.Application.Common.Command.Authentication.Login;
+﻿using AutoMapper.Internal.Mappers;
+using Ecommerce.Application.Common.Command.Authentication.Login;
 using Ecommerce.Application.Common.Command.AuthenticationExternal;
 using Ecommerce.Application.Dependency;
 using Ecommerce.Application.Interfaces;
+using Ecommerce.Application.Mappers;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Interfaces.UnitOfWork;
 using Ecommerce.Infrastructure;
@@ -23,6 +25,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using System.Runtime.Serialization;
 using System.Security.Principal;
 
 namespace Ecommerce.Web
@@ -52,10 +55,10 @@ namespace Ecommerce.Web
             builder.Services.AddScoped<IPrincipalFactory, PrincipalFactory>();
             builder.Services.AddRepositories();
             builder.Services.AddMediatRServices();
+
             //builder.Services.AddMediatRServices();
 
-            builder.Services.AddAutoMapper(typeof(UserProfile).Assembly);
-            builder.Services.AddAutoMapper(typeof(ModelMapping).Assembly);
+            builder.Services.AddAutoMapper(typeof(ObjectMapper));
 
             
             //AddIdentity tự động đăng ký các scheme như ApplicationScheme, ExternalScheme, TwoFactorRememberMeScheme

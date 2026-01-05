@@ -5,19 +5,23 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Web.Controllers
 {
- //   [Authorize]
+    [Authorize]
     public class ProfileController : Controller
     {
-        private readonly IAuthClient _authClient;
+        private readonly IProfileService _profileService;
 
-        public ProfileController(IAuthClient authClient)
+        public ProfileController(IProfileService profileService)
         {
-            _authClient = authClient;
+            _profileService = profileService;
         }
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var profile = await _authClient.GetProfileAsync();
+            var profile = await _profileService.GetProfileAsync();
+            if (profile.IsFailure)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
             return View(profile.Value);
         }
     }

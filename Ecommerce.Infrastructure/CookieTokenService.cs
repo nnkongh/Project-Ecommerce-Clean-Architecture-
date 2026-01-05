@@ -5,6 +5,23 @@ namespace Ecommerce.Infrastructure;
 
 public class CookieTokenService : ICookieTokenService
 {
+    private readonly IHttpContextAccessor _contextAccessor;
+
+    public CookieTokenService(IHttpContextAccessor contextAccessor)
+    {
+        _contextAccessor = contextAccessor;
+    }
+
+    public string? GetAccessToken()
+    {
+        var context = _contextAccessor.HttpContext;
+        if(context == null)
+        {
+            return null;
+        }
+        context.Request.Cookies.TryGetValue("access_token", out var token);
+        return token;
+    }
 
     public void RemoveTokenFromCookie(HttpContext httpContext)
     {

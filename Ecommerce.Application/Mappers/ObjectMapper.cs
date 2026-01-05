@@ -25,7 +25,6 @@ namespace Ecommerce.Application.Mappers
             CreateMap<CartItem,CartItemModel>().ReverseMap();
             CreateMap<ItemWishList,ItemWishlistModel>().ReverseMap();
             CreateMap<Address, AddressModel>().ReverseMap();
-            CreateMap<ProfileModel, User>().ReverseMap();
             CreateMap<Wishlist, WishlistModel>().ReverseMap();
 
             // Mapping for specific models
@@ -34,6 +33,11 @@ namespace Ecommerce.Application.Mappers
 
             CreateMap<CreateProductRequest, Product>();
             CreateMap<UpdateProductRequest, Product>();
+
+            CreateMap<ProfileModel, User>();
+            CreateMap<User, ProfileModel>();
+
+
         }
     }
 }

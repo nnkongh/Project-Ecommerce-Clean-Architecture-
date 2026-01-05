@@ -17,6 +17,5 @@ namespace Ecommerce.Web.Interface
         Task<ApiResponse<bool>> ResetPasswordAsync(ResetPasswordViewModel model);
         Task LogoutAsync();
 
-        Task<Result<ProfileModel>> GetProfileAsync();
     }
 }

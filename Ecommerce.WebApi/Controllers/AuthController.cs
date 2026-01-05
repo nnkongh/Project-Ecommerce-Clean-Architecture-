@@ -20,8 +20,10 @@ namespace Ecommerce.WebApi.Controllers
     [Route("auth")]
     public class AuthController : ApiController
     {
-        public AuthController(ISender sender) : base(sender)
+        private readonly ICookieTokenService _cookieService;
+        public AuthController(ISender sender, ICookieTokenService cookieService) : base(sender)
         {
+            _cookieService = cookieService;
         }
 
         [HttpPost("login")]

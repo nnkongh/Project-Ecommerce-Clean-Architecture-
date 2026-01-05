@@ -1,6 +1,7 @@
 using Ecommerce.Application.Common.Command.AuthenticationExternal;
 using Ecommerce.Application.Dependency;
 using Ecommerce.Application.Interfaces;
+using Ecommerce.Application.Mappers;
 using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.Dependency_Injection;
 using Ecommerce.Infrastructure.Services.ExternalAuth;
@@ -30,7 +31,7 @@ namespace Ecommerce.WebApi
             builder.Services.AddAdapterServices();
             builder.Services.AddScoped<IExternalLoginService, ExternalLoginService>();
             builder.Services.AddScoped<ICookieTokenService, CookieTokenService>();
-
+            builder.Services.AddAutoMapper(typeof(ObjectMapper));
             var app = builder.Build();
 
          

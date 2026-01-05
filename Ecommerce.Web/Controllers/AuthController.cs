@@ -81,13 +81,15 @@ namespace Ecommerce.Web.Controllers
                 ModelState.AddModelError(string.Empty, "Đăng nhập thất bại.");
                 return View(model);
             }
+
             var token = result.Value.AccessToken;
+            _logger.LogWarning($"Token: {token} ");
             if (string.IsNullOrEmpty(token))
             {
                 ModelState.AddModelError(string.Empty, "Token không hợp lệ.");
                 return View(model);
             }
-            //var principal = HttpContext.User.
+            _cookieTokenService.SetTokenInsideCookie(result.Value,HttpContext);
             var principal = _principalFactory.CreatePrincipalFromToken(token);
             if (principal == null)
             {
@@ -106,23 +108,14 @@ namespace Ecommerce.Web.Controllers
         [HttpGet("external-login")]
         public IActionResult ExternalLogin([FromQuery] string provider, [FromQuery] string redirectUri)
         {
-            _logger.LogWarning($"External login call");
-
             redirectUri = redirectUri ?? Url.Content("~/");
-            _logger.LogWarning($"Redirect to {redirectUri}, provider: {provider}");
-            //_logger.LogWarning($"provider: {model.Provider}, redirect: {model.RedirectUri}");
             var callback = Url.Action(nameof(ExternalLoginCallback), "Auth", new { redirectUri = redirectUri }, Request.Scheme);
-
-            _logger.LogWarning($"Call back: {callback}");
-            //var returnUrl = Url.
             var properties = _signinManager.ConfigureExternalAuthenticationProperties(provider, callback);
-            _logger.LogWarning($"Properties: {properties.RedirectUri}");
             return Challenge(properties, provider);
         }
         [HttpGet("external-login-callback")]
         public async Task<IActionResult> ExternalLoginCallback([FromQuery] string redirectUri, [FromQuery] string remoteError = null)
         {
-            _logger.LogWarning("External call back");
             var info = await _signinManager.GetExternalLoginInfoAsync();
             var command = new ExternalLoginCommand
             {
@@ -134,16 +127,16 @@ namespace Ecommerce.Web.Controllers
                     Name = info.Principal.FindFirstValue(ClaimTypes.Name)!
                 }
             };
-
             try
             {
                 var result = await _mediator.Send(command);
                 var tokenResponse = await _httpClient.PostAsJsonAsync("https://localhost:7021/token/create-token", result.User);
                 var token = await tokenResponse.Content.ReadFromJsonAsync<TokenModel>();
+                _logger.LogWarning($"Token: {token.AccessToken} ");
                 var mapped = _mapper.Map<AppUser>(result.User);
                 _cookieTokenService.SetTokenInsideCookie(token!, HttpContext);
                 await _signinManager.SignInAsync(mapped, isPersistent: false);
-                return Redirect($"{redirectUri}#accesstoken={token}");
+                return Redirect($"{redirectUri}#accesstoken={token.AccessToken}");
 
             }
             catch (Exception ex)
@@ -243,8 +236,9 @@ namespace Ecommerce.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             await _authClient.LogoutAsync();
+            await _signinManager.SignOutAsync();
+            _cookieTokenService.RemoveTokenFromCookie(HttpContext);
             return RedirectToAction("Index", "Home");
         }
     }

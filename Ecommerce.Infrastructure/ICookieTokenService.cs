@@ -5,6 +5,7 @@ namespace Ecommerce.Infrastructure
 {
     public interface ICookieTokenService
     {
+        string? GetAccessToken();
         void RemoveTokenFromCookie(HttpContext httpContext);
         void SetTokenInsideCookie(TokenModel token, HttpContext httpContext);
     }

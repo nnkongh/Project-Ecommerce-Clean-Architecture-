@@ -15,10 +15,10 @@ namespace Ecommerce.Web.Services
     {
         private readonly HttpClient _httpClient;
         private readonly IMapper _mapper;
-        public AuthClient(HttpClient httpClient, IMapper mapper)
+        public AuthClient(IMapper mapper, IHttpClientFactory httpClientFactory)
         {
-            _httpClient = httpClient;
             _mapper = mapper;
+            _httpClient = httpClientFactory.CreateClient("ApiClient");
         }
 
 
@@ -38,22 +38,6 @@ namespace Ecommerce.Web.Services
             {
                 return ApiResponse<string>.Fail("Failed");
             }
-        }
-
-        public async Task<Result<ProfileModel>> GetProfileAsync()
-        {
-            var response = await _httpClient.GetAsync("profile/view");
-            if (!response.IsSuccessStatusCode)
-            {
-                return Result.Failure<ProfileModel>(Error.NullValue);
-            }
-            var apiResponse = await response.Content.ReadFromJsonAsync<ProfileModel>();
-            if(apiResponse == null)
-            {
-                return Result.Failure<ProfileModel>(Error.NullValue);
-            }
-            var viewModel = _mapper.Map<ProfileModel>(apiResponse);
-            return Result.Success(viewModel);
         }
 
         public async Task<ApiResponse<TokenModel>> LoginAsync(LoginPageViewModel model)

@@ -51,7 +51,6 @@ namespace Ecommerce.Application.Common.Command.AuthenticationExternal
 
             
             var existingUser = await _userRepository.FindByEmailAsync(info.Email);
-            _logger.LogWarning("Existing user");
             if (existingUser != null)
             {
                 var externalIdentity = new ExternalIdentity
@@ -59,7 +58,6 @@ namespace Ecommerce.Application.Common.Command.AuthenticationExternal
                     Provider = info.Provider,
                     ProviderKey = info.ProviderKey,
                 };
-                _logger.LogWarning("Add External login");
                 await _externalLoginService.AddExternalLoginToExistingUserAsync(existingUser.Id,externalIdentity);
                 var userModel = _mapper.Map<UserModel>(existingUser);
                 return new ExternalLoginResult
