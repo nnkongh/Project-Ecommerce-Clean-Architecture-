@@ -48,7 +48,7 @@ namespace Ecommerce.Infrastructure.Repository.Base
         {
             return await _context.Set<T>().FindAsync(id);
         }
-
+                            
         public virtual async  Task<T?> UpdatePartialAsync(TKey id, T entity, params Expression<Func<T,object>>[] propertiesToUpdate)
         {
             var existing = await _context.Set<T>().FindAsync(id);
@@ -56,7 +56,7 @@ namespace Ecommerce.Infrastructure.Repository.Base
 
             if(propertiesToUpdate?.Length > 0)
             {
-                
+                    
                 foreach(var prop in propertiesToUpdate)
                 {
                     var compiled = prop.Compile(); // biến một kiểu expression thành một kiểu delegate Func<T,object>

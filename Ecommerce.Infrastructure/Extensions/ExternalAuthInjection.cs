@@ -26,12 +26,12 @@ namespace Ecommerce.Infrastructure.Dependency_Injection
         {
             services.AddAuthentication(opt =>
             {
+                opt.DefaultAuthenticateScheme = IdentityConstants.ExternalScheme;
                 opt.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
             })
                  .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, opt =>
                  {
                      opt.Cookie.HttpOnly = true;
-
                      opt.LoginPath = "/auth/login";
                      opt.AccessDeniedPath = "/access-denied";
                  })
