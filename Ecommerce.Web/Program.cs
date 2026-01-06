@@ -41,7 +41,7 @@ namespace Ecommerce.Web
             //Shared Layers
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructure(builder.Configuration);
-
+            builder.Services.AddAutoMapper(typeof(UserProfile));
             //MVC-Specific
             builder.Services.AddWebMvcServices(builder.Configuration);
             builder.Services.AddControllersWithViews();

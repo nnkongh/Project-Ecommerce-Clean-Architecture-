@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using Ecommerce.Web.ViewModels.Profile
+@model ProfileViewModel;
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -108,12 +110,13 @@
                 <h3>Address</h3>
                 @if (Model.Address != null)
                 {
-                    <p>@Model.Address.Street</p>
-                    <p>@Model.Address.City, @Model.Address.Country</p>
+                    <p>@Model.Address.City</p>
+                    <p>@Model.Address.District, @Model.Address.Ward</p>
+                    <p>@Model.Address.PostalCode</p>
                 }
                 else
                 {
-                    <p>No address provided</p>
+                    <p>Thông tin địa chỉ chưa được cập nhật</p>
                 }
             </div>
 

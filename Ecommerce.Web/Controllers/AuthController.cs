@@ -57,6 +57,7 @@ namespace Ecommerce.Web.Controllers
         [HttpGet]
         public IActionResult Login(string returnUrl = null)
         {
+            ViewData["HideAuthHeader"] = true;
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
@@ -116,18 +117,30 @@ namespace Ecommerce.Web.Controllers
             return Challenge(properties, provider);
         }
         [HttpGet("external-login-callback")]
-        public async Task<IActionResult> ExternalLoginCallback([FromQuery] string redirectUri, [FromQuery] string remoteError = null)
+        public async Task<IActionResult> ExternalLoginCallback([FromQuery] string? redirectUri, [FromQuery] string? remoteError = null)
         {
-            var info = await _signinManager.GetExternalLoginInfoAsync();
 
+
+            var info = await _signinManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return Redirect("/login");
+            }
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrEmpty(email))
+            {
+                return Redirect("/login");
+            }
+
+            var name = info.Principal.FindFirstValue(ClaimTypes.Name) ?? email;
             var command = new ExternalLoginCommand
             {
                 info = new ExternalUserInfo
                 {
                     Provider = info!.LoginProvider,
                     ProviderKey = info.ProviderKey,
-                    Email = info.Principal.FindFirstValue(ClaimTypes.Email)!,
-                    Name = info.Principal.FindFirstValue(ClaimTypes.Name)!
+                    Email = email,
+                    Name = name
                 }
             };
             try
@@ -159,6 +172,7 @@ namespace Ecommerce.Web.Controllers
         [HttpGet]
         public IActionResult Register()
         {
+            ViewData["HideAuthHeader"] = true;
             return View();
         }
         [HttpPost]

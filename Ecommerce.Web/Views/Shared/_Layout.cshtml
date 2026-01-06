@@ -9,44 +9,67 @@
     <link rel="stylesheet" href="~/Ecommerce.Web.styles.css" asp-append-version="true" />
 </head>
 <body>
-    <header>
-        <ul class="navbar-nav ms-auto">
-            @if (User.Identity.IsAuthenticated)
-            {
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="fas fa-user-circle"></i> @User.Identity.Name
-                    </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item" asp-controller="Profile" asp-action="Index">Thông tin cá nhân</a></li>
-                        <li><a class="dropdown-item" asp-controller="Orders" asp-action="Index">Đơn hàng</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <form asp-controller="Auth" asp-action="Logout" method="post">
-                                <button type="submit" class="dropdown-item">
-                                    <i class="fas fa-sign-out-alt"></i> Đăng xuất
-                                </button>
+    @{
+        var hideAuthHeader = ViewData["HideAuthHeader"] as bool? ?? false;
+    }
+
+    @if (!hideAuthHeader)
+    {
+        <header class="bg-dark">
+            <nav class="container-fluid">
+                <ul class="navbar-nav d-flex flex-row justify-content-end align-items-center gap-4 px-4">
+
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <li class="nav-item d-flex align-items-center gap-4">
+                            <span class="nav-link text-light fw-semibold mb-0">
+                                <i class="fas fa-user-circle me-1"></i>
+                                Xin chào @User.Identity.Name
+                            </span>
+
+                            <a class="nav-link text-light"
+                               asp-controller="Profile"
+                               asp-action="Index">
+                                Thông tin cá nhân
+                            </a>
+
+                            <a class="nav-link text-light"
+                               asp-controller="Orders"
+                               asp-action="Index">
+                                Đơn hàng
+                            </a>
+
+                            <form asp-controller="Auth"
+                                  asp-action="Logout"
+                                  method="post"
+                                  class="m-0">
+                                <button type="submit" class="btn btn-link">Đăng xuất</button>
                             </form>
                         </li>
-                    </ul>
-                </li>
-            }
-            else
-            {
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Auth" asp-action="Login">
-                        <i class="fas fa-sign-in-alt"></i> Đăng nhập
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="Auth" asp-action="Register">
-                        <i class="fas fa-user-plus"></i> Đăng ký
-                    </a>
-                </li>
-            }
-        </ul>
-    </header>
+                    }
+                    else
+                    {
+                        <li class="nav-item d-flex align-items-center gap-4">
+                            <a class="nav-link text-light"
+                               asp-controller="Auth"
+                               asp-action="Login">
+                                Đăng nhập
+                            </a>
+
+                            <a class="nav-link text-light"
+                               asp-controller="Auth"
+                               asp-action="Register">
+                                Đăng ký
+                            </a>
+                        </li>
+                    }
+
+                </ul>
+            </nav>
+        </header>
+
+    }
+
     <div class="container">
         <main role="main" class="pb-3">
             @RenderBody()
@@ -55,7 +78,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-                © 2026 - Simple Ecommerce
+            © 2026 - Simple Ecommerce
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

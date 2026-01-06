@@ -18,7 +18,7 @@ namespace Ecommerce.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var profile = await _profileService.GetProfileAsync();
-            if (profile.IsFailure)
+            if (!profile.IsSuccess)
             {
                 return RedirectToAction("Login", "Auth");
             }

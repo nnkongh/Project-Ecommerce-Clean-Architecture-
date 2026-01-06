@@ -5,6 +5,7 @@ using Ecommerce.Infrastructure.Identity;
 using Ecommerce.Infrastructure.Interfaces.Authentication;
 using Ecommerce.Infrastructure.Services.Authentication;
 using Ecommerce.Web.Interface;
+using Ecommerce.Web.Mapping;
 using Ecommerce.Web.Services;
 using Microsoft.AspNetCore.Identity;
 using System.Runtime.CompilerServices;
@@ -15,6 +16,8 @@ namespace Ecommerce.Web.Dependencies
     {
         public static IServiceCollection AddWebMvcServices(this IServiceCollection services, IConfiguration configuration)
         {
+            services.AddAutoMapper(typeof(ViewModelsMapping));
+
             services.AddIdentityService();
 
             services.AddIdentity();
