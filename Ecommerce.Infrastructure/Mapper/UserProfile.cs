@@ -22,7 +22,6 @@ namespace Ecommerce.Infrastructure.Mapper
                 .ForMember(dest => dest.NormalizedEmail, opt => opt.Ignore())
                 .ForMember(dest => dest.NormalizedUserName, opt => opt.Ignore());
 
-            CreateMap<User, UserModel>().ReverseMap();
 
         }
     }

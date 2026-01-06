@@ -77,9 +77,6 @@ namespace Ecommerce.Application.Common.Command.AuthenticationExternal
                 ProviderKey = info.ProviderKey,
             };
             var createdUser = await _externalLoginService.CreateUserFromExternalAsync(externalUserInfo, newExternalIdentiy, cancellationToken);
-            var newUser = _mapper.Map<User>(createdUser);
-            await _userRepository.AddAsync(newUser);
-            await _uow.SaveChangesAsync(cancellationToken);
 
             return new ExternalLoginResult
             {

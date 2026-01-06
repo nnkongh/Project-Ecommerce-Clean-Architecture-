@@ -29,6 +29,7 @@ namespace Ecommerce.Infrastructure.Dependency_Injection
             })
                .AddDefaultTokenProviders()
                .AddRoles<IdentityRole>()
+               .AddSignInManager()
                .AddEntityFrameworkStores<AppIdentityDbContext>();
 
 

@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
 {
-    public sealed class CheckoutCartCommandHandler : IRequestHandler<CheckoutCartCommand, Result>
+    public sealed class CheckoutCartCommandHandler : IRequestHandler<CheckoutCartCommand, Result<OrderModel>>
     {
         private readonly ICartRepository _cartRepo;
         private readonly IMediator _mediator;
@@ -29,7 +29,7 @@ namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
             _mediator = mediator;
         }
 
-        public async Task<Result> Handle(CheckoutCartCommand request, CancellationToken cancellationToken)
+        public async Task<Result<OrderModel>> Handle(CheckoutCartCommand request, CancellationToken cancellationToken)
         {
             var cart = await _cartRepo.GetCartWithItemByUserIdAsync(request.userId);
             if(cart == null)
@@ -42,7 +42,7 @@ namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
             }
             var cartDto = _mapper.Map<CartModel>(cart);
             var result = await _mediator.Send(new CreateOrderByCartCommand(cartDto, request.userId), cancellationToken);
-            return result.IsSuccess ? Result.Success("Order created successfully") : Result.Failure(new Error("","Can not create order"));
+            return result.IsSuccess ? Result.Success<OrderModel>(result.Value) : Result.Failure<OrderModel>(new Error("","Can not create order"));
 
         }
     }

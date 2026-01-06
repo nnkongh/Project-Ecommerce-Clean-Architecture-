@@ -13,6 +13,7 @@ using Ecommerce.Infrastructure.Interfaces.Authentication;
 using Google.Apis.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
@@ -27,17 +28,25 @@ namespace Ecommerce.Infrastructure.Services.ExternalAuth
     public class ExternalLoginService : IExternalLoginService
     {
         private readonly UserManager<AppUser> _userManager;
+        private readonly IUserRepository _userRespository;
+        private readonly IIdentityRole _roleManager;
+        private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
-        public ExternalLoginService(IMapper mapper, UserManager<AppUser> userManager, IUserRepository userRepository)
+        private readonly ILogger<ExternalLoginService> _logger;
+        public ExternalLoginService(IMapper mapper, UserManager<AppUser> userManager, IUserRepository userRepository, IIdentityRole roleManager, IUserRepository userRespository, IUnitOfWork uow, ILogger<ExternalLoginService> logger)
         {
             _mapper = mapper;
             _userManager = userManager;
+            _roleManager = roleManager;
+            _userRespository = userRespository;
+            _uow = uow;
+            _logger = logger;
         }
 
         public async Task AddExternalLoginToExistingUserAsync(string userId, ExternalIdentity externalIdentity)
         {
             var user = await _userManager.FindByIdAsync(userId);
-            if(user == null)
+            if (user == null)
             {
                 throw new InvalidOperationException("Failed to add external login");
             }
@@ -49,15 +58,17 @@ namespace Ecommerce.Infrastructure.Services.ExternalAuth
             }
         }
 
-            public async Task<UserModel> CreateUserFromExternalAsync(ExternalUserInfo externalUserInfo, ExternalIdentity externalIdentity, CancellationToken cancellationToken)
+        public async Task<UserModel> CreateUserFromExternalAsync(ExternalUserInfo externalUserInfo, ExternalIdentity externalIdentity, CancellationToken cancellationToken)
+        {
+            var appUser = new AppUser
             {
-                var appUser = new AppUser
-                {
-                    UserName = externalUserInfo.Email,
-                    Email = externalUserInfo.Email,
-                    EmailConfirmed = true,
-                };
-                var result = await _userManager.CreateAsync(appUser);
+                UserName = externalUserInfo.Email,
+                Email = externalUserInfo.Email,
+                EmailConfirmed = true,
+            };
+            var result = await _userManager.CreateAsync(appUser);
+            var roles = await _roleManager.GetRolesAsync(appUser);
+            var role = roles.ToList();
             if (!result.Succeeded)
             {
                 throw new InvalidOperationException($"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
@@ -65,7 +76,7 @@ namespace Ecommerce.Infrastructure.Services.ExternalAuth
 
             var loginInfo = new UserLoginInfo(externalIdentity.Provider, externalIdentity.ProviderKey, externalIdentity.Provider);
 
-            var loginResult = await _userManager.AddLoginAsync(appUser,loginInfo);
+            var loginResult = await _userManager.AddLoginAsync(appUser, loginInfo);
             if (!loginResult.Succeeded)
             {
                 await _userManager.DeleteAsync(appUser);
@@ -77,8 +88,13 @@ namespace Ecommerce.Infrastructure.Services.ExternalAuth
                 Email = externalUserInfo.Email,
                 UserName = externalUserInfo.Name,
                 EmailConfirmed = true,
-                IdentityId = appUser.Id
+                IdentityId = appUser.Id,
+                Role = role
             };
+            var mapped = _mapper.Map<User>(user);
+            await _userRespository.AddAsync(mapped);
+            await _roleManager.AddToRoleAsync(appUser, "User");
+            await _uow.SaveChangesAsync(cancellationToken);
             return user;
         }
 

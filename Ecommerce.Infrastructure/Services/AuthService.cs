@@ -92,6 +92,7 @@ namespace Ecommerce.Infrastructure.Services
 
         public async Task<Result<UserModel>> Login(LoginModel login)
         {
+            try { 
             var user = await _userAuthenticationService.FindEmailAsync(login.Email);
             if (user == null)
             {
@@ -104,6 +105,10 @@ namespace Ecommerce.Infrastructure.Services
             }
             var mapped = _mapper.Map<UserModel>(user);
             return Result.Success(mapped);
+            }catch(Exception ex)
+            {
+                throw new Exception("An error occurred while processing the forgot password request.", ex);
+            }
         }
 
         public async Task<Result<UserModel>> Register(RegisterModel model)
