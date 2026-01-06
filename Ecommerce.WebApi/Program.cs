@@ -5,6 +5,7 @@ using Ecommerce.Application.Mappers;
 using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Dependency_Injection;
+using Ecommerce.Infrastructure.Mapper;
 using Ecommerce.Infrastructure.Services.ExternalAuth;
 using Ecommerce.WebApi.Dependencies;
 using Ecommerce.WebApi.Services;
@@ -28,7 +29,8 @@ namespace Ecommerce.WebApi
             //Shared layer
             builder.Services.AddApplicationServices();
             builder.Services.AddInfrastructure(builder.Configuration);
-
+            builder.Services.AddScoped<IExternalLoginService, ExternalLoginService>();
+            builder.Services.AddAutoMapper(typeof(UserProfile));
             //API-specific
             builder.Services.AddWebApiServices(builder.Configuration);
             builder.Services.AddControllers();

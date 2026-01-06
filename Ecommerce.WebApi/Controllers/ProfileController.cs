@@ -11,7 +11,7 @@ using System.Security.Claims;
 
 namespace Ecommerce.WebApi.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "User")]
     [Route("profile")]
     public class ProfileController : ApiController
     {

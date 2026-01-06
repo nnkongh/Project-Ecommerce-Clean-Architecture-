@@ -18,8 +18,9 @@ namespace Ecommerce.WebApi.Dependencies
         public static IServiceCollection AddWebApiServices(this IServiceCollection services, IConfiguration configuration)
         {
 
-            services.AddIdentityCore()
-                    .AddIdentityService();
+            services.AddIdentityCore();
+
+            services.AddIdentityService();
 
             services.AddJwtAuthentication(configuration);
 

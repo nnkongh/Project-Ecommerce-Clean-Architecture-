@@ -42,9 +42,9 @@ namespace Ecommerce.WebApi.Controllers
         }
      
         [HttpPost("logout")]
-        public IActionResult Logout(ClaimsPrincipal principal, HttpContext context)
+        public IActionResult Logout()
         {
-            var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             return userId == null ? BadRequest() : Ok();
         }
         [HttpPost("forgot-password")]
