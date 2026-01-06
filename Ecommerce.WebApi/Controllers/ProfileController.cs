@@ -1,4 +1,5 @@
-﻿using Ecommerce.Application.Common.Command.Profile;
+﻿using Ecommerce.Application.Common.Command.Products.UpdateProduct;
+using Ecommerce.Application.Common.Command.Profile;
 using Ecommerce.Application.Common.Queries.Profile.GetProfile;
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.User;
@@ -11,7 +12,7 @@ using System.Security.Claims;
 
 namespace Ecommerce.WebApi.Controllers
 {
-    [Authorize(Roles = "User")]
+    [Authorize]
     [Route("profile")]
     public class ProfileController : ApiController
     {
@@ -21,22 +22,21 @@ namespace Ecommerce.WebApi.Controllers
             this.logger = logger;
         }
 
-        [HttpPut]
-        [Route("update")]
-        public async Task<IActionResult> UpdateAddress(UpdateAddressRequest request)
+        [HttpPatch("update")]
+        public async Task<IActionResult> UpdateProfile(UpdateProfileRequest request)
         {
-            var user = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (user == null) 
-            { 
-                return Unauthorized();
-            }
-            var command = new UpdateAddressCommand(user, request);
+            logger.LogWarning($"Dia chi: {request.Address.Ward}, {request.Address.Province}, {request.Address.Street}, {request.Address.City}, {request.Address.District},");
+
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return Unauthorized();
+
+            var command = new UpdateProfileCommand(userId, request);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(new ApiResponse<AddressModel> { IsSuccess = true, Value = result.Value})
-                                    : BadRequest(new ApiResponse<AddressModel> { IsSuccess = false, Error = result.Error });
+            
+            return result.IsSuccess ? Ok(new ApiResponse<ProfileModel> { IsSuccess = true, Value = result.Value})
+                                    : BadRequest(new ApiResponse<ProfileModel> { IsSuccess = false, Error = result.Error });
         }
-        [HttpGet]
-        [Route("view")]
+        [HttpGet("view")]
         public async Task<IActionResult> GetProfile()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
