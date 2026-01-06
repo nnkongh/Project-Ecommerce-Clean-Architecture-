@@ -10,7 +10,8 @@ namespace Ecommerce.Application.DTOs.Models
     {
         public string? District { get; set; }
         public string? City { get; set; }
-        public string? PostalCode { get; set; }
+        public string? Province { get; set; }
         public string? Ward { get; set; }
+        public string? Street { get; set; }
     }
 }

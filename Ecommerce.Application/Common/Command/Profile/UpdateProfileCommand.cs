@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Profile
 {
-    public sealed record UpdateAddressCommand(string userId, UpdateAddressRequest update) : IRequest<Result<AddressModel>>
+    public sealed record UpdateProfileCommand(string userId, UpdateProfileRequest update) : IRequest<Result<ProfileModel>>
     {
     }
 }
