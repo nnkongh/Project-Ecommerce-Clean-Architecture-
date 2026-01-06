@@ -1,4 +1,5 @@
-﻿@using Ecommerce.Web.ViewModels.Profile
+﻿@using System.Globalization
+@using Ecommerce.Web.ViewModels.Profile
 @model ProfileViewModel;
 <!DOCTYPE html>
 <html lang="en">
@@ -99,7 +100,6 @@
             <div class="profile-info">
                 <h2>@Model.UserName</h2>
                 <p>Email: @Model.Email</p>
-                <p>Phone: @Model.PhoneNumber</p>
             </div>
         </div>
 
@@ -107,12 +107,14 @@
         <div class="profile-body">
 
             <div class="section">
-                <h3>Address</h3>
+                <h3>Địa chỉ</h3>
                 @if (Model.Address != null)
                 {
-                    <p>@Model.Address.City</p>
-                    <p>@Model.Address.District, @Model.Address.Ward</p>
-                    <p>@Model.Address.PostalCode</p>
+                    <p>Thành phố: @Model.Address.City</p>
+                    <p>Tỉnh: @Model.Address.Province</p>
+                    <p>Phường: @Model.Address.District </p>
+                    <p>Quận: @Model.Address.Ward</p>
+                    <p>Đường: @Model.Address.Street</p>
                 }
                 else
                 {
@@ -121,15 +123,15 @@
             </div>
 
             <div class="section">
-                <h3>Account Info</h3>
-                <p>Member since: @Model.CreatedAt.ToString("dd/MM/yyyy")</p>
+                <h3>Thông tin tài khoản</h3>
+                <p>Ngày tạo: @Model.CreatedAt.ToString("dd/MM/yyyy", CultureInfo.CurrentCulture)</p>
             </div>
 
         </div>
 
         <!-- FOOTER -->
         <div class="profile-footer">
-            <button class="btn">Edit Profile</button>
+            <a href="@Url.Action("EditProfile", "Profile")" class="btn btn-primary">Edit Profile</a>
         </div>
 
     </div>

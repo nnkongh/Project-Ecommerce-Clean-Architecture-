@@ -1,0 +1,85 @@
+﻿@using Ecommerce.Application.DTOs.ModelsRequest.User
+@model UpdateProfileRequest
+
+<form asp-action="EditProfile" method="post" class="edit-profile-form">
+
+    <h2>Edit Profile</h2>
+
+    <div class="form-group mb-3">
+        <label asp-for="UserName" class="form-label">Username</label>
+        <input asp-for="UserName" class="form-control" placeholder="Nhập username" />
+        <span asp-validation-for="UserName" class="text-danger"></span>
+    </div>
+
+    <h3>Địa chỉ</h3>
+
+    <div class="form-group mb-3">
+        <label asp-for="Address.City" class="form-label">Tỉnh / Thành phố</label>
+        <input asp-for="Address.City" class="form-control" placeholder="Nhập tỉnh/thành phố" />
+        <span asp-validation-for="Address.City" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Address.District" class="form-label">Phường / Xã</label>
+        <input asp-for="Address.District" class="form-control" placeholder="Nhập phường/xã" />
+        <span asp-validation-for="Address.District" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Address.Ward" class="form-label">Quận</label>
+        <input asp-for="Address.Ward" class="form-control" placeholder="Nhập quận" />
+        <span asp-validation-for="Address.Ward" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="Address.Street" class="form-label">Đường / Số nhà</label>
+        <input asp-for="Address.Street" class="form-control" placeholder="Nhập đường/số nhà" />
+        <span asp-validation-for="Address.Street" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Lưu thay đổi</button>
+</form>
+
+<style>
+    .edit-profile-form {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #f9f9f9;
+    }
+
+        .edit-profile-form h2, .edit-profile-form h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+    .form-group label {
+        font-weight: 600;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+
+    .btn-primary {
+        background-color: #007bff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        color: white;
+        font-weight: 600;
+    }
+
+    .text-danger {
+        font-size: 0.9rem;
+        margin-top: 3px;
+        display: block;
+    }
+</style>
