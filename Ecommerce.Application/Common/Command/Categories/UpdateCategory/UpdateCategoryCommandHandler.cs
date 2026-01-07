@@ -38,7 +38,7 @@ namespace Ecommerce.Application.Common.Command.Categories.UpdateCategory
             var category = _mapper.Map<Category>(request.update);
             var updated = await _categoryRepository.UpdatePartialAsync(request.id,
                                                                 category,
-                                                                x => x.Name, x => x.Description);
+                                                                x => x.Name);
             var mapped = _mapper.Map<CategoryModel>(updated);
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success(mapped);

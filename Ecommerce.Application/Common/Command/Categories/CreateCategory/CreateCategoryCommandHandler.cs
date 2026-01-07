@@ -31,10 +31,21 @@ namespace Ecommerce.Application.Common.Command.Categories.CreateCategory
             {
                 return Result.Failure<CategoryModel>(new Error("", "Category name cannot be empty"));
             }
+            if(request.create.ParentId.HasValue)
+            {
+                var parent = await _repo.GetByIdAsync(request.create.ParentId.Value);
+
+                if(parent == null)
+                {
+                    return Result.Failure<CategoryModel>(new Error("","Parent category không tồn tại"));
+                }
+            }
             var category = _mapper.Map<Category>(request.create);
-            var result = await _repo.AddAsync(category);
+
+            await _repo.AddAsync(category);
             await _uow.SaveChangesAsync(cancellationToken);
-            var mapped = _mapper.Map<CategoryModel>(result);
+
+            var mapped = _mapper.Map<CategoryModel>(category);
             return Result.Success(mapped);
 
         }
