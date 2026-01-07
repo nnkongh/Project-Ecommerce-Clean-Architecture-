@@ -49,6 +49,11 @@ namespace Ecommerce.Web.Dependencies
 
             services.AddScoped<IAuthenticationClient, AuthenticationClient>();
             services.AddScoped<IProfileClient, ProfileClient>();
+            services.AddScoped<ICartClient, CartClient>();
+            services.AddScoped<IProductClient, ProductClient>();
+            services.AddScoped<ICategoryClient, CategoryClient>();
+            services.AddScoped<ICommentClient, CommentClient>();
+            services.AddScoped<IWishlistClient, WishlistClient>();
             return services;
         }
 
