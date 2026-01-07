@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.Category;
+using Ecommerce.Domain.Shared;
 using Ecommerce.Infrastructure.Repository;
 using Ecommerce.Web.Interface;
 using Ecommerce.Web.ViewModels;
@@ -27,16 +28,32 @@ namespace Ecommerce.Web.Services
         {
             var response = await _httpClient.GetAsync("category/list");
 
-            var result = await response.Content.ReadFromJsonAsync<ApiResponse<CategoryModel>>();
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<IReadOnlyList<CategoryModel>>>();
 
             if(result == null || !result.IsSuccess)
             {
                 return ApiResponse<IReadOnlyList<CategoryViewModel>>.Fail(result?.Error?.Message ?? "Không thể lấy category");
             }
 
-            var mapped = _mapper.Map<IReadOnlyList<CategoryViewModel>>(result);
+            var mapped = _mapper.Map<IReadOnlyList<CategoryViewModel>>(result.Value);
 
             return ApiResponse<IReadOnlyList<CategoryViewModel>>.Success(mapped);
+        }
+
+        public async Task<ApiResponse<CategoryViewModel>> GetCategoryByIdAsync(int id)
+        {
+            var response = await _httpClient.GetAsync($"category/{id}");
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<CategoryViewModel>>();
+
+            if(result == null || !result.IsSuccess)
+            {
+                return ApiResponse<CategoryViewModel>.Fail(result?.Error?.Message ?? $"Không thể lấy category {id}");
+            }
+
+            var mapped = _mapper.Map<CategoryViewModel>(result.Value);
+
+            return ApiResponse<CategoryViewModel>.Success(mapped);
         }
 
         public Task<ApiResponse<CategoryModel>> GetCategoryByNameAsync(string name)

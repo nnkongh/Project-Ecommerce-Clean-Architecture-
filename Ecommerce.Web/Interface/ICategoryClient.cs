@@ -11,6 +11,8 @@ namespace Ecommerce.Web.Interface
         Task<ApiResponse<CategoryModel>> GetCategoryByNameAsync(string name);
         Task<ApiResponse<CategoryModel>> CreateCategoryAsync(CreateCategoryRequest category);
         Task<ApiResponse<CategoryViewModel>> UpdateCategoryAsync(int id, UpdateCategoryRequest category);
+        Task<ApiResponse<CategoryViewModel>> GetCategoryByIdAsync(int id);
+
 
     }
 }
