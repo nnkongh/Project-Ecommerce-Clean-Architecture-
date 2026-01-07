@@ -1,79 +1,312 @@
-﻿<!DOCTYPE html>
-<html lang="en">
+﻿
+<!DOCTYPE html>
+<html lang="vi">
 <head>
     <meta charset="UTF-8" />
-    <title>Ecommerce Homepage</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trang chủ - Simple Ecommerce</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
-        header, footer {
-            padding: 16px;
-            background: #f2f2f2;
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
         }
 
-        .container {
-            padding: 16px;
+        /* Header */
+        header {
+            background: #212529;
+            padding: 15px 0;
         }
 
-        .categories, .products {
-            margin-bottom: 24px;
-        }
+            header nav {
+                max-width: 100%;
+                margin: 0 auto;
+            }
 
-        .category-list, .product-list {
+        .navbar-nav {
+            list-style: none;
             display: flex;
-            gap: 12px;
+            align-items: center;
+            padding: 0 30px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            display: inline-block;
+        }
+
+            .nav-link:hover {
+                opacity: 0.8;
+            }
+
+        .me-auto {
+            margin-right: auto;
+        }
+
+        .search-form {
+            max-width: 400px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+        }
+
+            .search-form input {
+                flex: 1;
+                padding: 8px 15px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+
+            .search-form button {
+                padding: 8px 20px;
+                background: transparent;
+                border: 1px solid white;
+                color: white;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
+                .search-form button:hover {
+                    background: rgba(255,255,255,0.1);
+                }
+
+        .right-menu {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-left: auto;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Categories Section */
+        .categories {
+            margin-bottom: 40px;
+        }
+
+        h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .category-list {
+            display: flex;
+            gap: 15px;
             flex-wrap: wrap;
         }
 
-        .category, .product {
-            border: 1px solid #ccc;
-            padding: 12px;
+        .category {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 20px;
             width: 180px;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+            .category:hover {
+                border-color: #667eea;
+                box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+            }
+
+            .category i {
+                font-size: 40px;
+                color: #667eea;
+                margin-bottom: 10px;
+            }
+
+        /* Products Section */
+        .products {
+            margin-bottom: 40px;
+        }
+
+        .product-list {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .product {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 20px;
+            width: 220px;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+            .product:hover {
+                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            }
+
+        .product-image {
+            width: 100%;
+            height: 180px;
+            background: #f0f0f0;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 50px;
+        }
+
+        .product-name {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        .product-price {
+            color: #e74c3c;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .product button {
+            width: 100%;
+            padding: 10px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+            .product button:hover {
+                background: #5568d3;
+            }
+
+        /* Footer */
+        footer {
+            background: #f2f2f2;
+            border-top: 1px solid #ddd;
+            padding: 20px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            color: #666;
         }
     </style>
 </head>
 <body>
-
-    <header>
-        <strong>My Ecommerce</strong>
-        |
-        <input type="text" placeholder="Search..." />
-        |
-        <a href="/login">Login</a>
-        |
-        <a href="/cart">Cart</a>
-    </header>
-
+    <!-- Header giống _Layout -->
+   
+    <!-- Main Content -->
     <div class="container">
-
+        <!-- Categories -->
         <section class="categories">
-            <h3>Categories</h3>
-            <div class="category-list" id="categoryList">
-                <!-- Render category từ API -->
-                <div class="category">Laptop</div>
-                <div class="category">Phone</div>
-            </div>
-        </section>
-
-        <section class="products">
-            <h3>Products</h3>
-            <div class="product-list" id="productList">
-                <!-- Render product từ API -->
-                <div class="product">
-                    <p><strong>Product name</strong></p>
-                    <p>Price: 100$</p>
-                    <button>Add to cart</button>
+            <h3>Danh mục sản phẩm</h3>
+            <div class="category-list">
+                <div class="category">
+                    <i class="fas fa-laptop"></i>
+                    <div>Laptop</div>
+                </div>
+                <div class="category">
+                    <i class="fas fa-mobile-alt"></i>
+                    <div>Điện thoại</div>
+                </div>
+                <div class="category">
+                    <i class="fas fa-headphones"></i>
+                    <div>Tai nghe</div>
+                </div>
+                <div class="category">
+                    <i class="fas fa-keyboard"></i>
+                    <div>Bàn phím</div>
+                </div>
+                <div class="category">
+                    <i class="fas fa-mouse"></i>
+                    <div>Chuột</div>
                 </div>
             </div>
         </section>
 
+        <!-- Products -->
+        <section class="products">
+            <h3>Sản phẩm nổi bật</h3>
+            <div class="product-list">
+                <div class="product">
+                    <div class="product-image">
+                        <i class="fas fa-laptop"></i>
+                    </div>
+                    <div class="product-name">Laptop Dell XPS 13</div>
+                    <div class="product-price">25,000,000₫</div>
+                    <button>Thêm vào giỏ</button>
+                </div>
+
+                <div class="product">
+                    <div class="product-image">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="product-name">iPhone 15 Pro</div>
+                    <div class="product-price">30,000,000₫</div>
+                    <button>Thêm vào giỏ</button>
+                </div>
+
+                <div class="product">
+                    <div class="product-image">
+                        <i class="fas fa-headphones"></i>
+                    </div>
+                    <div class="product-name">Sony WH-1000XM5</div>
+                    <div class="product-price">8,500,000₫</div>
+                    <button>Thêm vào giỏ</button>
+                </div>
+
+                <div class="product">
+                    <div class="product-image">
+                        <i class="fas fa-keyboard"></i>
+                    </div>
+                    <div class="product-name">Keychron K8 Pro</div>
+                    <div class="product-price">3,200,000₫</div>
+                    <button>Thêm vào giỏ</button>
+                </div>
+
+                <div class="product">
+                    <div class="product-image">
+                        <i class="fas fa-mouse"></i>
+                    </div>
+                    <div class="product-name">Logitech MX Master 3S</div>
+                    <div class="product-price">2,500,000₫</div>
+                    <button>Thêm vào giỏ</button>
+                </div>
+            </div>
+        </section>
     </div>
 
-    
-
+    <!-- Footer giống _Layout -->
+    <footer>
+        <div class="footer-container">
+            © 2026 - Simple Ecommerce
+        </div>
+    </footer>
 </body>
 </html>
