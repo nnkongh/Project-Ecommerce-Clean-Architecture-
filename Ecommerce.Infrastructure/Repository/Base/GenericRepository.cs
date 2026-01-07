@@ -33,12 +33,11 @@ namespace Ecommerce.Infrastructure.Repository.Base
             return Task.FromResult(entity);
         }
 
-        public async Task<IReadOnlyList<T>> GetAll()
+        public async Task<IReadOnlyList<T>> GetAsync()
         {
             return await _context.Set<T>().ToListAsync();
         }
-
-   
+  
         public async Task<IReadOnlyList<T>> GetByAsync(Expression<Func<T, bool>> predicate)
         {
             return await _context.Set<T>().Where(predicate).ToListAsync();
@@ -66,10 +65,7 @@ namespace Ecommerce.Infrastructure.Repository.Base
             }
             return entity;
         }
-        public async Task<IReadOnlyList<T>> GetAllAsync()
-        {
-            return await _context.Set<T>().ToListAsync();
-        }
+     
         private IQueryable<T> ApplySpecification(ISpecification<T> specfication)
         {
             return SpecificationEvaluator<T>.GetQuery(_context.Set<T>().AsQueryable(),specfication);

@@ -70,6 +70,12 @@ namespace Ecommerce.Infrastructure.Data
                 .HasOne(x => x.User)
                 .WithMany(x => x.Wishlist)
                 .HasForeignKey(x => x.UserId);
+
+            modelBuilder.Entity<Category>()
+                .HasOne(c => c.Parent)
+                .WithMany(c => c.Children)
+                .HasForeignKey(c => c.ParentId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Models;
 using Ecommerce.Domain.Specification;
+using Ecommerce.Domain.Specification.Base;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Repository.Base;
 using Microsoft.EntityFrameworkCore;
@@ -16,31 +17,6 @@ namespace Ecommerce.Infrastructure.Repository
     {
         public ProductRepository(ApplicationDbContext context) : base(context)
         {
-        }
-
-        public async Task<IEnumerable<Product?>> GetProductByCategoryIdAsync(int categoryId)
-        {
-            return await _context.Products
-                .Where(x => x.CategoryId == categoryId).ToListAsync();
-        }
-
-        public async Task<Product?> GetProductByIdWithCategoryAsync(int productId)
-        {
-            var spec = new ProductWithCategorySpecification(productId);
-            return await GetEnityWithSpecAsync(spec);
-        }
-
-        public async Task<IEnumerable<Product?>> GetProductByNameAsync(string name)
-        {
-            var spec = new ProductWithCategorySpecification(name);
-            var result = await GetAsync(spec);
-            return result;
-        }
-
-        public async Task<IEnumerable<Product>> GetProductByCategoryAsync()
-        {
-            var spec = new ProductWithCategorySpecification();
-            return await GetAsync(spec);
         }
     }
 }
