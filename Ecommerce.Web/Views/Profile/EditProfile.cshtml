@@ -3,11 +3,11 @@
 
 <form asp-action="EditProfile" method="post" class="edit-profile-form">
 
-    <h2>Edit Profile</h2>
+    <h2>Chỉnh sửa</h2>
 
     <div class="form-group mb-3">
-        <label asp-for="UserName" class="form-label">Username</label>
-        <input asp-for="UserName" class="form-control" placeholder="Nhập username" />
+        <label asp-for="UserName" class="form-label">Tên</label>
+        <input asp-for="UserName" class="form-control" placeholder="Nhập tên" />
         <span asp-validation-for="UserName" class="text-danger"></span>
     </div>
 
@@ -38,6 +38,7 @@
     </div>
 
     <button type="submit" class="btn btn-primary mt-3">Lưu thay đổi</button>
+    <a asp-action="Index" class="btn btn-secondary mt-3 ms-2">Quay lại</a>
 </form>
 
 <style>
