@@ -1,7 +1,6 @@
 ﻿using Ecommerce.Application.Common.Command.Products.CreateProduct;
 using Ecommerce.Application.Common.Command.Products.DeleteProduct;
 using Ecommerce.Application.Common.Command.Products.UpdateProduct;
-using Ecommerce.Application.Common.Queries.Products.GetAllProducts;
 using Ecommerce.Application.Common.Queries.Products.GetProductByCategoryId;
 using Ecommerce.Application.Common.Queries.Products.GetProductByName;
 using Ecommerce.Application.Common.Queries.Products.GetProductsCategory;
@@ -25,36 +24,31 @@ namespace Ecommerce.WebApi.Controllers
         }
 
         [HttpGet("by-name/{name}")]
-        public async Task<IActionResult> SearchProductByName(string name)
+        [AllowAnonymous]
+        public async Task<IActionResult> GetProductByName(string name)
         {
-            var query = new GetProductByNameQuery(name);
+            var query = new GetProductByCategoryNameQuery(name);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(new ApiResponse<IEnumerable<ProductModel>> { IsSuccess = true, Value = result.Value })
-                                    : BadRequest(new ApiResponse<ProductModel> { IsSuccess = false, Error = result.Error });
+            return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = true, Value = result.Value })
+                                    : BadRequest(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = false, Error = result.Error });
         }
         [HttpGet("by-category/{id}")]
-        public async Task<IActionResult> SearchProductByCategoryId(int id)
+        [AllowAnonymous]
+        public async Task<IActionResult> GetProductByCategoryId(int id)
         {
-            var query = new GetProductByCategoryIdQuery(id);
+            var query = new GetProductsByCategoryIdQuery(id);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(new ApiResponse<IEnumerable<ProductModel>> { IsSuccess = true, Value = result.Value })
-                                    : BadRequest(new ApiResponse<ProductModel> { IsSuccess = false, Error = result.Error });
+            return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = true, Value = result.Value })
+                                    : BadRequest(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = false, Error = result.Error });
         }
-        [HttpGet("search")]
-        public async Task<IActionResult> SearchProduct()
+        [HttpGet("list")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetProductsByCategory()
         {
             var query = new GetProductsByCategoryQuery();
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(new ApiResponse<IEnumerable<ProductModel>> { IsSuccess = true, Value = result.Value })
-                                    : BadRequest(new ApiResponse<ProductModel> { IsSuccess = false, Error = result.Error });
-        }
-        [HttpGet("list")]
-        public async Task<IActionResult> GetList()
-        {
-            var query = new GetAllProductsQuery();
-            var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(new ApiResponse<IEnumerable<ProductModel>> { IsSuccess = true, Value = result.Value })
-                                    : BadRequest(new ApiResponse<ProductModel> { IsSuccess = false, Error = result.Error });
+            return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = true, Value = result.Value })
+                                    : BadRequest(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = false, Error = result.Error });
         }
         [HttpPost("add")]
         public async Task<IActionResult> AddProduct([FromBody]CreateProductRequest request)

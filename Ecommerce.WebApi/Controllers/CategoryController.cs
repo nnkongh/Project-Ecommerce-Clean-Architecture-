@@ -45,20 +45,21 @@ namespace Ecommerce.WebApi.Controllers
                                     : BadRequest(new ApiResponse<CategoryModel> { IsSuccess = false, Error = result.Error });
         }
         [HttpGet("list")]
-        public async Task<ActionResult<IEnumerable<CategoryModel>>> GetCategories()
+        [AllowAnonymous]
+        public async Task<IActionResult> GetCategories()
         {
             var query = new GetAllCategoriesQuery();
             var result = await Sender.Send(query);
             return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<CategoryModel>> { IsSuccess = true, Value = result.Value})
-                                    : BadRequest(new ApiResponse<CategoryModel> { IsSuccess = false, Error = result.Error });
+                                    : BadRequest(new ApiResponse<IReadOnlyList<CategoryModel>> { IsSuccess = false, Error = result.Error });
         }
-        [HttpGet("{id}")]
-        public async Task<ActionResult<IEnumerable<CategoryModel>>> GetCategoryById(int id)
+        [HttpGet("detailed/{id}")]
+        public async Task<IActionResult> GetCategoryById(int id)
         {
             var query = new GetCategoryByIdQuery(id);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(new ApiResponse<CategoryModel> { IsSuccess = true, Value = result.Value })
-                                    : BadRequest(new ApiResponse<CategoryModel> { IsSuccess = false, Error = result.Error });
+            return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = true, Value = result.Value })
+                                    : BadRequest(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = false, Error = result.Error });
         }
     }
 }

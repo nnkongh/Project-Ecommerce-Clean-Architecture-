@@ -25,7 +25,6 @@ namespace Ecommerce.WebApi.Controllers
         [HttpPatch("update")]
         public async Task<IActionResult> UpdateProfile(UpdateProfileRequest request)
         {
-            logger.LogWarning($"Dia chi: {request.Address.Ward}, {request.Address.Province}, {request.Address.Street}, {request.Address.City}, {request.Address.District},");
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null) return Unauthorized();
