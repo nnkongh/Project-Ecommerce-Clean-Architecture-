@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Ecommerce.Web.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
 </head>
 <body>
     @{
@@ -17,39 +18,99 @@
     {
         <header class="bg-dark">
             <nav class="container-fluid">
-                <ul class="navbar-nav d-flex flex-row justify-content-end align-items-center gap-4 px-4">
+                <ul class="navbar-nav d-flex flex-row align-items-center px-4 w-100">
 
+                    <!-- BÊN TRÁI -->
                     @if (User.Identity?.IsAuthenticated == true)
                     {
-                        <li class="nav-item d-flex align-items-center gap-4">
+                        <li class="nav-item me-auto">
                             <span class="nav-link text-light fw-semibold mb-0">
                                 <i class="fas fa-user-circle me-1"></i>
                                 Xin chào @User.Identity.Name
                             </span>
-
-                            <a class="nav-link text-light"
-                               asp-controller="Profile"
-                               asp-action="Index">
-                                Thông tin cá nhân
-                            </a>
-
-                            <a class="nav-link text-light"
-                               asp-controller="Orders"
-                               asp-action="Index">
-                                Đơn hàng
-                            </a>
-
-                            <form asp-controller="Auth"
-                                  asp-action="Logout"
-                                  method="post"
-                                  class="m-0">
-                                <button type="submit" class="btn btn-link">Đăng xuất</button>
-                            </form>
                         </li>
                     }
-                    else
-                    {
-                        <li class="nav-item d-flex align-items-center gap-4">
+                    <li class="nav-item mx-auto" style="max-width: 400px; width: 100%;">
+                        <form asp-controller="Product"
+                              asp-action="Index"
+                              method="get"
+                              class="d-flex">
+                            <input class="form-control me-2"
+                                   type="search"
+                                   name="keyword"
+                                   placeholder="Tìm sản phẩm..." />
+                            <button class="btn btn-outline-light" type="submit">
+                                Tìm
+                            </button>
+                        </form>
+                    </li>
+
+
+                    <!-- BÊN PHẢI -->
+                    <li class="nav-item d-flex align-items-center gap-4">
+
+                        <a class="nav-link text-light fw-semibold"
+                           asp-controller="Category"
+                           asp-action="Index">
+                            <i class="fas fa-list me-1"></i>
+                            Danh mục
+                        </a>
+
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <!-- Dropdown Thông tin cá nhân -->
+                            <div class="dropdown">
+                                <a class="nav-link text-light dropdown-toggle"
+                                   href="#"
+                                   id="userDropdown"
+                                   role="button"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+                                    <i class="fas fa-user me-1"></i>
+                                    Thông tin cá nhân
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Profile"
+                                           asp-action="Index">
+                                            <i class="fas fa-user-circle me-2"></i>
+                                            Trang cá nhân
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Orders"
+                                           asp-action="Index">
+                                            <i class="fas fa-shopping-bag me-2"></i>
+                                            Đơn hàng
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Wishlist"
+                                           asp-action="Index">
+                                            <i class="fas fa-heart me-2"></i>
+                                            Wishlist
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <form asp-controller="Auth"
+                                              asp-action="Logout"
+                                              method="post"
+                                              class="m-0">
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="fas fa-sign-out-alt me-2"></i>
+                                                Đăng xuất
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
+                        else
+                        {
                             <a class="nav-link text-light"
                                asp-controller="Auth"
                                asp-action="Login">
@@ -61,13 +122,12 @@
                                asp-action="Register">
                                 Đăng ký
                             </a>
-                        </li>
-                    }
+                        }
 
+                    </li>
                 </ul>
             </nav>
         </header>
-
     }
 
     <div class="container">

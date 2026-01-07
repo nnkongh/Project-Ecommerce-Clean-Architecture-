@@ -1,0 +1,23 @@
+﻿@using Ecommerce.Application.DTOs.Models
+@model IReadOnlyList<CategoryViewModel>
+
+<div class="container my-5">
+
+    <div class="row g-4">
+        @foreach (var category in Model)
+        {
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h4 class="card-title">@category.Name</h4>
+                    </div>
+                    <div class="card-footer text-end">
+                        <a href="@Url.Action("detailed", new { id = category.Id   })" class="btn btn-sm btn-outline-primary">
+                            Xem chi tiết
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

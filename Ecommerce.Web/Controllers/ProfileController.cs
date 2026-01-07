@@ -1,6 +1,7 @@
 ﻿using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.User;
 using Ecommerce.Domain.Models;
+using Ecommerce.Domain.Shared;
 using Ecommerce.Web.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,12 +23,13 @@ namespace Ecommerce.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var profile = await _profileService.GetProfileAsync();
-            if (!profile.IsSuccess)
+            var result = await _profileService.GetProfileAsync();
+            if (!result.IsSuccess)
             {
+                ModelState.AddModelError(string.Empty, result.Error.Message);
                 return RedirectToAction("Login", "Auth");
             }
-            return View(profile.Value);
+            return View(result.Value);
         }
 
         [HttpGet]
@@ -36,6 +38,7 @@ namespace Ecommerce.Web.Controllers
             var result = await _profileService.GetProfileForEditAsync();
             if (!result.IsSuccess)
             {
+                ModelState.AddModelError(string.Empty, result.Error.Message);
                 return RedirectToAction("Login", "Auth");
             }
             var model = result.Value;
