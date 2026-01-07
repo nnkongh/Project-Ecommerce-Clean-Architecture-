@@ -8,5 +8,5 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.DTOs.ModelsRequest.Category
 {
-    public record UpdateCategoryRequest(string Name, string Description);
+    public record UpdateCategoryRequest(string Name, int ParentId);
 }

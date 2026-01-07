@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.DTOs.ModelsRequest.Category
 {
-    public record CreateCategoryRequest(string? Name, string? Description);
+    public record CreateCategoryRequest(string? Name, int? ParentId);
 }

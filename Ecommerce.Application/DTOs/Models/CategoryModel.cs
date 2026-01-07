@@ -10,7 +10,11 @@ namespace Ecommerce.Application.DTOs.Models
     public record class CategoryModel : BaseModel
     {
         public string? Name { get; set; }
-        public string? Description { get; set; }
+
+        public int? ParentId { get; set; }
+        public CategoryModel Parent { get; set; } = new CategoryModel();
+        public ICollection<CategoryModel> Children { get; set; } = [];
+
         [JsonIgnore]
         public List<ProductModel>? Products { get; set; }
     }
