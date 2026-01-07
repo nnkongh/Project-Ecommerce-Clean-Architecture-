@@ -1,5 +1,6 @@
 ﻿using Ecommerce.Domain.Interfaces.Base;
 using Ecommerce.Domain.Models;
+using Ecommerce.Domain.Specification.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,9 +11,5 @@ namespace Ecommerce.Domain.Interfaces
 {
     public interface IProductRepository : IRepositoryBase<Product, int>
     {
-        Task<IEnumerable<Product?>> GetProductByNameAsync(string name);
-        Task<Product?> GetProductByIdWithCategoryAsync(int productId);
-        Task<IEnumerable<Product?>> GetProductByCategoryIdAsync(int categoryId);
-        Task<IEnumerable<Product>> GetProductByCategoryAsync();
     }
 }

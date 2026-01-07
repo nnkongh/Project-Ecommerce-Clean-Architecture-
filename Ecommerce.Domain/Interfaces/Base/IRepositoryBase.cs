@@ -11,7 +11,8 @@ namespace Ecommerce.Domain.Interfaces.Base
     public interface IRepositoryBase<T,TKey> where T : class
     {
         Task<T?> GetByIdAsync(TKey id);
-        Task<IReadOnlyList<T>> GetAllAsync();
+        Task<IReadOnlyList<T>> GetAsync();
+        Task<IReadOnlyList<T>> GetAsync(ISpecification<T> spec);
         Task<IReadOnlyList<T>> GetAsync(Expression<Func<T, bool>> predicate,
                                         Func<IQueryable<T>, IOrderedQueryable<T>> orderBy,
                                         List<Expression<Func<T,object>>> includes);
@@ -19,7 +20,6 @@ namespace Ecommerce.Domain.Interfaces.Base
         Task<IReadOnlyList<T>> GetAsync(Expression<Func<T,bool>> predicate,
                                         Func<IQueryable<T>,IOrderedQueryable<T>> orderBy);
         Task<T?> GetEnityWithSpecAsync(ISpecification<T> spec);
-        Task<IReadOnlyList<T>> GetAsync(ISpecification<T> spec);
         Task<T> AddAsync(T entity);
         Task<T?> UpdatePartialAsync(TKey id, T entity, params Expression<Func<T, object>>[] propertiesToUpdate);
         Task<T> Update(T entity);
