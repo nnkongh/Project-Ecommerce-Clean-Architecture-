@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Products.GetProductByCategoryId
 {
-    public sealed record GetProductByCategoryIdQuery(int categoryId) : IRequest<Result<IEnumerable<ProductModel>>>
+    public sealed record GetProductsByCategoryIdQuery(int categoryId) : IRequest<Result<IReadOnlyList<ProductModel>>>
     {
     }
 }

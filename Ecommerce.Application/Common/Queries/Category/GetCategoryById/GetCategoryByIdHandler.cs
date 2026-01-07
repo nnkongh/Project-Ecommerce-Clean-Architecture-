@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Category.GetCategoryById
 {
-    public sealed class GetCategoryByIdHandler : IRequestHandler<GetCategoryByIdQuery, Result<CategoryModel>>
+    public sealed class GetCategoryByIdHandler : IRequestHandler<GetCategoryByIdQuery, Result<IReadOnlyList<ProductModel>>>
     {
         private readonly ICategoryRepository _repo;
         private readonly IMapper _mapper;
@@ -23,19 +23,24 @@ namespace Ecommerce.Application.Common.Queries.Category.GetCategoryById
         }
 
 
-        public async Task<Result<CategoryModel>> Handle(GetCategoryByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<IReadOnlyList<ProductModel>>> Handle(GetCategoryByIdQuery request, CancellationToken cancellationToken)
         {
             if (request.id <= 0)
             {
-                return Result.Failure<CategoryModel>(new Error("Null",$"{request.id} is null"));
+                return Result.Failure<IReadOnlyList<ProductModel>>(new Error("Null",$"{request.id} is null"));
             }
             var category = await _repo.GetByIdAsync(request.id);
             if (category is null)
             {
-                return Result.Failure<CategoryModel>(Error.NullValue);
+                return Result.Success<IReadOnlyList<ProductModel>>(Array.Empty<ProductModel>());
             }
-            var mapped = _mapper.Map<CategoryModel>(category);
-            return mapped;
+            if (category.Products == null || !category.Products.Any())
+            {
+                // Category có tồn tại nhưng không có product
+                return Result.Success<IReadOnlyList<ProductModel>>(Array.Empty<ProductModel>());
+            }
+            var mapped = _mapper.Map<IReadOnlyList<ProductModel>>(category.Products);
+            return Result.Success(mapped);
         }
     }
 }

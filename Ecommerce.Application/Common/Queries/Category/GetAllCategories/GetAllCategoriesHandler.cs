@@ -24,7 +24,7 @@ namespace Ecommerce.Application.Common.Queries.Category.GetAllCategories
 
         public async Task<Result<IReadOnlyList<CategoryModel>>> Handle(GetAllCategoriesQuery request, CancellationToken cancellationToken)
         {
-            var categories = await _repo.GetAllAsync();
+            var categories = await _repo.GetAsync();
             if(categories is null || !categories.Any())
             {
                 return Array.Empty<CategoryModel>();
