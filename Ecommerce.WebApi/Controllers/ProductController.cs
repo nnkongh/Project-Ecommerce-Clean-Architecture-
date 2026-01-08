@@ -15,15 +15,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace Ecommerce.WebApi.Controllers
 {
 
-    [Route("product")]
+    [Route("products")]
     [Authorize]
-    public sealed class ProductController : ApiController
+    public class ProductController : ApiController
     {
         public ProductController(ISender sender) : base(sender)
         {
         }
 
-        [HttpGet("by-name/{name}")]
+        [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetProductByName(string name)
         {
@@ -32,7 +32,7 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = true, Value = result.Value })
                                     : BadRequest(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = false, Error = result.Error });
         }
-        [HttpGet("by-category/{id}")]
+        [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetProductByCategoryId(int id)
         {
@@ -41,7 +41,7 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = true, Value = result.Value })
                                     : BadRequest(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = false, Error = result.Error });
         }
-        [HttpGet("list")]
+        [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetProductsByCategory()
         {
@@ -50,7 +50,7 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = true, Value = result.Value })
                                     : BadRequest(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = false, Error = result.Error });
         }
-        [HttpPost("add")]
+        [HttpPost]
         public async Task<IActionResult> AddProduct([FromBody]CreateProductRequest request)
         {
             var command = new CreateProductCommand(request);
@@ -58,7 +58,7 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(new ApiResponse<ProductModel> { IsSuccess = true, Value = result.Value })
                                     : BadRequest(new ApiResponse<ProductModel> { IsSuccess = false, Error = result.Error });
         }
-        [HttpPut("update/{id:int}")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody]UpdateProductRequest request)
         {
             var command = new UpdateProductCommand(id,request);
@@ -66,13 +66,13 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(new ApiResponse<ProductModel> { IsSuccess = true, Value = result.Value })
                                     : BadRequest(new ApiResponse<ProductModel> { IsSuccess = false, Error = result.Error });
         }
-        [HttpDelete("{id:int}")]
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var command = new DeleteProductCommand(id);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(new ApiResponse<ProductModel> { IsSuccess = true})
-                                    : BadRequest(new ApiResponse<ProductModel> { IsSuccess = false, Error = result.Error });
+            return result.IsSuccess ? Ok(new ApiResponse<bool> { IsSuccess = true})
+                                    : BadRequest(new ApiResponse<bool> { IsSuccess = false, Error = result.Error });
         }
 
     }

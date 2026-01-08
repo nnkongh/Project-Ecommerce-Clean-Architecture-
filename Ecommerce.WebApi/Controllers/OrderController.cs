@@ -14,13 +14,13 @@ using System.Security.Claims;
 namespace Ecommerce.WebApi.Controllers
 {
     [Authorize]
-    [Route("order")]
+    [Route("orders")]
     public class OrderController : ApiController
     {
         public OrderController(ISender sender) : base(sender)
         {
         }
-        [HttpGet("get-list-order")]
+        [HttpGet]
         public async Task<IActionResult> GetListOrderByUserId()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -33,7 +33,7 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<OrderModel>> { IsSuccess = true, Value = result.Value })
                                     : BadRequest(new ApiResponse<OrderModel> { IsSuccess = false, Error = result.Error });
         }
-        [HttpGet("get-order/{orderId}")]
+        [HttpGet("{orderId}")]
         public async Task<IActionResult> GetOrderById(int orderId)
         {
             var query = new GetOrderByIdQuery(orderId);
@@ -41,7 +41,7 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(new ApiResponse<OrderModel> { IsSuccess = true, Value = result.Value })
                                     : BadRequest(new ApiResponse<OrderModel> { IsSuccess = false, Error = result.Error });
         }
-        [HttpPost("create-order")]
+        [HttpPost]
         public async Task<IActionResult> CreateOrder(CreateOrderRequest order)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

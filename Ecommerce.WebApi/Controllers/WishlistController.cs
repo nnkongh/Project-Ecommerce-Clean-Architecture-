@@ -23,7 +23,6 @@ namespace Ecommerce.WebApi.Controllers
         {
         }
         [HttpPost]
-        [Route("add-to-wishlist")]
         public async Task<IActionResult> AddItemToWishlist(AddToWishlistRequest request)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -36,17 +35,15 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(new ApiResponse<WishlistModel> { IsSuccess = true, Value = result.Value })
                                       : BadRequest(new ApiResponse<WishlistModel> { IsSuccess = false, Error = result.Error });
         }
-        [HttpDelete]
-        [Route("{wishlistId}/delete/{productId}")]
-        public async Task<IActionResult> DeleteItemInWishlist(int productId, int wishlistId)
+        [HttpDelete("{productId}")]
+        public async Task<IActionResult> DeleteItemInWishlist(int productId,[FromQuery] int wishlistId)
         {
             var command = new RemoveItemWishlistCommand(productId, wishlistId);
             var result = await Sender.Send(command);
             return result.IsSuccess ? Ok(new ApiResponse<WishlistModel> { IsSuccess = true })
                                      : BadRequest(new ApiResponse<WishlistModel> { IsSuccess = false, Error = result.Error });
         }
-        [HttpGet]
-        [Route("get-by-id/{wishlistId}")]
+        [HttpGet("{wishlistId}")]
         public async Task<IActionResult> GetWishlistById(int wishlistId)
         {
 
@@ -56,7 +53,6 @@ namespace Ecommerce.WebApi.Controllers
                                        : BadRequest(new ApiResponse<WishlistModel> { IsSuccess = false, Error = result.Error });
         }
         [HttpGet]
-        [Route("get-wishlists")]
         public async Task<IActionResult> GetWishlistsByUserId()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -69,8 +65,7 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<WishlistModel>> { IsSuccess = true, Value = result.Value })
                                       : BadRequest(new ApiResponse<WishlistModel> { IsSuccess = false, Error = result.Error });
         }
-        [HttpPost]
-        [Route("move-to-cart/{wishlistId}")]
+        [HttpPost("{wishlistId}")]
         public async Task<IActionResult> MoveItemToCart(int wishlistId, [FromBody]MovetoCartRequest request)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

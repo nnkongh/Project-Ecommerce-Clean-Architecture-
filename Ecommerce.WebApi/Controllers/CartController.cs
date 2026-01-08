@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 namespace Ecommerce.WebApi.Controllers
 {
     [Authorize]
-    [Route("cart")]
+    [Route("carts")]
     public class CartController : ApiController
      {
         public CartController(ISender sender) : base(sender)
@@ -27,7 +27,6 @@ namespace Ecommerce.WebApi.Controllers
         }
 
         [HttpPost]
-        [Route("add-to-cart")]
         public async Task<IActionResult> AddItemToCart(AddToCartRequest request)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -40,7 +39,6 @@ namespace Ecommerce.WebApi.Controllers
                                     : BadRequest(new ApiResponse<CartModel> { IsSuccess = false, Error = result.Error});
         }
         [HttpGet]
-        [Route("get-cart-id/")]
         public async Task<IActionResult> GetCartItemById()
         {
             var user = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -54,8 +52,7 @@ namespace Ecommerce.WebApi.Controllers
                                     : BadRequest(new ApiResponse<CartModel> {IsSuccess = false, Error = result.Error});
         }
         [HttpDelete]
-        [Route("delete-item/{productId}/quantity/{quantity}")]
-        public async Task<IActionResult> DeleteItemInCart([FromRoute]int productId, int quantity)
+        public async Task<IActionResult> DeleteItemInCart([FromRoute]int productId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if(userId == null)
@@ -68,7 +65,6 @@ namespace Ecommerce.WebApi.Controllers
                                     : BadRequest(new ApiResponse<CartModel> { IsSuccess = false, Error = result.Error});
         }
         [HttpPost]
-        [Route("checkout")]
         public async Task<IActionResult> CheckoutCart()
         {
             var user = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -82,7 +78,6 @@ namespace Ecommerce.WebApi.Controllers
                                     : BadRequest(new ApiResponse<OrderModel> { IsSuccess = false, Error = result.Error});
         }
         [HttpGet]
-        [Route("get-list-cart")]
         public async Task<IActionResult> GetListCartByUserId()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -96,8 +91,7 @@ namespace Ecommerce.WebApi.Controllers
                                     : BadRequest(new ApiResponse<CartModel> { IsSuccess = false, Error = result.Error});
         }
         [HttpPut]
-        [Route("reduce-item/{productId}/{quantity}")]
-        public async Task<IActionResult> ReduceItemInCart(int productId, int quantity)
+        public async Task<IActionResult> UpdateItemQuantity(int productId,[FromQuery] int quantity)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if(userId == null)
