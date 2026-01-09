@@ -1,12 +1,16 @@
-﻿using Ecommerce.Infrastructure;
+﻿using CloudinaryDotNet;
+using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Dependency_Injection;
 using Ecommerce.Infrastructure.Identity;
+using Ecommerce.Infrastructure.Interfaces;
 using Ecommerce.Infrastructure.Interfaces.Authentication;
+using Ecommerce.Infrastructure.Services;
 using Ecommerce.Infrastructure.Services.Authentication;
 using Ecommerce.Web.Interface;
 using Ecommerce.Web.Mapping;
 using Ecommerce.Web.Services;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using System.Runtime.CompilerServices;
 
@@ -26,7 +30,11 @@ namespace Ecommerce.Web.Dependencies
 
             services.AddHttpClientService(configuration);
 
+            services.AddApplicationAuthentication();
+
             services.AddCookieToken();
+
+            services.AddPhotoService(configuration);
 
             services.AddHttpClientService(configuration);
 
@@ -34,6 +42,16 @@ namespace Ecommerce.Web.Dependencies
 
             return services;
         }
+        public static IServiceCollection AddApplicationAuthentication(this IServiceCollection services)
+        {
+            services.AddAuthentication(opt =>
+            {
+                opt.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
+                opt.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            });
+            return services;
+        }
+
         public static IServiceCollection AddHttpClientService(this IServiceCollection services, IConfiguration config)
         {
             services.AddHttpContextAccessor();
@@ -54,6 +72,17 @@ namespace Ecommerce.Web.Dependencies
             services.AddScoped<ICategoryClient, CategoryClient>();
             services.AddScoped<ICommentClient, CommentClient>();
             services.AddScoped<IWishlistClient, WishlistClient>();
+
+            
+            return services;
+        }
+        public static IServiceCollection AddPhotoService(this IServiceCollection services, IConfiguration config)
+        {
+
+            services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
+
+            services.AddScoped<IPhotoService, PhotoService>();
+
             return services;
         }
 
