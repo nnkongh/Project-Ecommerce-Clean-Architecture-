@@ -75,11 +75,6 @@ namespace Ecommerce.Web.Controllers
                 ModelState.AddModelError(string.Empty, "Đăng nhập thất bại.");
                 return View(model);
             }
-            if (!result.IsSuccess)
-            {
-                ModelState.AddModelError(string.Empty, "Đăng nhập thất bại.");
-                return View(model);
-            }
 
             var token = result.Value.AccessToken;
             if (string.IsNullOrEmpty(token))
@@ -96,10 +91,11 @@ namespace Ecommerce.Web.Controllers
                 return View(model);
             }
 
-            await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, principal,
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
                 new AuthenticationProperties
                 {
                     IsPersistent = model.RememberMe,
+                    
                 });
             return RedirectToAction("Index", "Home");
         }
@@ -258,8 +254,7 @@ namespace Ecommerce.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await _authClient.LogoutAsync();
-            await _signinManager.SignOutAsync();
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             _cookieTokenService.RemoveTokenFromCookie();
             return RedirectToAction("Index", "Home");
         }
