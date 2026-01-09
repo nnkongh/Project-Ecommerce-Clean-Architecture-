@@ -46,9 +46,9 @@ namespace Ecommerce.WebApi.Controllers
         }
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetCategories()
+        public async Task<IActionResult> GetRootCategories()
         {
-            var query = new GetAllCategoriesQuery();
+            var query = new GetRootCategoriesQuery();
             var result = await Sender.Send(query);
             return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<CategoryModel>> { IsSuccess = true, Value = result.Value})
                                     : BadRequest(new ApiResponse<IReadOnlyList<CategoryModel>> { IsSuccess = false, Error = result.Error });
