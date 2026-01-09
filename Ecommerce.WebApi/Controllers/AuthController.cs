@@ -41,12 +41,6 @@ namespace Ecommerce.WebApi.Controllers
                                     : BadRequest(new ApiResponse<TokenModel> { IsSuccess = false, Error = result.Error });
         }
      
-        [HttpPost("logout")]
-        public IActionResult Logout()
-        {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            return userId == null ? BadRequest() : Ok();
-        }
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordModel forgotPasswordDto)
         {
