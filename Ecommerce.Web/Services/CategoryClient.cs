@@ -26,7 +26,7 @@ namespace Ecommerce.Web.Services
 
         public async Task<ApiResponse<IReadOnlyList<CategoryViewModel>>> GetCategoriesAsync()
         {
-            var response = await _httpClient.GetAsync("category/list");
+            var response = await _httpClient.GetAsync("categories");
 
             var result = await response.Content.ReadFromJsonAsync<ApiResponse<IReadOnlyList<CategoryModel>>>();
 
@@ -42,7 +42,7 @@ namespace Ecommerce.Web.Services
 
         public async Task<ApiResponse<CategoryViewModel>> GetCategoryByIdAsync(int id)
         {
-            var response = await _httpClient.GetAsync($"category/{id}");
+            var response = await _httpClient.GetAsync($"categories/{id}");
 
             var result = await response.Content.ReadFromJsonAsync<ApiResponse<CategoryViewModel>>();
 

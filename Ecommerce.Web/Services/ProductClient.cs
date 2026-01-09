@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
+using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Web.Interface;
+using Ecommerce.Web.ViewModels;
+using Ecommerce.Web.ViewModels.ApiResponse;
 
 namespace Ecommerce.Web.Services
 {
@@ -12,6 +15,65 @@ namespace Ecommerce.Web.Services
         {
             _mapper = mapper;
             _httpClient = httpClient.CreateClient("ApiClient");
+        }
+
+        public async Task<ApiResponse<ProductViewModel>> CreateProductAsync(ProductViewModel product)
+        {
+            var response = await _httpClient.PostAsJsonAsync("products", product);
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<ProductModel>>();
+
+            if(result == null || !result.IsSuccess)
+            {
+                return ApiResponse<ProductViewModel>.Fail(result?.Error?.Message ?? "Không thể tạo mới sản phẩm");
+            }
+
+            var mapped = _mapper.Map<ProductViewModel>(result.Value);
+
+            return ApiResponse<ProductViewModel>.Success(mapped);
+        }
+
+        public async Task<ApiResponse<bool>> DeleteProductAsync(int id)
+        {
+            var response = await _httpClient.DeleteAsync($"products/{id}");
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return ApiResponse<bool>.Fail("Không thể xóa sản phẩm");
+            }
+            return ApiResponse<bool>.Success(true);
+        }
+
+        public async Task<ApiResponse<ProductViewModel>> GetProductByIdAsync(int id)
+        {
+            var response = await _httpClient.GetAsync($"products/{id}");
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<ProductModel>>();
+
+            if(result == null || !result.IsSuccess)
+            {
+                return ApiResponse<ProductViewModel>.Fail(result?.Error?.Message ?? "Không thể lấy sản phẩm");
+            }
+
+            var mapped = _mapper.Map<ProductViewModel>(result.Value);
+
+            return ApiResponse<ProductViewModel>.Success(mapped);
+        }
+
+        public async Task<ApiResponse<ProductViewModel>> UpdateProductAsync(int id, ProductViewModel product)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"products/{id}", product);
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<ProductViewModel>>();
+
+            if (result == null || !result.IsSuccess)
+            {
+                return ApiResponse<ProductViewModel>.Fail(result?.Error?.Message ?? "Không thể cập nhật sản phẩm");
+            }
+
+            var mapped = _mapper.Map<ProductViewModel>(result.Value);
+
+            return ApiResponse<ProductViewModel>.Success(mapped);
         }
     }
 }

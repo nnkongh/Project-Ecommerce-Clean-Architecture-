@@ -61,10 +61,6 @@ namespace Ecommerce.Web.Services
             }
         }
 
-        public async Task LogoutAsync()
-        {
-            await _httpClient.PostAsync("auth/logout",null);
-        }
 
         public async Task<ApiResponse<UserModel>> RegisterAsync(RegisterViewModel model)
         {
