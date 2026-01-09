@@ -31,16 +31,16 @@ namespace Ecommerce.Application.Common.Command.Products.CreateProduct
         {
             if (string.IsNullOrWhiteSpace(request.create.Name))
             {
-                return Result.Failure<ProductModel>(new Error("", "Product name is required"));
+                return Result.Failure<ProductModel>(new Error("", "Tên sản phẩm không được để trống"));
             }
             if (request.create.Price <= 0)
             {
-                return Result.Failure<ProductModel>(new Error("", "Product price must be greater than zero"));
+                return Result.Failure<ProductModel>(new Error("", "Giá sản phẩm phải lớn hơn 0"));
             }
             var existing = await _categoryRepo.GetByIdAsync(request.create.CategoryId);
             if (existing == null)
             {
-                return Result.Failure<ProductModel>(new Error("", $"The category with id {request.create.CategoryId} is not found"));
+                return Result.Failure<ProductModel>(new Error("", $"Danh mục không tồn tại"));
             }
             var entity = _mapper.Map<Product>(request.create);
             var item = await _productRepo.AddAsync(entity);

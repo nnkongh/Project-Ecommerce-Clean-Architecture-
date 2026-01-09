@@ -16,7 +16,5 @@ namespace Ecommerce.Application.DTOs.Models
         public decimal Price { get; set; }
         public int Stock { get; set; }
         public int CategoryId { get; set; }
-        [JsonIgnore]
-        public CategoryModel Category { get; set; } = null!;
     }
 }

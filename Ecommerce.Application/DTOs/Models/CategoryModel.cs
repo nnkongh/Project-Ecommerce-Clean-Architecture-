@@ -12,7 +12,7 @@ namespace Ecommerce.Application.DTOs.Models
         public string? Name { get; set; }
 
         public int? ParentId { get; set; }
-        public CategoryModel Parent { get; set; } = new CategoryModel();
+        [JsonIgnore]
         public ICollection<CategoryModel> Children { get; set; } = [];
 
         [JsonIgnore]
