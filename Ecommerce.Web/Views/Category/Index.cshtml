@@ -1,23 +1,186 @@
 ﻿@using Ecommerce.Application.DTOs.Models
 @model IReadOnlyList<CategoryViewModel>
 
-<div class="container my-5">
 
-    <div class="row g-4">
-        @foreach (var category in Model)
-        {
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body">
-                        <h4 class="card-title">@category.Name</h4>
-                    </div>
-                    <div class="card-footer text-end">
-                        <a href="@Url.Action("detailed", new { id = category.Id   })" class="btn btn-sm btn-outline-primary">
-                            Xem chi tiết
-                        </a>
-                    </div>
-                </div>
-            </div>
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trang chủ - Simple Ecommerce</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-    </div>
-</div>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8f9fa;
+        }
+
+        /* Header */
+        header {
+            background: #212529;
+            padding: 15px 0;
+        }
+
+            header nav {
+                max-width: 100%;
+                margin: 0 auto;
+            }
+
+        .navbar-nav {
+            list-style: none;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            display: inline-block;
+        }
+
+            .nav-link:hover {
+                opacity: 0.8;
+            }
+
+        .me-auto {
+            margin-right: auto;
+        }
+
+        .search-form {
+            max-width: 400px;
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            gap: 10px;
+        }
+
+            .search-form input {
+                flex: 1;
+                padding: 8px 15px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+            }
+
+            .search-form button {
+                padding: 8px 20px;
+                background: transparent;
+                border: 1px solid white;
+                color: white;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+
+                .search-form button:hover {
+                    background: rgba(255,255,255,0.1);
+                }
+
+        .right-menu {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            margin-left: auto;
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px 20px;
+        }
+
+        /* Categories Section */
+        .categories {
+            margin-bottom: 40px;
+            justify-content: center;
+        }
+
+        h3 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .category-list {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .category {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 20px;
+            width: 180px;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+            .category:hover {
+                border-color: #667eea;
+                box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+            }
+
+            .category i {
+                font-size: 40px;
+                color: #667eea;
+                margin-bottom: 10px;
+            }
+
+    </style>
+</head>
+<body>
+    <section class="categories">
+        <div class="category-list">
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var category in Model)
+                {
+                    <a href="@Url.Action("category", new { id = category.Id })"
+                       class="category text-decoration-none">
+                        <i class="@GetCategoryIcon(category.Name!)"></i>
+                        <div>@category.Name</div>
+                    </a>
+                }
+            }
+            else
+            {
+                <div class="empty-state">
+                    <i class="fas fa-inbox" style="font-size: 48px; color: #ccc; margin-bottom: 15px;"></i>
+                    <p>Chưa có danh mục nào</p>
+                </div>
+            }
+        </div>
+    </section>
+</body>
+</html>
+@functions {
+    string GetCategoryIcon(string name)
+    {
+        return name.ToLower() switch
+        {
+            "laptop" => "fas fa-laptop",
+            "điện thoại" => "fas fa-mobile-alt",
+            "tai nghe" => "fas fa-headphones",
+            "bàn phím" => "fas fa-keyboard",
+            "chuột" => "fas fa-mouse",
+            _ => "fas fa-box"
+        };
+    }
+}
