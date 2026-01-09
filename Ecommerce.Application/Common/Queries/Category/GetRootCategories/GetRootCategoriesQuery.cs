@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Category.GetAllCategories
 {
-    public sealed record GetAllCategoriesQuery : IRequest<Result<IReadOnlyList<CategoryModel>>>
+    public sealed record GetRootCategoriesQuery : IRequest<Result<IReadOnlyList<CategoryModel>>>
     {
     }
 }

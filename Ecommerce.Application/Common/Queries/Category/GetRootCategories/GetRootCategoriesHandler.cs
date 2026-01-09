@@ -11,23 +11,24 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Category.GetAllCategories
 {
-    public sealed class GetAllCategoriesHandler : IRequestHandler<GetAllCategoriesQuery, Result<IReadOnlyList<CategoryModel>>>
+    public sealed class GetRootCategoriesHandler : IRequestHandler<GetRootCategoriesQuery, Result<IReadOnlyList<CategoryModel>>>
     {
         private readonly ICategoryRepository _repo;
         private readonly IMapper _mapper;
 
-        public GetAllCategoriesHandler(IMapper mapper, ICategoryRepository repo)
+        public GetRootCategoriesHandler(IMapper mapper, ICategoryRepository repo)
         {
             _mapper = mapper;
             _repo = repo;
         }
 
-        public async Task<Result<IReadOnlyList<CategoryModel>>> Handle(GetAllCategoriesQuery request, CancellationToken cancellationToken)
+        public async Task<Result<IReadOnlyList<CategoryModel>>> Handle(GetRootCategoriesQuery request, CancellationToken cancellationToken)
         {
-            var categories = await _repo.GetAsync();
-            if(categories is null || !categories.Any())
+            var categories = await _repo.GetByAsync(x => x.ParentId == null);
+
+            if(!categories.Any())
             {
-                return Array.Empty<CategoryModel>();
+                return Result.Success<IReadOnlyList<CategoryModel>>(Array.Empty<CategoryModel>());
             }
             var mapped = _mapper.Map<IReadOnlyList<CategoryModel>>(categories);
             return Result.Success(mapped);
