@@ -19,7 +19,7 @@ namespace Ecommerce.Web.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
-            var result = await _categoryClient.GetCategoriesAsync();
+            var result = await _categoryClient.GetRootCategoriesAsync();
             if (!result.IsSuccess)
             {
                 ModelState.AddModelError(string.Empty, result.Error.Message);
@@ -29,15 +29,16 @@ namespace Ecommerce.Web.Controllers
         }
         [HttpGet("detailed/{id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<IActionResult> ChildCategories(int id)
         {
-            var result = await _categoryClient.GetCategoryByIdAsync(id);
+            var result = await _categoryClient.GetChildCategoriesAsync(id);
 
             if (!result.IsSuccess)
             {
                 ModelState.AddModelError(string.Empty, result.Error.Message);
                 return RedirectToAction("Login", "Auth");
             }
+            ViewBag.ParentCategoryId = id;
             return View(result.Value);
         }
     }
