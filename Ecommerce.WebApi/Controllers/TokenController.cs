@@ -21,7 +21,6 @@ namespace Ecommerce.WebApi.Controllers
         [Route("create-token")]
         public async Task<IActionResult> CreateToken([FromBody]UserModel user)
         {
-            _logger.LogInformation("Creating token..");
             var tokenResult = await _tokenService.CreateToken(user, true);
             return Ok(tokenResult);
         } 
