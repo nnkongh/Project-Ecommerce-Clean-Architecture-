@@ -3,27 +3,52 @@ using Ecommerce.Domain.Shared;
 using Ecommerce.Infrastructure.Interfaces;
 using Ecommerce.Web.Interface;
 using Ecommerce.Web.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Diagnostics.Contracts;
+using System.Threading.Tasks;
 
 namespace Ecommerce.Web.Controllers
 {
     public class ProductController : Controller
     {
-
+        private readonly ICategoryClient _categoryClient;
         private readonly IPhotoService _photoService;
         private readonly IProductClient _productClient;
-        public ProductController(IPhotoService photoService, IProductClient productClient)
+        public ProductController(IPhotoService photoService, IProductClient productClient, ICategoryClient categoryClient)
         {
             _photoService = photoService;
             _productClient = productClient;
+            _categoryClient = categoryClient;
         }
 
 
         public IActionResult Index() => View();
 
         [HttpGet]
-        public IActionResult Create() => View();
+        public async Task<IActionResult> Create()
+        {
+            var model = new ProductViewModel();
+            await LoadCategories(model);
+            return View(model);
+        }
+        private async Task LoadCategories(ProductViewModel model) {
+            var categories = await _categoryClient.GetRootCategoriesAsync();
+
+            model.ParentCategories = categories.Value.Select(c => new SelectListItem
+            {
+                Value = c.Id.ToString(),
+                Text = c.Name
+            }).ToList();
+
+            var allCategories = await _categoryClient.GetAllCategoriesAsync();
+
+            if (allCategories.IsSuccess)
+            {
+                model.AllCategories = allCategories.Value.ToList();
+            }
+        }
         [HttpPost]
         public async Task<IActionResult> Create([FromForm]ProductViewModel model)
         {
@@ -43,14 +68,23 @@ namespace Ecommerce.Web.Controllers
                     }
                     model.ImageUrl = upload.SecureUrl.ToString();
                 }
+
                 var result = await _productClient.CreateProductAsync(model);
                 if (!result.IsSuccess)
                 {
                     TempData["Failed"] = "Tạo sản phẩm thất bại";
-                    return RedirectToAction(nameof(Index));
+                    return RedirectToAction(nameof(Create));
                 }
                 TempData["Success"] = "Tạo sản phẩm thành công";
-                return RedirectToAction(nameof(Index));
+
+                var categoryResult = await _categoryClient.GetCategoryByIdAsync(model.CategoryId);
+                if (!categoryResult.IsSuccess)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                var category = categoryResult.Value;
+
+                return RedirectToAction("ChildCategories", "Category",new {id = category.ParentId, selectCategoryId = category.Id});
             }
             catch (Exception ex)
             {
@@ -156,6 +190,37 @@ namespace Ecommerce.Web.Controllers
             var segment = uri.Segments;
             var fileName = segment[segment.Length - 1];
             return fileName;
+        }
+
+        [HttpGet("products/{categoryId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Products(int categoryId)
+        {
+            var productsResult = await _productClient.GetAllProductsByCategoryAsync(categoryId);
+
+            if (!productsResult.IsSuccess)
+            {
+                TempData["Error"] = productsResult.Error.Message;
+                return RedirectToAction("Index");
+            }
+
+            ViewBag.CategoryId = categoryId;
+            ViewBag.CategoryName = "Sản phẩm";
+
+            return View(productsResult.Value);
+        }
+
+        [HttpGet("item/{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> Detail(int id)
+        {
+            var result = await _productClient.GetProductByIdAsync(id);
+            if (!result.IsSuccess)
+            {
+                TempData["Error"] = result.Error.Message;
+                return RedirectToAction("Index");
+            }
+            return View(result.Value);
         }
     }
 
