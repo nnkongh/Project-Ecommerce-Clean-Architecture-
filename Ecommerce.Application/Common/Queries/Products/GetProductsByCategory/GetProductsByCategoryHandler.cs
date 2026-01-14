@@ -3,7 +3,6 @@ using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Shared;
 using Ecommerce.Domain.Specification;
-using Ecommerce.Domain.Specification.ProductSpec;
 using MediatR;
 using System;
 using System.Collections.Generic;

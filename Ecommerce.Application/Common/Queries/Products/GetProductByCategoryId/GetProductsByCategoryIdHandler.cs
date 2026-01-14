@@ -4,7 +4,6 @@ using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Interfaces.Base;
 using Ecommerce.Domain.Shared;
 using Ecommerce.Domain.Specification;
-using Ecommerce.Domain.Specification.ProductSpec;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -39,7 +38,7 @@ namespace Ecommerce.Application.Common.Queries.Products.GetProductByCategoryId
                 throw new ArgumentNullException(nameof(category));
             }
 
-            var spec = new ProductWithCategorySpec(request.categoryId);
+            var spec = new ProductWithCategorySpec(request.categoryId,isCategoryId: true);
 
             var products = await _productRepository.GetAsync(spec);
 

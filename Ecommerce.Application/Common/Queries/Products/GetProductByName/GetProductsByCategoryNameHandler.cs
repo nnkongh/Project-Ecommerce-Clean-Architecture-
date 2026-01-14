@@ -3,7 +3,6 @@ using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Shared;
 using Ecommerce.Domain.Specification;
-using Ecommerce.Domain.Specification.ProductSpec;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -17,7 +16,6 @@ namespace Ecommerce.Application.Common.Queries.Products.GetProductByName
     {
         private readonly IProductRepository _productRepository;
         private readonly IMapper _mapper;
-
         public GetProductsByCategoryNameHandler(IProductRepository productRepository, IMapper mapper)
         {
             _productRepository = productRepository;
@@ -25,10 +23,11 @@ namespace Ecommerce.Application.Common.Queries.Products.GetProductByName
         }
         public async Task<Result<IReadOnlyList<ProductModel>>> Handle(GetProductByCategoryNameQuery request, CancellationToken cancellationToken)
         {
+
             var spec = new ProductWithCategorySpec(request.name);
 
             var produtcs = await _productRepository.GetAsync(spec);
-
+            
             if(produtcs == null || !produtcs.Any())
             {
                 return Result.Success<IReadOnlyList<ProductModel>>(Array.Empty<ProductModel>());
