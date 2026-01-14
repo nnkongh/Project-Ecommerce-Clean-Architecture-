@@ -1,6 +1,6 @@
 ﻿@model ProductViewModel
 
-<form asp-action="CreateProduct" method="post" enctype="multipart/form-data" class="create-product-form">
+<form asp-action="Create" method="post" enctype="multipart/form-data" class="create-product-form">
     <h2>Tạo sản phẩm mới</h2>
 
     <div class="form-group mb-3">
@@ -39,15 +39,42 @@
     </div>
 
     <div class="form-group mb-3">
-        <label asp-for="CategoryId" class="form-label">Danh mục</label>
-        <select asp-for="CategoryId" class="form-control">
-            <option value="">-- Chọn danh mục --</option>
-        </select>
-        <span asp-validation-for="CategoryId" class="text-danger"></span>
-    </div>
+    <label asp-for="CategoryId" class="form-label">
+        <i class="fas fa-layer-group"></i> Danh mục cha
+    </label>
+    <select id="parentCategorySelect" class="form-control">
+        <option value="">-- Chọn danh mục cha --</option>
+        @if (Model.ParentCategories != null && Model.ParentCategories.Any())
+        {
+            @foreach (var category in Model.ParentCategories)
+            {
+                <option value="@category.Value">@category.Text</option>
+            }
+        }
+    </select>
+</div>
 
-    <button type="submit" class="btn btn-primary mt-3">Tạo sản phẩm</button>
-    <a asp-action="Index" class="btn btn-secondary mt-3 ms-2">Hủy</a>
+<div class="form-group mb-3" id="childCategoryGroup" style="display: none;">
+    <label asp-for="CategoryId" class="form-label">
+        <i class="fas fa-tags"></i> Danh mục con <span class="text-danger">*</span>
+    </label>
+    <select asp-for="CategoryId" id="childCategorySelect" class="form-control">
+        <option value="">-- Chọn danh mục con --</option>
+    </select>
+    <span asp-validation-for="CategoryId" class="text-danger"></span>
+    <small class="form-text text-muted">
+        Chọn danh mục cụ thể cho sản phẩm của bạn
+    </small>
+</div>
+
+    <div class="form-group mt-4">
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Tạo sản phẩm
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-times"></i> Hủy
+        </a>
+    </div>
 </form>
 
 <style>
@@ -149,8 +176,66 @@
         border-radius: 8px;
     }
 </style>
-
-<script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script type="text/javascript">
+    const allCategories = @Html.Raw(Json.Serialize(Model.AllCategories.Select(c => new { 
+        id = c.Id, 
+        name = c.Name, 
+        parentId = c.ParentId 
+    })));
+    console.log('All categories:', allCategories);
+    $(document).ready(function() {
+        // ===== CASCADING DROPDOWN =====
+        const parentSelect = $('#parentCategorySelect');
+        const childGroup = $('#childCategoryGroup');
+        const childSelect = $('#childCategorySelect');
+        
+        // Khi chọn category cha
+        parentSelect.on('change', function() {
+            const parentId = parseInt($(this).val());
+            
+            if (!parentId) {
+                childGroup.slideUp(300);
+                childSelect.val('').trigger('change');
+                return;
+            }
+            
+            // Lọc categories con
+            const childCategories = allCategories.filter(c => c.parentId === parentId);
+            
+            if (childCategories.length > 0) {
+                // Clear và thêm options mới
+                childSelect.empty();
+                childSelect.append('<option value="">-- Chọn danh mục con --</option>');
+                
+                childCategories.forEach(category => {
+                    childSelect.append(
+                        `<option value="${category.id}">${category.name}</option>`
+                    );
+                });
+                
+                // Hiển thị dropdown con
+                childGroup.slideDown(300);
+            } else {
+                childGroup.slideUp(300);
+                childSelect.val('');
+            }
+        });
+        
+        // ===== KẾT NỐI IMAGE PREVIEW =====
+        $('#imageFile').on('change', function(event) {
+            previewImage(event);
+        });
+        
+        // Reset form
+        $('form').on('reset', function() {
+            childGroup.hide();
+            childSelect.val('');
+            parentSelect.val('');
+            $('#imagePreview').hide();
+            $('#preview').attr('src', '');
+        });
+    });
     function previewImage(event) {
         const file = event.target.files[0];
         const preview = document.getElementById('preview');

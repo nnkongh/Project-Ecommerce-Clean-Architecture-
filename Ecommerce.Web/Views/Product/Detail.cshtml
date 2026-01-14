@@ -1,0 +1,66 @@
+﻿@model ProductViewModel
+
+@{
+    ViewData["Title"] = "Chi tiết sản phẩm";
+}
+
+<div style="max-width: 800px; margin: 20px auto; padding: 20px;">
+    <div style="margin-bottom: 20px;">
+        <button onclick="history.back()" style="padding: 8px 16px; background-color: #6c757d; color: white; border: none; cursor: pointer; border-radius: 4px;">
+            ← Quay lại
+        </button>
+    </div>
+
+    <h2 style="margin-bottom: 20px; color: #333;">Chi tiết sản phẩm</h2>
+
+    <div style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: #fff;">
+
+        @if (!string.IsNullOrEmpty(Model.ImageUrl))
+        {
+            <div style="text-align: center; margin-bottom: 20px;">
+                <img src="@Model.ImageUrl" alt="@Model.Name" style="max-width: 400px; max-height: 400px; border: 1px solid #ddd; border-radius: 4px;" />
+            </div>
+        }
+
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px; font-weight: bold; width: 30%;">Tên sản phẩm:</td>
+                <td style="padding: 12px;">@Model.Name</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px; font-weight: bold;">Mô tả:</td>
+                <td style="padding: 12px;">@Model.Description</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px; font-weight: bold;">Giá:</td>
+                <td style="padding: 12px; color: #dc3545; font-size: 18px; font-weight: bold;">
+                    @if (Model.Price.HasValue)
+                    {
+                        @Model.Price.Value.ToString("N0") <text> VNĐ</text>
+                    }
+                    else
+                    {
+                        <text>Chưa có giá</text>
+                    }
+                </td>
+            </tr>
+            <tr style="border-bottom: 1px solid #eee;">
+                <td style="padding: 12px; font-weight: bold;">Tồn kho:</td>
+                <td style="padding: 12px;">
+                    <span style="color: @(Model.Stock > 0 ? "#28a745" : "#dc3545");">
+                        @Model.Stock sản phẩm
+                    </span>
+                </td>
+            </tr>
+        </table>
+
+        <div style="margin-top: 30px; text-align: center;">
+            <a href="@Url.Action("Edit", new { id = Model.Id })" style="padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px; margin-right: 10px;">
+                Chỉnh sửa
+            </a>
+            <a href="@Url.Action("Index")" style="padding: 10px 20px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 4px;">
+                Danh sách sản phẩm
+            </a>
+        </div>
+    </div>
+</div>
