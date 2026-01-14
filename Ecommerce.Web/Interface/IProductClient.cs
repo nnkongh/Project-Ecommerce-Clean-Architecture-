@@ -10,7 +10,7 @@ namespace Ecommerce.Web.Interface
         Task<ApiResponse<bool>> DeleteProductAsync(int id);
         Task<ApiResponse<ProductViewModel>> GetProductByIdAsync(int id);
         
-
+        Task<ApiResponse<IReadOnlyList<ProductViewModel>>> GetAllProductsByCategoryAsync(int categoryId);
 
     }
 }

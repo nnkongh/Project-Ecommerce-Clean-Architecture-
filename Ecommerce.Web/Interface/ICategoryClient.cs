@@ -7,11 +7,13 @@ namespace Ecommerce.Web.Interface
 {
     public interface ICategoryClient
     {
-        Task<ApiResponse<IReadOnlyList<CategoryViewModel>>> GetCategoriesAsync();
+        Task<ApiResponse<IReadOnlyList<CategoryViewModel>>> GetRootCategoriesAsync();
         Task<ApiResponse<CategoryModel>> GetCategoryByNameAsync(string name);
         Task<ApiResponse<CategoryModel>> CreateCategoryAsync(CreateCategoryRequest category);
         Task<ApiResponse<CategoryViewModel>> UpdateCategoryAsync(int id, UpdateCategoryRequest category);
-        Task<ApiResponse<CategoryViewModel>> GetCategoryByIdAsync(int id);
+        Task<ApiResponse<IReadOnlyList<CategoryViewModel>>> GetChildCategoriesAsync(int parentId);
+        Task<ApiResponse<IReadOnlyList<CategoryViewModel>>> GetAllCategoriesAsync();
+        Task<ApiResponse<CategoryViewModel>> GetCategoryByIdAsync(int? id);
 
 
     }
