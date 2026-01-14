@@ -152,7 +152,7 @@
             {
                 @foreach (var category in Model)
                 {
-                    <a href="@Url.Action("category", new { id = category.Id })"
+                    <a href="@Url.Action("ChildCategories", "Category", new { id = category.Id })"
                        class="category text-decoration-none">
                         <i class="@GetCategoryIcon(category.Name!)"></i>
                         <div>@category.Name</div>
