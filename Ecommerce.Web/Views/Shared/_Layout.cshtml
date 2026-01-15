@@ -94,6 +94,14 @@
                                             Yêu thích
                                         </a>
                                     </li>
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-controller="Product"
+                                           asp-action="Create">
+                                            <i class="fas fa-heart me-2"></i>
+                                            Tạo sản phẩm
+                                        </a>
+                                    </li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
                                         <form asp-controller="Auth"
@@ -143,6 +151,7 @@
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

@@ -48,7 +48,6 @@ namespace Ecommerce.Application.Common.Command.AuthenticationExternal
                     User = user,
                 };
             }
-
             
             var existingUser = await _userRepository.FindByEmailAsync(info.Email);
             if (existingUser != null)
