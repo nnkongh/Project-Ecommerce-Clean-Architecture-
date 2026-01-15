@@ -30,7 +30,7 @@ namespace Ecommerce.Web.Dependencies
 
             services.AddHttpClientService(configuration);
 
-            services.AddApplicationAuthentication();
+           // services.AddApplicationAuthentication();
 
             services.AddCookieToken();
 
@@ -46,9 +46,13 @@ namespace Ecommerce.Web.Dependencies
         {
             services.AddAuthentication(opt =>
             {
-                opt.DefaultSignInScheme = IdentityConstants.ApplicationScheme;
+                opt.DefaultSignInScheme = IdentityConstants.ExternalScheme;
                 opt.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             });
+                //.AddCookie(opt =>
+                //{
+                //    opt.LogoutPath = "/auth/logout";
+                //});
             return services;
         }
 
