@@ -24,9 +24,9 @@ namespace Ecommerce.Web.Services
             throw new NotImplementedException();
         }
 
-        public async Task<ApiResponse<IReadOnlyList<CategoryViewModel>>> GetCategoriesAsync()
+        public async Task<ApiResponse<IReadOnlyList<CategoryViewModel>>> GetRootCategoriesAsync()
         {
-            var response = await _httpClient.GetAsync("categories");
+            var response = await _httpClient.GetAsync("categories/root");
 
             var result = await response.Content.ReadFromJsonAsync<ApiResponse<IReadOnlyList<CategoryModel>>>();
 
@@ -40,20 +40,20 @@ namespace Ecommerce.Web.Services
             return ApiResponse<IReadOnlyList<CategoryViewModel>>.Success(mapped);
         }
 
-        public async Task<ApiResponse<CategoryViewModel>> GetCategoryByIdAsync(int id)
+        public async Task<ApiResponse<IReadOnlyList<CategoryViewModel>>> GetChildCategoriesAsync(int id)
         {
-            var response = await _httpClient.GetAsync($"categories/{id}");
+            var response = await _httpClient.GetAsync($"categories/{id}/children");
 
-            var result = await response.Content.ReadFromJsonAsync<ApiResponse<CategoryViewModel>>();
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<IReadOnlyList<CategoryViewModel>>>();
 
             if(result == null || !result.IsSuccess)
             {
-                return ApiResponse<CategoryViewModel>.Fail(result?.Error?.Message ?? $"Không thể lấy category {id}");
+                return ApiResponse<IReadOnlyList<CategoryViewModel>>.Fail(result?.Error?.Message ?? $"Không thể lấy category {id}");
             }
 
-            var mapped = _mapper.Map<CategoryViewModel>(result.Value);
+            var mapped = _mapper.Map<IReadOnlyList<CategoryViewModel>>(result.Value);
 
-            return ApiResponse<CategoryViewModel>.Success(mapped);
+            return ApiResponse<IReadOnlyList<CategoryViewModel>>.Success(mapped);
         }
 
         public Task<ApiResponse<CategoryModel>> GetCategoryByNameAsync(string name)
@@ -64,6 +64,39 @@ namespace Ecommerce.Web.Services
         public Task<ApiResponse<CategoryViewModel>> UpdateCategoryAsync(int id, UpdateCategoryRequest category)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<ApiResponse<IReadOnlyList<CategoryViewModel>>> GetAllCategoriesAsync()
+        {
+            var response = await _httpClient.GetAsync("categories/all");
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<IReadOnlyList<CategoryModel>>>();
+
+            if(result == null || !result.IsSuccess)
+            {
+                return ApiResponse<IReadOnlyList<CategoryViewModel>>.Fail(result?.Error?.Message ?? $"Không thể lấy category");
+            }
+
+            var mapped = _mapper.Map<IReadOnlyList<CategoryViewModel>>(result.Value);
+
+            return ApiResponse<IReadOnlyList<CategoryViewModel>>.Success(mapped);
+
+        }
+
+        public async Task<ApiResponse<CategoryViewModel>> GetCategoryByIdAsync(int? id)
+        {
+            var response = await _httpClient.GetAsync($"categories/{id}");
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<CategoryModel>>();
+
+            if (result == null || !result.IsSuccess)
+            {
+                return ApiResponse<CategoryViewModel>.Fail(result?.Error?.Message ?? $"Không thể lấy category");
+            }
+
+            var mapped = _mapper.Map<CategoryViewModel>(result.Value);
+
+            return ApiResponse<CategoryViewModel>.Success(mapped);
         }
     }
 }

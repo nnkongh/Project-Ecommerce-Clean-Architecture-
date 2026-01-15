@@ -44,9 +44,25 @@ namespace Ecommerce.Web.Services
             return ApiResponse<bool>.Success(true);
         }
 
+        public async Task<ApiResponse<IReadOnlyList<ProductViewModel>>> GetAllProductsByCategoryAsync(int categoryId)
+        {
+            var response = await _httpClient.GetAsync($"products/category/{categoryId}");
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<IReadOnlyList<ProductModel>>>();
+
+            if(result == null || !result.IsSuccess)
+            {
+                return ApiResponse<IReadOnlyList<ProductViewModel>>.Fail(
+                result?.Error?.Message ?? "Không thể lấy danh sách sản phẩm");
+            }
+            var mapped = _mapper.Map<IReadOnlyList<ProductViewModel>>(result.Value);
+
+            return ApiResponse<IReadOnlyList<ProductViewModel>>.Success(mapped);
+        }
+
         public async Task<ApiResponse<ProductViewModel>> GetProductByIdAsync(int id)
         {
-            var response = await _httpClient.GetAsync($"products/{id}");
+            var response = await _httpClient.GetAsync($"products/item/{id}");
 
             var result = await response.Content.ReadFromJsonAsync<ApiResponse<ProductModel>>();
 
