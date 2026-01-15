@@ -69,34 +69,39 @@ namespace Ecommerce.Web.Controllers
                 return View(model);
             }
 
-            var result = await _authClient.LoginAsync(model);
-            if (!result.IsSuccess)
+            var loginResult = await _authClient.LoginAsync(model);
+            if (!loginResult.IsSuccess)
             {
                 ModelState.AddModelError(string.Empty, "Đăng nhập thất bại.");
                 return View(model);
             }
 
-            var token = result.Value.AccessToken;
+            var token = loginResult.Value.AccessToken;
             if (string.IsNullOrEmpty(token))
             {
                 ModelState.AddModelError(string.Empty, "Token không hợp lệ.");
                 return View(model);
             }
-            _cookieTokenService.SetTokenInsideCookie(result.Value);
+            _cookieTokenService.SetTokenInsideCookie(loginResult.Value);
 
-            var principal = _principalFactory.CreatePrincipalFromToken(token);
-            if (principal == null)
-            {
-                ModelState.AddModelError(string.Empty, "Token không hợp lệ.");
-                return View(model);
-            }
+            //var principal = _principalFactory.CreatePrincipalFromToken(token);
+            //if (principal == null)
+            //{
+            //    ModelState.AddModelError(string.Empty, "Token không hợp lệ.");
+            //    return View(model);
+            //}
 
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
-                new AuthenticationProperties
-                {
-                    IsPersistent = model.RememberMe,
-                    
-                });
+            //await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
+            //    new AuthenticationProperties
+            //    {
+            //        IsPersistent = model.RememberMe,
+
+            //    });
+
+            var result = await _signinManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: true);
+
+            if (result.Succeeded)
+                return RedirectToAction("Index", "Home");
             return RedirectToAction("Index", "Home");
         }
 
@@ -112,17 +117,17 @@ namespace Ecommerce.Web.Controllers
 
             return Challenge(properties, provider);
         }
-        [HttpGet("external-login-callback")]
+        [HttpGet("login-callback")]
         public async Task<IActionResult> ExternalLoginCallback([FromQuery] string? redirectUri, [FromQuery] string? remoteError = null)
         {
-
-
             var info = await _signinManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
                 return Redirect("/login");
             }
+
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+
             if (string.IsNullOrEmpty(email))
             {
                 return Redirect("/login");
@@ -254,7 +259,7 @@ namespace Ecommerce.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await _signinManager.SignOutAsync();    
             _cookieTokenService.RemoveTokenFromCookie();
             return RedirectToAction("Index", "Home");
         }
