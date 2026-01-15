@@ -8,6 +8,6 @@ namespace Ecommerce.Web.ViewModels
         public string? Name { get; set; }
         public int? ParentId { get; set; }
         public IReadOnlyList<CategoryViewModel> Children { get; set; } = [];
-        public List<ProductViewModel>? Products { get; set; }
+        public IReadOnlyList<ProductViewModel>? Products { get; set; }
     }
 }
