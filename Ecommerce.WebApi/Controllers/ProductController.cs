@@ -60,7 +60,7 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(new ApiResponse<ProductModel> { IsSuccess = true, Value = result.Value })
                                     : BadRequest(new ApiResponse<ProductModel> { IsSuccess = false, Error = result.Error });
         }
-        [HttpPut("{id}")]
+        [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody]UpdateProductRequest request)
         {
             var command = new UpdateProductCommand(id,request);
