@@ -30,31 +30,39 @@ namespace Ecommerce.Application.Common.Command.Products.UpdateProduct
 
         public async Task<Result<ProductModel>> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(request.update.Name))
+            if ((request.update.Stock.HasValue && request.update.Stock < 0) ||
+                (request.update.Price.HasValue && request.update.Price < 0))
             {
-                return Result.Failure<ProductModel>(new Error("", "Name can not be null"));
+                return Result.Failure<ProductModel>(new Error("", $"Số lượng và giá không được phép âm"));
             }
-            if (request.update.Price <= 0)
+            if (request.update.Name != null && string.IsNullOrWhiteSpace(request.update.Name))
             {
-                return Result.Failure<ProductModel>(new Error("", "Price must be greater than zero"));
+                return Result.Failure<ProductModel>(new Error("", "Tên không được rỗng"));
             }
+
             var product = await _productRepo.GetByIdAsync(request.id);
+
             if (product == null)
             {
                 return Result.Failure<ProductModel>(new Error("", $"Product with id {request.id} is not found"));
             }
-            var entity = _mapper.Map<Product>(request.update);
-            var updated = await _productRepo.UpdatePartialAsync(request.id, entity,
-                                                    x => x.Name,
-                                                    x => x.Price,
-                                                    x => x.Description,
-                                                    x => x.ImageUrl,
-                                                    x => x.Stock);
+
+            product.Name = request.update.Name ?? product.Name;
+
+            product.Price = request.update.Price ?? product.Price;
+
+            product.Stock = request.update.Stock ?? product.Stock;
+
+            product.ImageUrl = request.update.ImageUrl ?? product.ImageUrl;
+
+            product.Description = request.update.Description ?? product.Description;
+
+            //await _productRepo.Update(product);
             await _uow.SaveChangesAsync(cancellationToken);
-            var mapped = _mapper.Map<ProductModel>(updated);
+            var mapped = _mapper.Map<ProductModel>(product);
             return Result.Success(mapped);
         }
-        
+
     }
-    
+
 }

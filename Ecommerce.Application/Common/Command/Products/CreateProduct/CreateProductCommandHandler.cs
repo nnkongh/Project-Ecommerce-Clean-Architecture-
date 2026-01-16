@@ -37,7 +37,6 @@ namespace Ecommerce.Application.Common.Command.Products.CreateProduct
             {
                 return Result.Failure<ProductModel>(new Error("", "Giá sản phẩm phải lớn hơn 0"));
             }
-            var category = await _categoryRepo.GetAsync();
 
             var existing = await _categoryRepo.GetByIdAsync(request.create.CategoryId);
             if (existing == null)
