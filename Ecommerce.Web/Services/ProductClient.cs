@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs.Models;
+using Ecommerce.Application.DTOs.ModelsRequest.Product;
 using Ecommerce.Web.Interface;
 using Ecommerce.Web.ViewModels;
 using Ecommerce.Web.ViewModels.ApiResponse;
@@ -78,7 +79,8 @@ namespace Ecommerce.Web.Services
 
         public async Task<ApiResponse<ProductViewModel>> UpdateProductAsync(int id, ProductViewModel product)
         {
-            var response = await _httpClient.PutAsJsonAsync($"products/{id}", product);
+            //var updateModelt = _mapper.Map<UpdateProductRequest>(product);
+            var response = await _httpClient.PatchAsJsonAsync($"products/{id}", product);
 
             var result = await response.Content.ReadFromJsonAsync<ApiResponse<ProductViewModel>>();
 
