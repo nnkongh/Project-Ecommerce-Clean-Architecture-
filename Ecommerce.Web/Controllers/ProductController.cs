@@ -1,4 +1,5 @@
 ﻿using CloudinaryDotNet.Actions;
+using Ecommerce.Domain.Models;
 using Ecommerce.Domain.Shared;
 using Ecommerce.Infrastructure.Interfaces;
 using Ecommerce.Web.Interface;
@@ -52,6 +53,7 @@ namespace Ecommerce.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromForm]ProductViewModel model)
         {
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -78,10 +80,6 @@ namespace Ecommerce.Web.Controllers
                 TempData["Success"] = "Tạo sản phẩm thành công";
 
                 var categoryResult = await _categoryClient.GetCategoryByIdAsync(model.CategoryId);
-                if (!categoryResult.IsSuccess)
-                {
-                    return RedirectToAction("Index", "Home");
-                }
                 var category = categoryResult.Value;
 
                 return RedirectToAction("ChildCategories", "Category",new {id = category.ParentId, selectCategoryId = category.Id});
@@ -99,9 +97,10 @@ namespace Ecommerce.Web.Controllers
             try
             {
                 var product = await _productClient.GetProductByIdAsync(id);
+               
                 if (!product.IsSuccess)
                 {
-                    ModelState.AddModelError("", "Lỗi upload ảnh: " + product.Error.Message);
+                    ModelState.AddModelError("", "Lỗi lấy sản phẩm " + product.Error.Message);
                     return RedirectToAction(nameof(Index));
                 }
                 return View(product.Value);
@@ -145,8 +144,11 @@ namespace Ecommerce.Web.Controllers
                     ModelState.AddModelError("", "Lỗi upload ảnh: " + result.Error.Message);
                     return View(model);
                 }
+                var categoriesResult = await _categoryClient.GetCategoryByIdAsync(model.CategoryId);
+                var category = categoriesResult.Value;
+
                 TempData["Success"] = "Cập nhật thành công";
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("ChildCategories", "Category", new { id = category.ParentId, selectCategoryId = category.Id });
 
             }
             catch (Exception ex)
