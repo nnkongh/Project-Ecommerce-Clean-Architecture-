@@ -11,6 +11,9 @@ namespace Ecommerce.Web.Interface
         Task<ApiResponse<ProductViewModel>> GetProductByIdAsync(int id);
         
         Task<ApiResponse<IReadOnlyList<ProductViewModel>>> GetAllProductsByCategoryAsync(int categoryId);
+        Task<ApiResponse<IReadOnlyList<ProductViewModel>>> GetAllProductsByNameAsync(string name);
+        Task<ApiResponse<IReadOnlyList<ProductViewModel>>> GetAllProductsAsync();
+
 
     }
 }

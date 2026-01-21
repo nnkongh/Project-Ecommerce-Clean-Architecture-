@@ -1,6 +1,7 @@
 ﻿using Ecommerce.Application.Common.Command.Products.CreateProduct;
 using Ecommerce.Application.Common.Command.Products.DeleteProduct;
 using Ecommerce.Application.Common.Command.Products.UpdateProduct;
+using Ecommerce.Application.Common.Queries.Products.GetAllProducts;
 using Ecommerce.Application.Common.Queries.Products.GetProductByCategoryId;
 using Ecommerce.Application.Common.Queries.Products.GetProductById;
 using Ecommerce.Application.Common.Queries.Products.GetProductByName;
@@ -26,10 +27,18 @@ namespace Ecommerce.WebApi.Controllers
 
         //[HttpGet("category/{name}")]
         [AllowAnonymous]
-        
-        public async Task<IActionResult> GetProductByName(string name)
+        [HttpGet("search")]
+        public async Task<IActionResult> GetProductsByName([FromQuery]string name)
         {
             var query = new GetProductByCategoryNameQuery(name);
+            var result = await Sender.Send(query);
+            return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = true, Value = result.Value })
+                                    : BadRequest(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = false, Error = result.Error });
+        }
+        [HttpGet("list")]
+        public async Task<IActionResult> GetAllProducts()
+        {
+            var query = new GetAllProductsQuery();
             var result = await Sender.Send(query);
             return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = true, Value = result.Value })
                                     : BadRequest(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = false, Error = result.Error });

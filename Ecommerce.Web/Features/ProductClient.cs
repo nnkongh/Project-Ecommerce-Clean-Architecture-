@@ -45,6 +45,22 @@ namespace Ecommerce.Web.Services
             return ApiResponse<bool>.Success(true);
         }
 
+        public async Task<ApiResponse<IReadOnlyList<ProductViewModel>>> GetAllProductsAsync()
+        {
+            var response = await _httpClient.GetAsync("products");
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<IReadOnlyList<ProductModel>>>();
+
+            if(result == null || !result.IsSuccess)
+            {
+                return ApiResponse<IReadOnlyList<ProductViewModel>>.Fail(result?.Error?.Message ?? "Không thể lấy danh sách sản phẩm");
+            }
+
+            var mapped = _mapper.Map<IReadOnlyList<ProductViewModel>>(result.Value);
+
+            return ApiResponse<IReadOnlyList<ProductViewModel>>.Success(mapped);
+        }
+
         public async Task<ApiResponse<IReadOnlyList<ProductViewModel>>> GetAllProductsByCategoryAsync(int categoryId)
         {
             var response = await _httpClient.GetAsync($"products/category/{categoryId}");
@@ -56,6 +72,23 @@ namespace Ecommerce.Web.Services
                 return ApiResponse<IReadOnlyList<ProductViewModel>>.Fail(
                 result?.Error?.Message ?? "Không thể lấy danh sách sản phẩm");
             }
+            var mapped = _mapper.Map<IReadOnlyList<ProductViewModel>>(result.Value);
+
+            return ApiResponse<IReadOnlyList<ProductViewModel>>.Success(mapped);
+        }
+
+        public async Task<ApiResponse<IReadOnlyList<ProductViewModel>>> GetAllProductsByNameAsync(string name)
+        {
+            var response = await _httpClient.GetAsync($"products/search?name={Uri.EscapeDataString(name)}");
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<IReadOnlyList<ProductModel>>>();
+
+            if(result == null || !result.IsSuccess)
+            {
+                return ApiResponse<IReadOnlyList<ProductViewModel>>.Fail(
+                result?.Error?.Message ?? "Không thể lấy danh sách sản phẩm");
+            }
+
             var mapped = _mapper.Map<IReadOnlyList<ProductViewModel>>(result.Value);
 
             return ApiResponse<IReadOnlyList<ProductViewModel>>.Success(mapped);

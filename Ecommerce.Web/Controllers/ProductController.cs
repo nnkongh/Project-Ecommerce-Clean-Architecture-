@@ -25,16 +25,22 @@ namespace Ecommerce.Web.Controllers
         }
 
 
-        public IActionResult Index() => View();
+        public async Task<IActionResult> Index()
+        {
+            var product = await _productClient.GetAllProductsAsync();
+            return View(product.Value);
+        }
 
         [HttpGet]
+        
         public async Task<IActionResult> Create()
         {
             var model = new ProductViewModel();
             await LoadCategories(model);
             return View(model);
         }
-        private async Task LoadCategories(ProductViewModel model) {
+        private async Task LoadCategories(ProductViewModel model)
+        {
             var categories = await _categoryClient.GetRootCategoriesAsync();
 
             model.ParentCategories = categories.Value.Select(c => new SelectListItem
@@ -51,7 +57,7 @@ namespace Ecommerce.Web.Controllers
             }
         }
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm]ProductViewModel model)
+        public async Task<IActionResult> Create([FromForm] ProductViewModel model)
         {
 
             if (!ModelState.IsValid)
@@ -60,11 +66,11 @@ namespace Ecommerce.Web.Controllers
             }
             try
             {
-                if(model.Image != null && model.Image.Length > 0)
+                if (model.Image != null && model.Image.Length > 0)
                 {
                     var upload = await _photoService.AddPhotoAsync(model.Image);
 
-                    if(upload.Error != null)
+                    if (upload.Error != null)
                     {
                         ModelState.AddModelError("", "Lỗi upload file");
                     }
@@ -82,7 +88,7 @@ namespace Ecommerce.Web.Controllers
                 var categoryResult = await _categoryClient.GetCategoryByIdAsync(model.CategoryId);
                 var category = categoryResult.Value;
 
-                return RedirectToAction("ChildCategories", "Category",new {id = category.ParentId, selectCategoryId = category.Id});
+                return RedirectToAction("ChildCategories", "Category", new { id = category.ParentId, selectCategoryId = category.Id });
             }
             catch (Exception ex)
             {
@@ -92,12 +98,12 @@ namespace Ecommerce.Web.Controllers
         }
 
         [HttpGet]
-        public async  Task<IActionResult> Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             try
             {
                 var product = await _productClient.GetProductByIdAsync(id);
-               
+
                 if (!product.IsSuccess)
                 {
                     ModelState.AddModelError("", "Lỗi lấy sản phẩm " + product.Error.Message);
@@ -108,7 +114,7 @@ namespace Ecommerce.Web.Controllers
             catch
             {
                 TempData["Error"] = "Có lỗi xảy ra: ";
-                return RedirectToAction(nameof (Index));
+                return RedirectToAction(nameof(Index));
             }
         }
         [HttpPost]
@@ -172,14 +178,15 @@ namespace Ecommerce.Web.Controllers
                 if (!string.IsNullOrEmpty(product.Value!.ImageUrl))
                 {
                     var publicId = GetPublicIdFromUrl(product.Value!.ImageUrl);
-                    if(!string.IsNullOrEmpty(publicId))
+                    if (!string.IsNullOrEmpty(publicId))
                     {
                         await _photoService.DeletePhotoAsync(publicId);
                     }
                 }
                 await _productClient.DeleteProductAsync(id);
                 TempData["Success"] = "Xóa sản phẩm thành công";
-            }catch (Exception)
+            }
+            catch (Exception)
             {
                 TempData["Error"] = "Có lỗi xảy ra khi xóa sản phẩm!";
             }
@@ -223,6 +230,19 @@ namespace Ecommerce.Web.Controllers
                 return RedirectToAction("Index");
             }
             return View(result.Value);
+        }
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> Search([FromQuery]string name)
+        {
+            var result = await _productClient.GetAllProductsByNameAsync(name);
+            if (!result.IsSuccess)
+            {
+                TempData["Error"] = result.Error.Message;
+                return RedirectToAction("Index");
+            }
+            ViewBag.SearchTerm = name;
+            return View("Index",result.Value);
         }
     }
 
