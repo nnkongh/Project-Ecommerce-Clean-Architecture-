@@ -38,7 +38,7 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(new ApiResponse<CartModel> { Value = result.Value ,IsSuccess = true} ) 
                                     : BadRequest(new ApiResponse<CartModel> { IsSuccess = false, Error = result.Error});
         }
-        [HttpGet]
+        [HttpGet()]
         public async Task<IActionResult> GetCartItemById()
         {
             var user = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -61,10 +61,10 @@ namespace Ecommerce.WebApi.Controllers
             }
             var command = new RemoveItemCartCommand(userId, productId);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(new ApiResponse<CartModel> { IsSuccess = true }) 
-                                    : BadRequest(new ApiResponse<CartModel> { IsSuccess = false, Error = result.Error});
+            return result.IsSuccess ? Ok(new ApiResponse<bool> { IsSuccess = true }) 
+                                    : BadRequest(new ApiResponse<bool> { IsSuccess = false, Error = result.Error});
         }
-        [HttpPost]
+        [HttpPost("checkout")]
         public async Task<IActionResult> CheckoutCart()
         {
             var user = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -77,7 +77,7 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(new ApiResponse<OrderModel> { Value = result.Value, IsSuccess = true}) 
                                     : BadRequest(new ApiResponse<OrderModel> { IsSuccess = false, Error = result.Error});
         }
-        [HttpGet]
+        [HttpGet("list/item")]
         public async Task<IActionResult> GetListCartByUserId()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -90,7 +90,7 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(new ApiResponse<CartModel> { Value = result.Value, IsSuccess = true }) 
                                     : BadRequest(new ApiResponse<CartModel> { IsSuccess = false, Error = result.Error});
         }
-        [HttpPut]
+        [HttpPut("{productId}")]
         public async Task<IActionResult> UpdateItemQuantity(int productId,[FromQuery] int quantity)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

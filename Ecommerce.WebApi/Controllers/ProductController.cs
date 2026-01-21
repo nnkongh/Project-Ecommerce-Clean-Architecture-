@@ -77,6 +77,7 @@ namespace Ecommerce.WebApi.Controllers
                                     : BadRequest(new ApiResponse<bool> { IsSuccess = false, Error = result.Error });
         }
         [HttpGet("item/{id}")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetProductById(int id)
         {
             var command = new GetProductByIdQuery(id);

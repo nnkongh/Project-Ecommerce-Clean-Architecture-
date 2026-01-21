@@ -55,6 +55,7 @@ namespace Ecommerce.WebApi.Controllers
                                     : BadRequest(new ApiResponse<IReadOnlyList<CategoryModel>> { IsSuccess = false, Error = result.Error });
         }
         [HttpGet("{id}/children")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetChildCategoryById(int id)
         {
             var query = new GetChildCategoryQuery(id);
