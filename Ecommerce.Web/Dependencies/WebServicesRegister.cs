@@ -7,10 +7,17 @@ using Ecommerce.Infrastructure.Interfaces;
 using Ecommerce.Infrastructure.Interfaces.Authentication;
 using Ecommerce.Infrastructure.Services;
 using Ecommerce.Infrastructure.Services.Authentication;
+using Ecommerce.Web.Authorization;
+using Ecommerce.Web.Client.Strategy;
+using Ecommerce.Web.Features.Authentication;
+using Ecommerce.Web.Features.Carts;
+using Ecommerce.Web.Handlers;
 using Ecommerce.Web.Interface;
 using Ecommerce.Web.Mapping;
 using Ecommerce.Web.Services;
+using Ecommerce.Web.Services.Strategy;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Runtime.CompilerServices;
 
@@ -26,7 +33,7 @@ namespace Ecommerce.Web.Dependencies
 
             services.AddIdentity();
 
-            services.AddExternalAuthentication(configuration);
+            services.AddAuthentication(configuration);
 
             services.AddHttpClientService(configuration);
 
@@ -37,6 +44,8 @@ namespace Ecommerce.Web.Dependencies
             services.AddPhotoService(configuration);
 
             services.AddHttpClientService(configuration);
+
+            services.AddCartSession();
 
             services.AddScoped<IPrincipalFactory, PrincipalFactory>();
 
@@ -49,13 +58,24 @@ namespace Ecommerce.Web.Dependencies
                 opt.DefaultSignInScheme = IdentityConstants.ExternalScheme;
                 opt.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             });
-                //.AddCookie(opt =>
-                //{
-                //    opt.LogoutPath = "/auth/logout";
-                //});
             return services;
         }
 
+        public static IServiceCollection AddPolicyBase(this IServiceCollection services)
+        {
+            services.AddScoped<IAuthorizationHandler, AuthorizationHandler<OrderOwnerRequirement>>();
+
+            services.AddAuthorization(opt =>
+            {
+                // Check role 
+                opt.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+
+                opt.AddPolicy("UserOnly", policy => policy.RequireRole("User","Admin"));
+
+                opt.AddPolicy("OrderOnwer", policy => policy.Requirements.Add(new OrderOwnerRequirement()));
+            });
+            return services;
+        }
         public static IServiceCollection AddHttpClientService(this IServiceCollection services, IConfiguration config)
         {
             services.AddHttpContextAccessor();
@@ -71,13 +91,16 @@ namespace Ecommerce.Web.Dependencies
 
             services.AddScoped<IAuthenticationClient, AuthenticationClient>();
             services.AddScoped<IProfileClient, ProfileClient>();
-            services.AddScoped<ICartClient, CartClient>();
             services.AddScoped<IProductClient, ProductClient>();
             services.AddScoped<ICategoryClient, CategoryClient>();
             services.AddScoped<ICommentClient, CommentClient>();
             services.AddScoped<IWishlistClient, WishlistClient>();
 
-            
+            services.AddScoped<CartApiClient>();
+            services.AddScoped<CartSessionClient>();
+            services.AddScoped<CartService>();
+            services.AddScoped<ICartStrategyFactory, CartStrategyFactory>();
+
             return services;
         }
         public static IServiceCollection AddPhotoService(this IServiceCollection services, IConfiguration config)
@@ -108,6 +131,17 @@ namespace Ecommerce.Web.Dependencies
         {
             services.AddScoped<ICookieTokenService, CookieTokenService>();
 
+            return services;
+        }
+        public static IServiceCollection AddCartSession(this IServiceCollection services)
+        {
+            services.AddDistributedMemoryCache();
+            services.AddSession(opt =>
+            {
+                opt.IdleTimeout = TimeSpan.FromDays(7);
+                opt.Cookie.HttpOnly = true;
+                opt.Cookie.IsEssential = true;
+            });
             return services;
         }
     }
