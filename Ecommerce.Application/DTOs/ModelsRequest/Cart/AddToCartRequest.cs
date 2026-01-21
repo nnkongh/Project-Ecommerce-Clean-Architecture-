@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.DTOs.ModelsRequest.Cart
 {
-    public sealed record AddToCartRequest(int productId, int quantity)
-    {
-    }
+    public sealed record AddToCartRequest(int Id, string? name, decimal? price, int quantity = 1);
+
 }

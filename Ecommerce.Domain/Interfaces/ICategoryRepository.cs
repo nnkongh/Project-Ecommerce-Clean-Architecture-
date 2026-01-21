@@ -10,5 +10,6 @@ namespace Ecommerce.Domain.Interfaces
 {
     public interface ICategoryRepository : IRepositoryBase<Category,int>
     {
+
     }
 }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Infrastructure
+namespace Ecommerce.Web.Handlers
 {
     public class AuthTokenHandler : DelegatingHandler
     {

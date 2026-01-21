@@ -36,7 +36,7 @@ namespace Ecommerce.Application.Common.Command.Carts.AddToCart
             {
                 return Result.Failure<CartModel>(new Error("", "User not found"));
             }
-            var product = await _productRepo.GetByIdAsync(handler.request.productId);
+            var product = await _productRepo.GetByIdAsync(handler.request.Id);
             if (product == null)
             {
                 return Result.Failure<CartModel>(new Error("ProductNotFound", "The specified product does not exist."));
@@ -51,7 +51,7 @@ namespace Ecommerce.Application.Common.Command.Carts.AddToCart
                 cart = Cart.CreateCart(handler.userId);
                 await _cartRepo.AddAsync(cart);
             }
-            cart.AddItem(handler.request.productId, handler.request.quantity, product.Price, product.Name);
+            cart.AddItem(handler.request.Id, handler.request.quantity, product.Price, product.Name);
             product.Stock -= handler.request.quantity;
             await _uow.SaveChangesAsync(cancellationToken);
 

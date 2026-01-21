@@ -15,14 +15,26 @@ namespace Ecommerce.Web.Controllers
     {
         private readonly IProfileClient _profileService;
         private readonly ILogger<ProfileController> _logger;
-        public ProfileController(IProfileClient profileService, ILogger<ProfileController> logger)
+        private readonly ICookieTokenService _cookieTokenService;
+
+        public ProfileController(IProfileClient profileService, ILogger<ProfileController> logger, ICookieTokenService cookieTokenService)
         {
             _profileService = profileService;
             _logger = logger;
+            _cookieTokenService = cookieTokenService;
         }
         [HttpGet]
         public async Task<IActionResult> Index()
         {
+
+            // Check if access token exists
+            var token = _cookieTokenService.GetAccessToken();
+
+            if(token == null)
+            {
+                return RedirectToAction("Login", "Auth");
+            }
+
             var result = await _profileService.GetProfileAsync();
             if (!result.IsSuccess)
             {
