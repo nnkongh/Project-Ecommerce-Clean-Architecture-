@@ -5,6 +5,7 @@
 }
 
 <div style="max-width: 800px; margin: 20px auto; padding: 20px;">
+    <input type="hidden" asp-for="Id" />
 
     <h2 style="margin-bottom: 20px; color: #333;">Chi tiết sản phẩm</h2>
 
@@ -29,9 +30,9 @@
             <tr style="border-bottom: 1px solid #eee;">
                 <td style="padding: 12px; font-weight: bold;">Giá:</td>
                 <td style="padding: 12px; color: #dc3545; font-size: 18px; font-weight: bold;">
-                    @if (Model.Price.HasValue)
+                    @if (Model.Price > 0)
                     {
-                        @Model.Price.Value.ToString("N0") <text> VNĐ</text>
+                        @Model.Price.ToString("N0") <text> VNĐ</text>
                     }
                     else
                     {
@@ -42,9 +43,35 @@
             <tr style="border-bottom: 1px solid #eee;">
                 <td style="padding: 12px; font-weight: bold;">Tồn kho:</td>
                 <td style="padding: 12px;">
-                    <span style="color: @(Model.Stock > 0 ? "#28a745" : "#dc3545");">
-                        @Model.Stock sản phẩm
-                    </span>
+                    @if (Model.Stock > 0)
+                    {
+                        <form asp-controller="Cart"
+                              asp-action="AddToCart"
+                              method="post"
+                              style="margin-top: 20px; text-align: center;">
+
+                            <input type="hidden" name="Id" value="@Model.Id" />
+
+                            <input type="number"
+                                   name="quantity"
+                                   value="1"
+                                   min="1"
+                                   max="@Model.Stock"
+                                   style="width: 40px; padding: 6px; margin-right: 10px;" />
+
+                            <button type="submit"
+                                    style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                🛒 Thêm vào giỏ hàng
+                            </button>
+                        </form>
+                    }
+                    else
+                    {
+                        <p style="color: #dc3545; text-align: center; margin-top: 20px;">
+                            Sản phẩm đã hết hàng
+                        </p>
+                    }
+
                 </td>
             </tr>
         </table>

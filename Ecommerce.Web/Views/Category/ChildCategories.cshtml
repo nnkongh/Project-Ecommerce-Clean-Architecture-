@@ -463,9 +463,9 @@
 
                             <div class="product-body">
                                 <div class="product-name">@product.Name</div>
-                                @if (product.Price.HasValue)
+                                @if (product.Price > 0)
                                 {
-                                    <div class="product-price">@product.Price.Value.ToString("N0") đ</div>
+                                    <div class="product-price">@product.Price.ToString("N0") đ</div>
                                 }
                             </div>
                         </a>

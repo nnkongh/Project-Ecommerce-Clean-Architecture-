@@ -1,0 +1,74 @@
+﻿@model Ecommerce.Web.ViewModels.CartViewModel
+
+@{
+    ViewData["Title"] = "Giỏ hàng";
+}
+
+<div class="container mt-4">
+    <h2>Giỏ hàng của bạn</h2>
+    <hr />
+
+    @if (Model.Items == null || Model.Items.Count == 0)
+    {
+        <div class="alert alert-info">
+            Giỏ hàng của bạn đang trống
+        </div>
+        <a href="@Url.Action("Index", "Category")" class="btn btn-primary">Tiếp tục mua sắm</a>
+    }
+    else
+    {
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Sản phẩm</th>
+                    <th>Đơn giá</th>
+                    <th>Số lượng</th>
+                    <th>Thành tiền</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+                        <td>@item.Name</td>
+                        <td>@item.TotalPrice.ToString("N0") đ</td>
+                        <td>
+                            <form method="post" asp-action="UpdateQuantity" class="d-inline">
+                                <input type="hidden" name="cartItemId" value="@item.Id" />
+                                <input type="number" name="quantity" value="@item.Quantity"
+                                       min="1" class="form-control" style="width: 80px; display: inline-block;" />
+                                <button type="submit" class="btn btn-sm btn-secondary">Cập nhật</button>
+                            </form>
+                        </td>
+                        <td>@item.TotalPrice.ToString("N0") đ</td>
+                        <td>
+                            <form method="post" asp-action="RemoveItem" class="d-inline">
+                                <input type="hidden" name="cartItemId" value="@item.Id" />
+                                <button type="submit" class="btn btn-sm btn-danger"
+                                        onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
+                                    Xóa
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-end"><strong>Tổng cộng:</strong></td>
+                    <td colspan="2"><strong>@Model.GrandTotal.ToString("N0") đ</strong></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <a href="@Url.Action("Index", "Category")" class="btn btn-secondary">Tiếp tục mua sắm</a>
+            </div>
+            <div class="col-md-6 text-end">
+                <a href="@Url.Action("Checkout", "Order")" class="btn btn-success btn-lg">Thanh toán</a>
+            </div>
+        </div>
+    }
+</div>
