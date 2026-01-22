@@ -76,11 +76,21 @@
             </tr>
         </table>
 
-        <div style="margin-top: 30px; text-align: center;">
-            <a href="@Url.Action("Edit", new { id = Model.Id })" style="padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px; margin-right: 10px;">
+        <div style="margin-top: 30px; display: flex; justify-content: center; gap: 10px; align-items: center;">
+            <a href="@Url.Action("Edit", new { id = Model.Id })"
+               style="padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">
                 Chỉnh sửa
             </a>
-            <button onclick="history.back()" style="padding: 8px 16px; background-color: #6c757d; color: white; border: none; cursor: pointer; border-radius: 4px;">
+
+            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" style="margin: 0;">
+                <button type="submit"
+                        style="padding: 10px 20px; background-color: orangered; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    Xóa
+                </button>
+            </form>
+
+            <button onclick="history.back()"
+                    style="padding: 10px 20px; background-color: #6c757d; color: white; border: none; cursor: pointer; border-radius: 4px;">
                 ← Quay lại
             </button>
         </div>
