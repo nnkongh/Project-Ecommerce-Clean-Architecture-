@@ -24,6 +24,9 @@ namespace Ecommerce.Web.Mapping
             CreateMap<CartModel, CartViewModel>();
             CreateMap<CartItemModel, CartItemViewModel>();
 
+            CreateMap<OrderModel, OrderViewModel>();
+            CreateMap<OrderItemModel, OrderItemViewModel >();
+
 
         }
     }
