@@ -12,7 +12,10 @@ namespace Ecommerce.Application.DTOs.Models
     public record OrderModel : BaseModel
     {
         public AddressModel Address { get; set; }
+        public string CustomerName { get; set; }
+        public decimal TotalAmount { get; set; }
+        public DateTime OrderDate { get; set; }
         public IReadOnlyList<OrderItemModel> Items { get; set; } = [];
-        public OrderStatus status { get; set; }
+        public OrderStatus OrderStatus { get; set; }
     }
 }

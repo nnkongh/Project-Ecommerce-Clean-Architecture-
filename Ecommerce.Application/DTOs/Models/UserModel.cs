@@ -20,6 +20,6 @@ namespace Ecommerce.Application.DTOs.Models
         public IEnumerable<string>? Role { get; set; }
         public string? RefreshToken { get; set; }
         public DateTime ExpiryRefreshToken { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime CreateAt { get; set; }
     }
 }
