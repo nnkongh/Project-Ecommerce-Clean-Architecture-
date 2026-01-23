@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs.Models;
-using Ecommerce.Application.DTOs.ModelsRequest.Cart;
+using Ecommerce.Application.DTOs.ModelsRequest.Carts;
 using Ecommerce.Application.Interfaces;
 using Ecommerce.Web.Interface;
 using Ecommerce.Web.Services.Strategy;
