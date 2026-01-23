@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs.Models;
-using Ecommerce.Application.DTOs.ModelsRequest.User;
+using Ecommerce.Application.DTOs.ModelsRequest.Users;
 using Ecommerce.Domain.Shared;
+using Ecommerce.Infrastructure.Interfaces;
 using Ecommerce.Web.Interface;
 using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.Web.ViewModels.Profile;
@@ -54,7 +55,9 @@ namespace Ecommerce.Web.Services
 
         public async Task<ApiResponse<ProfileViewModel>> UpdateProfileAsync(UpdateProfileRequest request)
         {
-            var response = await _httpClient.PatchAsJsonAsync("profile/update", request);
+            var profileModel = _mapper.Map<ProfileModel>(request);
+
+            var response = await _httpClient.PatchAsJsonAsync("profile/update", profileModel);
 
             var result = await response.Content.ReadFromJsonAsync<ApiResponse<ProfileModel>>();
 

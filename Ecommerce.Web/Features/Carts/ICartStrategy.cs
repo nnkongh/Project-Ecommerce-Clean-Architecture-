@@ -12,6 +12,5 @@ namespace Ecommerce.Web.Services.Strategy
         Task RemoveFromCartAsync(int productId);
         Task ClearCartAsync();
         Task UpdateCartAsync(int productId, int quantity);
-        Task<ApiResponse<OrderViewModel>> CheckOutCart();
     }
 }

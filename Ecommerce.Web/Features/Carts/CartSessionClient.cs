@@ -116,10 +116,6 @@ namespace Ecommerce.Web.Features.Carts
             return Task.CompletedTask;
         }
 
-        public Task<ApiResponse<OrderViewModel>> CheckOutCart()
-        {
-            //Lấy cart từ session
-            
-        }
+        
     }
 }
