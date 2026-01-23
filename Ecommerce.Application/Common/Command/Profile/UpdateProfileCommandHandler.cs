@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs;
 using Ecommerce.Application.DTOs.Models;
-using Ecommerce.Application.DTOs.ModelsRequest.User;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Interfaces.UnitOfWork;
 using Ecommerce.Domain.Models;
@@ -21,13 +20,11 @@ namespace Ecommerce.Application.Common.Command.Profile
         private readonly IUserRepository _userRepo;
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
-        private readonly ILogger<UpdateProfileCommandHandler> _logger;
-        public UpdateProfileCommandHandler(IUnitOfWork uow, IUserRepository userRepo, IMapper mapper, ILogger<UpdateProfileCommandHandler> logger)
+        public UpdateProfileCommandHandler(IUnitOfWork uow, IUserRepository userRepo, IMapper mapper)
         {
             _uow = uow;
             _userRepo = userRepo;
             _mapper = mapper;
-            _logger = logger;
         }
 
         public async Task<Result<ProfileModel>> Handle(UpdateProfileCommand request, CancellationToken cancellationToken)
@@ -42,6 +39,10 @@ namespace Ecommerce.Application.Common.Command.Profile
             if(request.update.UserName != null)
             {
                 user.UserName = request.update.UserName;
+            }
+            if(request.update.ImageUrl != null)
+            {
+                user.ImageUrl = request.update.ImageUrl;
             }
             if(request.update.Address != null)
             {
@@ -60,7 +61,7 @@ namespace Ecommerce.Application.Common.Command.Profile
                     ward: request.update.Address.Ward ?? "" );
             }
 
-            await _userRepo.Update(user);
+            //await _userRepo.Update(user);
             await _uow.SaveChangesAsync(cancellationToken);
             var profile = _mapper.Map<ProfileModel>(user);
             return Result.Success(profile);
