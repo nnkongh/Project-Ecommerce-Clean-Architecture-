@@ -44,15 +44,16 @@ namespace Ecommerce.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrder(CreateOrderRequest order)
         {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-            var command = new CreateOrderCommand(order,userId);
-            var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(new ApiResponse<OrderModel> { IsSuccess = true, Value = result.Value })
-                                    : BadRequest(new ApiResponse<OrderModel> { IsSuccess = false, Error = result.Error });
+            //var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            //if (userId == null)
+            //{
+            //    return Unauthorized();
+            //}
+            //var command = new CreateOrderCommand(order,userId);
+            //var result = await Sender.Send(command);
+            //return result.IsSuccess ? Ok(new ApiResponse<OrderModel> { IsSuccess = true, Value = result.Value })
+            //                        : BadRequest(new ApiResponse<OrderModel> { IsSuccess = false, Error = result.Error });
+            return Ok();
         }
         
     }

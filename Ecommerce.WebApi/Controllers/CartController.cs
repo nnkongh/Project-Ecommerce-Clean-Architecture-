@@ -38,7 +38,7 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(new ApiResponse<CartModel> { Value = result.Value ,IsSuccess = true} ) 
                                     : BadRequest(new ApiResponse<CartModel> { IsSuccess = false, Error = result.Error});
         }
-        [HttpGet()]
+        [HttpGet]
         public async Task<IActionResult> GetCartItemById()
         {
             var user = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

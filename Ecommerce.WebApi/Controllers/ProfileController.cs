@@ -2,7 +2,7 @@
 using Ecommerce.Application.Common.Command.Profile;
 using Ecommerce.Application.Common.Queries.Profile.GetProfile;
 using Ecommerce.Application.DTOs.Models;
-using Ecommerce.Application.DTOs.ModelsRequest.User;
+using Ecommerce.Application.DTOs.ModelsRequest.Users;
 using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
@@ -23,7 +23,7 @@ namespace Ecommerce.WebApi.Controllers
         }
 
         [HttpPatch("update")]
-        public async Task<IActionResult> UpdateProfile(UpdateProfileRequest request)
+        public async Task<IActionResult> UpdateProfile(ProfileModel request)
         {
 
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
