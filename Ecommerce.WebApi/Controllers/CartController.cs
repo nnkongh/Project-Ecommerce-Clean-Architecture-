@@ -6,7 +6,7 @@ using Ecommerce.Application.Common.Queries.Carts.GetCartById;
 using Ecommerce.Application.Common.Queries.Carts.GetCartByUserId;
 using Ecommerce.Application.DTOs.Authentication;
 using Ecommerce.Application.DTOs.Models;
-using Ecommerce.Application.DTOs.ModelsRequest.Cart;
+using Ecommerce.Application.DTOs.ModelsRequest.Carts;
 using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
