@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs.Models;
-using Ecommerce.Application.DTOs.ModelsRequest.Cart;
+using Ecommerce.Application.DTOs.ModelsRequest.Carts;
+using Ecommerce.Domain.Shared;
 using Ecommerce.Web.Services.Strategy;
 using Ecommerce.Web.ViewModels;
 using Ecommerce.Web.ViewModels.ApiResponse;
 using System.Security.Claims;
+using System.Text;
 
 namespace Ecommerce.Web.Features.Carts
 {
@@ -41,6 +43,26 @@ namespace Ecommerce.Web.Features.Carts
 
             }
 
+        }
+
+        public async Task<ApiResponse<OrderViewModel>> CheckOutCart()
+        {
+            try
+            {
+                var content = new StringContent("{}", Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("carts",content);
+
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse<OrderViewModel>>();
+                if (result == null || !result.IsSuccess)
+                {
+                    return ApiResponse<OrderViewModel>.Fail("Failed to checkout cart cause ", result.Error);
+                }
+                return ApiResponse<OrderViewModel>.Success(result.Value, "Checkout cart successfully");
+            }
+            catch(Exception ex)
+            {
+                return ApiResponse<OrderViewModel>.Fail("Failed to checkout cart cause ", result.Error);
+            }
         }
 
         public async Task ClearCartAsync()

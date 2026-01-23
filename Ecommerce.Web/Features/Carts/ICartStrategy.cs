@@ -1,5 +1,6 @@
-﻿using Ecommerce.Application.DTOs.ModelsRequest.Cart;
+﻿using Ecommerce.Application.DTOs.ModelsRequest.Carts;
 using Ecommerce.Web.ViewModels;
+using Ecommerce.Web.ViewModels.ApiResponse;
 
 namespace Ecommerce.Web.Services.Strategy
 {
@@ -11,5 +12,6 @@ namespace Ecommerce.Web.Services.Strategy
         Task RemoveFromCartAsync(int productId);
         Task ClearCartAsync();
         Task UpdateCartAsync(int productId, int quantity);
+        Task<ApiResponse<OrderViewModel>> CheckOutCart();
     }
 }

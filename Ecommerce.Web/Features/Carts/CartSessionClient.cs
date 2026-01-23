@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Ecommerce.Application.DTOs.ModelsRequest.Cart;
+using Ecommerce.Application.DTOs.ModelsRequest.Carts;
 using Ecommerce.Domain.Models;
 using Ecommerce.Web.Extensions;
 using Ecommerce.Web.Interface;
@@ -114,6 +114,12 @@ namespace Ecommerce.Web.Features.Carts
 
             }
             return Task.CompletedTask;
+        }
+
+        public Task<ApiResponse<OrderViewModel>> CheckOutCart()
+        {
+            //Lấy cart từ session
+            
         }
     }
 }
