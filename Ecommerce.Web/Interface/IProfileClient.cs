@@ -1,5 +1,5 @@
 ﻿using Ecommerce.Application.DTOs.Models;
-using Ecommerce.Application.DTOs.ModelsRequest.User;
+using Ecommerce.Application.DTOs.ModelsRequest.Users;
 using Ecommerce.Domain.Shared;
 using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.Web.ViewModels.Profile;
