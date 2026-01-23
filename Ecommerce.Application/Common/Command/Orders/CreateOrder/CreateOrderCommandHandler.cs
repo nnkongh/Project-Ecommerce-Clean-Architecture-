@@ -32,27 +32,28 @@ namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
 
         public async Task<Result<OrderModel>> Handle(CreateOrderCommand command, CancellationToken cancellationToken)
         {
-            var product = await _productRepo.GetByIdAsync(command.request.ProductId);
-            if (product == null)
-            {
-                return Result.Failure<OrderModel>(new Error("", $"Product not found"));
-            }
-            var user = await _userRepo.GetByIdAsync(command.userId);
-            if (user == null)
-            {
-                return Result.Failure<OrderModel>(new Error("", "User not found"));
-            }
-            if(user.Address == null)
-            {
-                return Result.Failure<OrderModel>(new Error("", "User address not found"));
-            }
-            var order = Order.CreateOrder(command.userId, user.UserName!, user.Address);
-            order.AddItem(product.Id, command.request.Quantity, product.Price, product.Name);
-            await _orderRepo.AddAsync(order);
-            product.Stock -= command.request.Quantity;
-            await _uow.SaveChangesAsync(cancellationToken);
-            var orderDto = _mapper.Map<OrderModel>(order);
-            return Result.Success(orderDto);
+            //var product = await _productRepo.GetByIdAsync(command.request.Id);
+            //if (product == null)
+            //{
+            //    return Result.Failure<OrderModel>(new Error("", $"Product not found"));
+            //}
+            //var user = await _userRepo.GetByIdAsync(command.userId);
+            //if (user == null)
+            //{
+            //    return Result.Failure<OrderModel>(new Error("", "User not found"));
+            //}
+            //if(user.Address == null)
+            //{
+            //    return Result.Failure<OrderModel>(new Error("", "User address not found"));
+            //}
+            //var order = Order.CreateOrder(command.userId, user.UserName!, user.Address);
+            //order.AddItem(product.Id, command.request.Quantity, product.Price, product.Name);
+            //await _orderRepo.AddAsync(order);
+            //product.Stock -= command.request.Quantity;
+            //await _uow.SaveChangesAsync(cancellationToken);
+            //var orderDto = _mapper.Map<OrderModel>(order);
+            //return Result.Success(orderDto);
+            return Result.Failure<OrderModel>(new Error("", "Not implemented"));
 
         }
     }

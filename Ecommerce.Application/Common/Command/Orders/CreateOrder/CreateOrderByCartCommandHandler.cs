@@ -36,11 +36,11 @@ namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
                                           request.order.User!.Address.Ward!,
                                           request.order.User!.Address.Street!,
                                           request.order.User!.Address.District!,
-                                          request.order.User!.Address.Street);
+                                          request.order.User!.Address.Province);
 
             foreach(var item in request.order.Cart.Items)
             {
-                order.AddItem(item.ProductId, item.Quantity, item.UnitPrice, item.ProductName!);
+                order.AddItem(item.ProductId, item.Quantity, item.ImageUrl, item.UnitPrice, item.ProductName!);
             }
             await _orderRepo.AddAsync(order);
             await _uow.SaveChangesAsync(cancellationToken);

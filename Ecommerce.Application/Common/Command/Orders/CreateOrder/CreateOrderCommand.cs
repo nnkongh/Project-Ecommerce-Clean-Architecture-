@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
 {
-    public sealed record CreateOrderCommand(CreateOrderRequest request, string userId) : IRequest<Result<OrderModel>>
+    public sealed record CreateOrderCommand(int productId, string userId) : IRequest<Result<OrderModel>>
     {
     }
 }
