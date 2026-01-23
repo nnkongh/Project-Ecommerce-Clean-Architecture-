@@ -138,7 +138,7 @@ namespace Ecommerce.Infrastructure.Services
                 Email = model.Email,
                 UserName = model.UserName,
                 ImageUrl = "",
-                CreatedAt = DateTime.Now,
+                CreateAt = DateTime.Now,
                 RefreshToken = "",
                 IdentityId = result.Id,
                 Id = result.Id,
