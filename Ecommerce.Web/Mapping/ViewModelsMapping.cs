@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.Product;
-using Ecommerce.Application.DTOs.ModelsRequest.User;
+using Ecommerce.Application.DTOs.ModelsRequest.Users;
 using Ecommerce.Web.ViewModels;
 using Ecommerce.Web.ViewModels.Profile;
 
@@ -26,6 +26,10 @@ namespace Ecommerce.Web.Mapping
 
             CreateMap<OrderModel, OrderViewModel>();
             CreateMap<OrderItemModel, OrderItemViewModel >();
+
+            CreateMap<UpdateProfileRequest, ProfileModel>();
+            CreateMap<AddressRequest, AddressModel>();
+
 
 
         }
