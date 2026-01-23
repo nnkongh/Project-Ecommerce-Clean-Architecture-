@@ -1,6 +1,9 @@
 ﻿@using Ecommerce.Application.DTOs.Models
 @model IReadOnlyList<CategoryViewModel>
 
+@{
+    var displayProducts = ViewBag.displayProducts as List<ProductViewModel> ?? new List<ProductViewModel>();
+}
 
 
 <!DOCTYPE html>
@@ -167,6 +170,44 @@
                 </div>
             }
         </div>
+    </section>
+
+    <section>
+        @if (displayProducts != null && displayProducts.Any())
+        {
+            <div class="products-grid">
+                @foreach (var product in displayProducts)
+                {
+                    <a href="@Url.Action("Detail", "Product", new { id = product.Id })" class="product-card">
+                        @if (!string.IsNullOrEmpty(product.ImageUrl))
+                        {
+                            <img src="@product.ImageUrl" alt="@product.Name" class="product-image" />
+                        }
+                        else
+                        {
+                            <div class="product-image" style="display: flex; align-items: center; justify-content: center; color: #ccc;">
+                                <i class="fas fa-image" style="font-size: 48px;"></i>
+                            </div>
+                        }
+
+                        <div class="product-body">
+                            <div class="product-name">@product.Name</div>
+                            @if (product.Price > 0)
+                            {
+                                <div class="product-price">@product.Price.ToString("N0") đ</div>
+                            }
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-state">
+                <i class="fas fa-box-open"></i>
+                <p>Chưa có sản phẩm nào trong danh mục này</p>
+            </div>
+        }
     </section>
 </body>
 </html>

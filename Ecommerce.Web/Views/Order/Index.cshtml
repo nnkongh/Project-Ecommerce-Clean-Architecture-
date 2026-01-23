@@ -1,1 +1,301 @@
-﻿@model IReadOnlyList<OrderViewModel>
+﻿@using Ecommerce.Domain.Enum
+@model IReadOnlyList<OrderViewModel>
+
+@{
+    ViewData["Title"] = "Quản lý Đơn hàng";
+}
+
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="fas fa-box me-2"></i>Danh sách Đơn hàng</h2>
+        <span class="badge bg-primary fs-6">Tổng: @Model?.Count() đơn hàng</span>
+    </div>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info text-center py-5">
+            <i class="fas fa-inbox fa-3x mb-3"></i>
+            <h4>Chưa có đơn hàng nào</h4>
+            <p class="text-muted">Các đơn hàng sẽ xuất hiện tại đây sau khi khách hàng đặt hàng</p>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th style="width: 8%">Mã ĐH</th>
+                                <th style="width: 15%">Khách hàng</th>
+                                <th style="width: 12%">Ngày đặt</th>
+                                <th style="width: 25%">Địa chỉ</th>
+                                <th class="text-center" style="width: 8%">SL SP</th>
+                                <th class="text-end" style="width: 12%">Tổng tiền</th>
+                                <th class="text-center" style="width: 10%">Trạng thái</th>
+                                <th class="text-center" style="width: 10%">Chi tiết</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <strong class="text-primary">#@order.Id</strong>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>@order.CustomerName</strong>
+                                            <br />
+                                            <small class="text-muted">
+                                                <i class="fas fa-phone me-1"></i>@order.CustomerName
+                                            </small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <small>
+                                            <i class="far fa-calendar me-1"></i>@order.OrderDate.ToString("dd/MM/yyyy")
+                                            <br />
+                                            <i class="far fa-clock me-1"></i>@order.OrderDate.ToString("HH:mm")
+                                        </small>
+                                    </td>
+                                    <td>
+                                        @if (order.Address != null)
+                                        {
+                                            <small class="text-muted">
+                                                <i class="fas fa-map-marker-alt me-1"></i>
+                                                @order.Address.Street, @order.Address.Ward,<br />
+                                                @order.Address.District, @order.Address.City
+                                            </small>
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-secondary">@order.Items.Count</span>
+                                    </td>
+                                    <td class="text-end">
+                                        <strong class="text-danger">@order.TotalAmount.ToString("N0") đ</strong>
+                                    </td>
+                                    <td class="text-center">
+                                        @switch (order.OrderStatus)
+                                        {
+                                            case OrderStatus.Pending:
+                                                <span class="badge bg-warning text-dark px-3 py-2">
+                                                    <i class="fas fa-clock me-1"></i>Chờ xử lý
+                                                </span>
+                                                break;
+                                            case OrderStatus.Processing:
+                                                <span class="badge bg-info px-3 py-2">
+                                                    <i class="fas fa-spinner me-1"></i>Đang xử lý
+                                                </span>
+                                                break;
+                                            case OrderStatus.Finished:
+                                                <span class="badge bg-success px-3 py-2">
+                                                    <i class="fas fa-check-circle me-1"></i>Hoàn thành
+                                                </span>
+                                                break;
+                                            default:
+                                                <span class="badge bg-secondary px-3 py-2">@order.OrderStatus</span>
+                                                break;
+                                        }
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-primary btn-sm" type="button"
+                                                data-bs-toggle="collapse"
+                                                data-bs-target="#order-@order.Id"
+                                                aria-expanded="false">
+                                            <i class="fas fa-eye me-1"></i>Xem
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="collapse" id="order-@order.Id">
+                                    <td colspan="8" class="p-0">
+                                        <div class="bg-light p-4">
+                                            <div class="row mb-3">
+                                                <div class="col-md-6">
+                                                    <h5 class="text-primary mb-3">
+                                                        <i class="fas fa-info-circle me-2"></i>Chi tiết đơn hàng #@order.Id
+                                                    </h5>
+                                                    <div class="mb-2">
+                                                        <strong>Khách hàng:</strong> @order.CustomerName
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <strong>Số điện thoại:</strong> @order.PhoneNumber
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <strong>Email:</strong> @order.Email
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 text-md-end">
+                                                    <div class="mb-2">
+                                                        <strong>Ngày đặt:</strong> @order.OrderDate.ToString("dd/MM/yyyy HH:mm:ss")
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <strong>Trạng thái:</strong>
+                                                        @switch (order.OrderStatus)
+                                                        {
+                                                            case OrderStatus.Pending:
+                                                                <span class="badge bg-warning text-dark">Chờ xử lý</span>
+                                                                break;
+                                                            case OrderStatus.Processing:
+                                                                <span class="badge bg-info">Đang xử lý</span>
+                                                                break;
+                                                            case OrderStatus.Finished:
+                                                                <span class="badge bg-success">Hoàn thành</span>
+                                                                break;
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <hr />
+
+                                            <h6 class="mb-3"><i class="fas fa-shopping-bag me-2"></i>Sản phẩm đã đặt</h6>
+                                            <div class="table-responsive">
+                                                <table class="table table-bordered bg-white">
+                                                    <thead class="table-light">
+                                                        <tr>
+                                                            <th style="width: 120px">Hình ảnh</th>
+                                                            <th>Sản phẩm</th>
+                                                            <th class="text-center" style="width: 150px">Đơn giá</th>
+                                                            <th class="text-center" style="width: 100px">Số lượng</th>
+                                                            <th class="text-end" style="width: 150px">Thành tiền</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        @foreach (var item in order.Items)
+                                                        {
+                                                            <tr>
+                                                                <td class="text-center">
+                                                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                                                    {
+                                                                        <img src="@item.ImageUrl"
+                                                                             alt="@item.ProductName"
+                                                                             class="img-thumbnail"
+                                                                             style="width: 100px; height: 100px; object-fit: cover;"
+                                                                             onerror="this.src='/images/no-image.png'" />
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <div class="bg-secondary d-flex align-items-center justify-content-center"
+                                                                             style="width: 100px; height: 100px;">
+                                                                            <i class="fas fa-image fa-2x text-white"></i>
+                                                                        </div>
+                                                                    }
+                                                                </td>
+                                                                <td class="align-middle">
+                                                                    <strong>@item.ProductName</strong>
+                                                                </td>
+                                                                <td class="text-center align-middle">
+                                                                    @item.Price.ToString("N0") đ
+                                                                </td>
+                                                                <td class="text-center align-middle">
+                                                                    <span class="badge bg-primary fs-6">@item.Quantity</span>
+                                                                </td>
+                                                                <td class="text-end align-middle">
+                                                                    <strong class="text-danger">
+                                                                        @((item.Price * item.Quantity).ToString("N0")) đ
+                                                                    </strong>
+                                                                </td>
+                                                            </tr>
+                                                        }
+                                                    </tbody>
+                                                    <tfoot class="table-light">
+                                                        <tr>
+                                                            <td colspan="4" class="text-end">
+                                                                <strong class="fs-5">Tổng cộng:</strong>
+                                                            </td>
+                                                            <td class="text-end">
+                                                                <strong class="text-danger fs-5">
+                                                                    @order.TotalAmount.ToString("N0") đ
+                                                                </strong>
+                                                            </td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
+
+                                            <div class="mt-3 text-end">
+                                                <button class="btn btn-secondary" type="button"
+                                                        data-bs-toggle="collapse"
+                                                        data-bs-target="#order-@order.Id">
+                                                    <i class="fas fa-times me-1"></i>Đóng
+                                                </button>
+                                                <a href="@Url.Action("PrintOrder", new { id = order.Id })"
+                                                   class="btn btn-info" target="_blank">
+                                                    <i class="fas fa-print me-1"></i>In đơn hàng
+                                                </a>
+                                                @if (order.OrderStatus == OrderStatus.Pending)
+                                                {
+                                                    <form method="post" asp-action="UpdateOrderStatus" class="d-inline">
+                                                        <input type="hidden" name="orderId" value="@order.Id" />
+                                                        <input type="hidden" name="status" value="@((int)OrderStatus.Processing)" />
+                                                        <button type="submit" class="btn btn-primary">
+                                                            <i class="fas fa-check me-1"></i>Xác nhận đơn
+                                                        </button>
+                                                    </form>
+                                                }
+                                                @if (order.OrderStatus == OrderStatus.Processing)
+                                                {
+                                                    <form method="post" asp-action="UpdateOrderStatus" class="d-inline">
+                                                        <input type="hidden" name="orderId" value="@order.Id" />
+                                                        <input type="hidden" name="status" value="@((int)OrderStatus.Finished)" />
+                                                        <button type="submit" class="btn btn-success">
+                                                            <i class="fas fa-check-double me-1"></i>Hoàn thành
+                                                        </button>
+                                                    </form>
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section Styles {
+    <style>
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .collapse.show + tr {
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .badge {
+            font-weight: 500;
+        }
+
+        .img-thumbnail {
+            border: 2px solid #dee2e6;
+            transition: transform 0.2s;
+        }
+
+            .img-thumbnail:hover {
+                transform: scale(1.05);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        // Auto collapse other orders when opening a new one
+        document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(button => {
+            button.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-bs-target');
+                document.querySelectorAll('.collapse.show').forEach(collapse => {
+                    if ('#' + collapse.id !== targetId) {
+                        bootstrap.Collapse.getInstance(collapse)?.hide();
+                    }
+                });
+            });
+        });
+    </script>
+}
