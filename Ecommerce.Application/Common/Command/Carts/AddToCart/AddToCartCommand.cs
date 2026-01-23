@@ -1,5 +1,4 @@
 ﻿using Ecommerce.Application.DTOs.Models;
-using Ecommerce.Application.DTOs.ModelsRequest.Cart;
 using Ecommerce.Application.DTOs.ModelsRequest.Carts;
 using Ecommerce.Domain.Shared;
 using MediatR;

@@ -52,7 +52,7 @@ namespace Ecommerce.Application.Common.Command.Carts.AddToCart
                 await _cartRepo.AddAsync(cart);
             }
 
-            cart.AddItem(handler.request.Id, handler.request.quantity, product.Price, product.Name);
+            cart.AddItem(handler.request.Id, handler.request.quantity, product.ImageUrl, product.Price, product.Name);
             await _uow.SaveChangesAsync(cancellationToken);
 
             var mapped = _mapper.Map<CartModel>(cart);

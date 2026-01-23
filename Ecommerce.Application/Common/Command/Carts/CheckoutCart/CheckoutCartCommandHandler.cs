@@ -59,14 +59,15 @@ namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
 
             var result = await _mediator.Send(new CreateOrderByCartCommand(orderRequest), cancellationToken);
 
-            if (result.IsSuccess)
+            if (!result.IsSuccess)
             {
-                cartResult.Value.Clear();
-                await _cartRepo.Delete(cartResult.Value);
-                await _uow.SaveChangesAsync(cancellationToken);
-                Result.Success(result.Value);
+                return Result.Failure<OrderModel>(new Error("ORDER_CREATE_FAILED", "Không thể tạo đơn hàng"));
             }
-            return Result.Failure<OrderModel>(new Error("ORDER_CREATE_FAILED", "Không thể tạo đơn hàng"));
+
+            cartResult.Value.Clear();
+            await _cartRepo.Delete(cartResult.Value);
+            await _uow.SaveChangesAsync(cancellationToken);
+            return Result.Success(result.Value);
         }
         private async Task<Result<User>> ValidatingUserInformation(string id)
         {
