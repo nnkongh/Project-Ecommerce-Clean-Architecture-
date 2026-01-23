@@ -29,7 +29,21 @@ namespace Ecommerce.Web.Controllers
                 ModelState.AddModelError(string.Empty, result.Error.Message);
                 return RedirectToAction("Login", "Auth");
             }
-            return View(result.Value);
+
+            var categories = result.Value.ToList();
+            List<ProductViewModel> displayProducts = new();
+
+            var productTasks = categories.Select(c => _productClient.GetAllProductsAsync());
+
+            var productResult = await Task.WhenAll(productTasks);
+
+            displayProducts = productResult
+                .Where(c => c.IsSuccess)
+                .SelectMany(c => c.Value)
+                .ToList();
+
+            ViewBag.DisplayProducts = displayProducts;
+            return View(categories);
         }
         [HttpGet("detailed/{id}")]
         [AllowAnonymous]

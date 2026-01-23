@@ -1,6 +1,7 @@
-﻿using Ecommerce.Application.DTOs.ModelsRequest.Cart;
+﻿using Ecommerce.Application.DTOs.ModelsRequest.Carts;
 using Ecommerce.Application.Interfaces;
 using Ecommerce.Web.Interface;
+using Ecommerce.Web.Models;
 using Ecommerce.Web.Services;
 using Ecommerce.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -9,17 +10,20 @@ using System.Runtime.CompilerServices;
 
 namespace Ecommerce.Web.Controllers
 {
+    
     public class CartController : Controller
     {
         private readonly CartService _cartService;
+        private readonly ICheckoutCartClient _checkoutClient;
         private readonly ILogger<CartController> _logger;
-        public CartController(CartService cartService, ILogger<CartController> logger)
+        public CartController(CartService cartService, ILogger<CartController> logger, ICheckoutCartClient checkoutClient)
         {
             _cartService = cartService;
             _logger = logger;
+            _checkoutClient = checkoutClient;
         }
 
-      
+
         [HttpPost("add")]
         public async Task<IActionResult> AddToCart(AddToCartRequest request)
         {
@@ -50,6 +54,15 @@ namespace Ecommerce.Web.Controllers
         {
             _cartService.RemoveFromCartAsync(productId);
             return RedirectToAction("Index", "Category");
+        }
+       
+
+        [HttpPost("checkout")]
+        [Authorize]
+        public async Task<IActionResult> CheckoutCart()
+        {
+            var orderViewModel = await _checkoutClient.CheckoutCartAsync();
+            return View("Index", orderViewModel.Value);
         }
     }
 }
