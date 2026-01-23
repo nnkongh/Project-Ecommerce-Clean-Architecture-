@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Ecommerce.Application.DTOs.Models;
+using Ecommerce.Domain.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,7 +10,7 @@ namespace Ecommerce.Application.DTOs.ModelsRequest.Order
 {
     public class CreateOrderRequest
     {
-        public int ProductId { get; set; }
-        public int Quantity { get; set; }
+        public CartModel Cart { get; set; } 
+        public UserModel User { get; set; }
     }
 }

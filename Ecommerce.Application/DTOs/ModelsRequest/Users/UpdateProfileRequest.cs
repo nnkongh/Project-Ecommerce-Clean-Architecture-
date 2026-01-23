@@ -1,16 +1,20 @@
 ﻿using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Domain.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Application.DTOs.ModelsRequest.User
+namespace Ecommerce.Application.DTOs.ModelsRequest.Users
 {
     public sealed record UpdateProfileRequest 
     {
         public string? UserName { get; set; }
+        public string? PhoneNumber { get; set; }
+        public IFormFile? Avatar { get; set; }
+        public string? AvatarUrl { get; set; }
         public AddressRequest? Address { get; set; }
 
     }

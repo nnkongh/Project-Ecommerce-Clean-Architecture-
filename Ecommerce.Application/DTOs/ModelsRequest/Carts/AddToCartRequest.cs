@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ecommerce.Application.DTOs.ModelsRequest.Cart
+namespace Ecommerce.Application.DTOs.ModelsRequest.Carts
 {
     public sealed record AddToCartRequest(int Id, string? name, decimal? price, int quantity = 1);
 
