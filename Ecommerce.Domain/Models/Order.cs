@@ -19,20 +19,20 @@ namespace Ecommerce.Domain.Models
         public decimal TotalAmount { get; set; }
         public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending; 
 
-        public static Order CreateOrder(string userId, string customerName, Address address)
+        public static Order CreateOrder(string userId, string customerName, string city, string ward, string district, string street, string? province)
         {
             var order = new Order()
             {
                 CustomerId = userId,
                 OrderStatus = OrderStatus.Pending,
-                Address = address,
+                Address = Address.Create(district, city, province, street, ward),
                 CustomerName = customerName,
                 OrderDate = DateTime.Now,
             };
             return order;
         }
 
-        public void AddItem(int productId, int quantity, decimal unitPrice, string productName)
+        public void AddItem(int productId, int quantity, string? ImageUrl, decimal unitPrice, string productName)
         {
             if(quantity <= 0)
             {
@@ -51,6 +51,7 @@ namespace Ecommerce.Domain.Models
             {
                 var orderItem = new OrderItem
                 {
+                    ImageUrl = ImageUrl,
                     ProductId = productId,
                     Quantity = quantity,
                     Price = unitPrice,

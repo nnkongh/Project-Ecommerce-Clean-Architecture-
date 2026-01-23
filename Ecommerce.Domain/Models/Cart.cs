@@ -31,7 +31,7 @@ namespace Ecommerce.Domain.Models
             };
             return cart;
         }
-        public void AddItem(int productId, int quantity, decimal unitPrice, string productName)
+        public void AddItem(int productId, int quantity, string? ImageUrl, decimal unitPrice, string productName)
         {
             if(quantity < 0 || unitPrice < 0)
             {
@@ -46,6 +46,7 @@ namespace Ecommerce.Domain.Models
             {
                 Items.Add(new CartItem()
                 {
+                    ImageUrl = ImageUrl,
                     Quantity = quantity,
                     ProductId = productId,
                     ProductName = productName,
