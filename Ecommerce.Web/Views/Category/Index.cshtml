@@ -2,224 +2,168 @@
 @model IReadOnlyList<CategoryViewModel>
 
 @{
-    var displayProducts = ViewBag.displayProducts as List<ProductViewModel> ?? new List<ProductViewModel>();
+    ViewData["Title"] = "Trang chủ";
+    var displayProducts = ViewBag.DisplayProducts as IReadOnlyList<ProductViewModel> ?? new List<ProductViewModel>();
 }
 
-
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Trang chủ - Simple Ecommerce</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            background: #f8f9fa;
-        }
-
-        /* Header */
-        header {
-            background: #212529;
-            padding: 15px 0;
-        }
-
-            header nav {
-                max-width: 100%;
-                margin: 0 auto;
-            }
-
-        .navbar-nav {
-            list-style: none;
-            display: flex;
-            align-items: center;
-            padding: 0 30px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-        }
-
-        .nav-link {
-            color: white;
-            text-decoration: none;
-            padding: 8px 15px;
-            display: inline-block;
-        }
-
-            .nav-link:hover {
-                opacity: 0.8;
-            }
-
-        .me-auto {
-            margin-right: auto;
-        }
-
-        .search-form {
-            max-width: 400px;
-            width: 100%;
-            margin: 0 auto;
-            display: flex;
-            gap: 10px;
-        }
-
-            .search-form input {
-                flex: 1;
-                padding: 8px 15px;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-            }
-
-            .search-form button {
-                padding: 8px 20px;
-                background: transparent;
-                border: 1px solid white;
-                color: white;
-                border-radius: 4px;
-                cursor: pointer;
-            }
-
-                .search-form button:hover {
-                    background: rgba(255,255,255,0.1);
-                }
-
-        .right-menu {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            margin-left: auto;
-        }
-
-        /* Container */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px 20px;
-        }
-
-        /* Categories Section */
-        .categories {
-            margin-bottom: 40px;
-            justify-content: center;
-        }
-
-        h3 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        .category-list {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .category {
-            background: white;
-            border: 1px solid #ddd;
-            padding: 20px;
-            width: 180px;
-            text-align: center;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-            .category:hover {
-                border-color: #667eea;
-                box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
-            }
-
-            .category i {
-                font-size: 40px;
-                color: #667eea;
-                margin-bottom: 10px;
-            }
-
-    </style>
-</head>
-<body>
-    <section class="categories">
-        <div class="category-list">
+<div class="container my-4">
+    <!-- Danh mục cha -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-white text-dark">
+            <h5 class="mb-0">
+                <i class="fas fa-th-large me-2"></i>Danh mục sản phẩm
+            </h5>
+        </div>
+        <div class="card-body">
             @if (Model != null && Model.Any())
             {
-                @foreach (var category in Model)
-                {
-                    <a href="@Url.Action("ChildCategories", "Category", new { id = category.Id })"
-                       class="category text-decoration-none">
-                        <i class="@GetCategoryIcon(category.Name!)"></i>
-                        <div>@category.Name</div>
-                    </a>
-                }
+                <div class="row g-3 justify-content-center">
+                    @foreach (var category in Model)
+                    {
+                        <div class="col-md-2 col-sm-4 col-6">
+                            <a href="@Url.Action("ChildCategories", "Category", new { id = category.Id })"
+                               class="text-decoration-none">
+                                <div class="card text-center h-100 category-card">
+                                    <div class="card-body">
+                                        <i class="@GetCategoryIcon(category.Name!) fa-3x mb-3 text-dark"></i>
+                                        <h6 class="card-title mb-0">@category.Name</h6>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
             }
             else
             {
-                <div class="empty-state">
-                    <i class="fas fa-inbox" style="font-size: 48px; color: #ccc; margin-bottom: 15px;"></i>
-                    <p>Chưa có danh mục nào</p>
+                <div class="text-center py-4">
+                    <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                    <p class="text-muted mb-0">Chưa có danh mục nào</p>
                 </div>
             }
         </div>
-    </section>
+    </div>
 
-    <section>
-        @if (displayProducts != null && displayProducts.Any())
-        {
-            <div class="products-grid">
-                @foreach (var product in displayProducts)
-                {
-                    <a href="@Url.Action("Detail", "Product", new { id = product.Id })" class="product-card">
-                        @if (!string.IsNullOrEmpty(product.ImageUrl))
-                        {
-                            <img src="@product.ImageUrl" alt="@product.Name" class="product-image" />
-                        }
-                        else
-                        {
-                            <div class="product-image" style="display: flex; align-items: center; justify-content: center; color: #ccc;">
-                                <i class="fas fa-image" style="font-size: 48px;"></i>
+    <!-- Sản phẩm nổi bật -->
+    <div class="card shadow-sm">
+        <div class="card-header bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-fire me-2 text-danger"></i>Sản phẩm nổi bật
+                </h5>
+                <span class="badge bg-dark">@displayProducts.Count sản phẩm</span>
+            </div>
+        </div>
+
+        <div class="card-body">
+            @if (displayProducts != null && displayProducts.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+                    @foreach (var product in displayProducts)
+                    {
+                        <div class="col">
+                            <div class="card h-100 product-card">
+                                <a href="@Url.Action("Detail", "Product", new { id = product.Id })"
+                                   class="text-decoration-none">
+                                    @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                    {
+                                        <img src="@product.ImageUrl"
+                                             class="card-img-top"
+                                             alt="@product.Name"
+                                             style="height: 200px; object-fit: cover;">
+                                    }
+                                    else
+                                    {
+                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                             style="height: 200px;">
+                                            <i class="fas fa-image fa-3x text-muted"></i>
+                                        </div>
+                                    }
+
+                                    <div class="card-body">
+                                        <h6 class="card-title text-dark mb-2"
+                                            style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: 3em;">
+                                            @product.Name
+                                        </h6>
+                                        @if (product.Price > 0)
+                                        {
+                                            <p class="card-text text-danger fw-bold fs-5 mb-0">
+                                                @product.Price.ToString("N0") đ
+                                            </p>
+                                        }
+                                        else
+                                        {
+                                            <p class="card-text text-muted mb-0">Liên hệ</p>
+                                        }
+                                    </div>
+                                </a>
+                                <div class="card-footer bg-transparent border-0 pt-0">
+                                    <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                                        <input type="hidden" name="Id" value="@product.Id" />
+                                        <input type="hidden" name="quantity" value="1" />
+                                        <button type="submit" class="btn btn-outline-dark btn-sm w-100">
+                                            <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
+                                        </button>
+                                    </form>
+                                </div>
                             </div>
-                        }
-
-                        <div class="product-body">
-                            <div class="product-name">@product.Name</div>
-                            @if (product.Price > 0)
-                            {
-                                <div class="product-price">@product.Price.ToString("N0") đ</div>
-                            }
                         </div>
-                    </a>
-                }
-            </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+                    <p class="text-muted mb-0">Chưa có sản phẩm nào</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .category-card {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
         }
-        else
-        {
-            <div class="empty-state">
-                <i class="fas fa-box-open"></i>
-                <p>Chưa có sản phẩm nào trong danh mục này</p>
-            </div>
+
+    .product-card {
+        transition: all 0.3s ease;
+    }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         }
-    </section>
-</body>
-</html>
+</style>
+
 @functions {
     string GetCategoryIcon(string name)
     {
         return name.ToLower() switch
         {
+            "iphone" => "fab fa-apple",
+            "apple" => "fab fa-apple",
+            "samsung" => "fas fa-mobile-alt",
+            "xiaomi" => "fas fa-mobile-alt",
+            "oppo" => "fas fa-mobile-alt",
+            "vivo" => "fas fa-mobile-alt",
+            "realme" => "fas fa-mobile-alt",
             "laptop" => "fas fa-laptop",
+            "máy tính" => "fas fa-desktop",
             "điện thoại" => "fas fa-mobile-alt",
+            "smartphone" => "fas fa-mobile-alt",
+            "tablet" => "fas fa-tablet-alt",
             "tai nghe" => "fas fa-headphones",
+            "headphone" => "fas fa-headphones",
             "bàn phím" => "fas fa-keyboard",
+            "keyboard" => "fas fa-keyboard",
             "chuột" => "fas fa-mouse",
             _ => "fas fa-box"
         };

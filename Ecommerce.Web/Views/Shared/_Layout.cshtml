@@ -1,167 +1,147 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi" class="h-100">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Ecommerce.Web</title>
+    <title>@ViewData["Title"] - Simple Ecommerce</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Ecommerce.Web.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
-<body>
+<body class="d-flex flex-column h-100">
     @{
         var hideAuthHeader = ViewData["HideAuthHeader"] as bool? ?? false;
     }
 
     @if (!hideAuthHeader)
     {
-        <header class="bg-dark">
-            <nav class="container-fluid">
-                <ul class="navbar-nav d-flex flex-row align-items-center px-4 w-100">
+        <!-- Header -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div class="container-fluid px-4">
+                <!-- Logo/Brand -->
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <i class="fas fa-store me-2"></i>Simple Ecommerce
+                </a>
 
-                    <!-- BÊN TRÁI -->
-                    @if (User.Identity?.IsAuthenticated == true)
-                    {
-                        <li class="nav-item me-auto">
-                            <span class="nav-link text-light fw-semibold mb-0">
-                                <i class="fas fa-user-circle me-1"></i>
-                                Xin chào @User.Identity.Name
-                            </span>
+                <!-- Mobile Toggle -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarMain">
+                    <!-- Search Form - Center -->
+                    <form asp-controller="Product" asp-action="Search" method="get" class="d-flex mx-auto" style="max-width: 500px; width: 100%;">
+                        <input class="form-control me-2" type="search" name="name" placeholder="Tìm kiếm sản phẩm..." />
+                        <button class="btn btn-outline-light" type="submit">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </form>
+
+                    <!-- Right Menu -->
+                    <ul class="navbar-nav ms-auto">
+                        <!-- Danh mục -->
+                        <li class="nav-item">
+                            <a class="nav-link" asp-controller="Category" asp-action="Index">
+                                <i class="fas fa-th-large me-1"></i>Danh mục
+                            </a>
                         </li>
-                    }
-                    <li class="nav-item mx-auto" style="max-width: 400px; width: 100%;">
-                        <form asp-controller="Product"
-                              asp-action="Search"
-                              method="get"
-                              class="d-flex">
-                            <input class="form-control me-2"
-                                   type="search"
-                                   name="name"
-                                   placeholder="Tìm sản phẩm..." />
-                            <button class="btn btn-outline-light" type="submit">
-                                Tìm
-                            </button>
-                        </form>
-                    </li>
-
-
-                    <!-- BÊN PHẢI -->
-                    <li class="nav-item d-flex align-items-center gap-4">
-
-                        <a class="nav-link text-light fw-semibold"
-                           asp-controller="Category"
-                           asp-action="Index">
-                            <i class="fas fa-list me-1"></i>
-                            Danh mục
-                        </a>
 
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <!-- Dropdown Thông tin cá nhân -->
-                            <div class="dropdown">
-                                <a class="nav-link text-light dropdown-toggle"
-                                   href="#"
-                                   id="userDropdown"
-                                   role="button"
-                                   data-bs-toggle="dropdown"
-                                   aria-expanded="false">
-                                    <i class="fas fa-user me-1"></i>
-                                    Thông tin cá nhân
+                            <!-- Giỏ hàng -->
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Cart" asp-action="Index">
+                                    <i class="fas fa-shopping-cart me-1"></i>Giỏ hàng
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            </li>
+
+                            <!-- User Dropdown -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
+                                    <i class="fas fa-user-circle me-1"></i>@User.Identity.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
                                     <li>
-                                        <a class="dropdown-item"
-                                           asp-controller="Profile"
-                                           asp-action="Index">
-                                            <i class="fas fa-user-circle me-2"></i>
-                                            Trang cá nhân
+                                        <a class="dropdown-item" asp-controller="Profile" asp-action="Index">
+                                            <i class="fas fa-user me-2"></i>Hồ sơ
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item"
-                                           asp-controller="Order"
-                                           asp-action="Index">
-                                            <i class="fas fa-shopping-bag me-2"></i>
-                                            Đơn hàng
+                                        <a class="dropdown-item" asp-controller="Order" asp-action="Index">
+                                            <i class="fas fa-box me-2"></i>Đơn hàng
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item"
-                                           asp-controller="Wishlist"
-                                           asp-action="Index">
-                                            <i class="fas fa-heart me-2"></i>
-                                            Yêu thích
+                                        <a class="dropdown-item" asp-controller="Wishlist" asp-action="Index">
+                                            <i class="fas fa-heart me-2"></i>Yêu thích
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item"
-                                           asp-controller="Product"
-                                           asp-action="Create">
-                                            <i class="fas fa-heart me-2"></i>
-                                            Tạo sản phẩm
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item"
-                                           asp-controller="Cart"
-                                           asp-action="Index">
-                                            <i class="fas fa-heart me-2"></i>
-                                            Giỏ hàng
+                                        <a class="dropdown-item" asp-controller="Product" asp-action="Create">
+                                            <i class="fas fa-plus-circle me-2"></i>Tạo sản phẩm
                                         </a>
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
                                     <li>
-                                        <form asp-controller="Auth"
-                                              asp-action="Logout"
-                                              method="post"
-                                              class="m-0">
+                                        <form asp-controller="Auth" asp-action="Logout" method="post" class="m-0">
                                             <button type="submit" class="dropdown-item text-danger">
-                                                <i class="fas fa-sign-out-alt me-2"></i>
-                                                Đăng xuất
+                                                <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
                                             </button>
                                         </form>
                                     </li>
                                 </ul>
-                            </div>
+                            </li>
                         }
                         else
                         {
-                            <a class="nav-link text-light"
-                               asp-controller="Auth"
-                               asp-action="Login">
-                                Đăng nhập
-                            </a>
-
-                            <a class="nav-link text-light"
-                               asp-controller="Auth"
-                               asp-action="Register">
-                                Đăng ký
-                            </a>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Auth" asp-action="Login">
+                                    <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Auth" asp-action="Register">
+                                    <i class="fas fa-user-plus me-1"></i>Đăng ký
+                                </a>
+                            </li>
                         }
-
-                    </li>
-                </ul>
-            </nav>
-        </header>
+                    </ul>
+                </div>
+            </div>
+        </nav>
     }
 
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+    <!-- Main Content -->
+    <main class="flex-grow-1">
+        @RenderBody()
+    </main>
 
-    <footer class="border-top footer text-muted">
+    <!-- Footer -->
+    <footer class="bg-dark text-white mt-auto py-3">
         <div class="container">
-            © 2026 - Simple Ecommerce
+            <div class="row align-items-center">
+                <div class="col-md-4 text-center text-md-start mb-2 mb-md-0">
+                    <span class="fw-bold"><i class="fas fa-store me-1"></i>Simple Ecommerce</span>
+                </div>
+                <div class="col-md-4 text-center mb-2 mb-md-0">
+                    <small class="text-muted">
+                        <a href="#" class="text-muted text-decoration-none me-3">Về chúng tôi</a>
+                        <a href="#" class="text-muted text-decoration-none me-3">Chính sách</a>
+                        <a href="#" class="text-muted text-decoration-none">Hỗ trợ</a>
+                    </small>
+                </div>
+                <div class="col-md-4 text-center text-md-end">
+                    <small class="text-muted">© 2026 Simple Ecommerce</small>
+                </div>
+            </div>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-    @await RenderSectionAsync("Styles", required: false)
 </body>
 </html>

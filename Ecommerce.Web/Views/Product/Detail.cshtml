@@ -4,95 +4,198 @@
     ViewData["Title"] = "Chi tiết sản phẩm";
 }
 
-<div style="max-width: 800px; margin: 20px auto; padding: 20px;">
-    <input type="hidden" asp-for="Id" />
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <!-- Breadcrumb -->
+            <nav aria-label="breadcrumb" class="mb-4">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index", "Home")">Trang chủ</a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index", "Product")">Sản phẩm</a>
+                    </li>
+                    <li class="breadcrumb-item active">@Model.Name</li>
+                </ol>
+            </nav>
 
-    <h2 style="margin-bottom: 20px; color: #333;">Chi tiết sản phẩm</h2>
+            <div class="card shadow-sm">
+                <div class="card-body p-4">
+                    <div class="row">
+                        <!-- Hình ảnh sản phẩm -->
+                        <div class="col-md-5 mb-4 mb-md-0">
+                            <div class="text-center">
+                                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                                {
+                                    <img src="@Model.ImageUrl"
+                                         alt="@Model.Name"
+                                         class="img-fluid rounded border"
+                                         style="max-height: 400px; object-fit: contain;">
+                                }
+                                else
+                                {
+                                    <div class="bg-light d-flex align-items-center justify-content-center rounded border"
+                                         style="height: 400px;">
+                                        <i class="fas fa-image fa-5x text-muted"></i>
+                                    </div>
+                                }
+                            </div>
+                        </div>
 
-    <div style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: #fff;">
+                        <!-- Thông tin sản phẩm -->
+                        <div class="col-md-7">
+                            <h2 class="mb-3">@Model.Name</h2>
 
-        @if (!string.IsNullOrEmpty(Model.ImageUrl))
-        {
-            <div style="text-align: center; margin-bottom: 20px;">
-                <img src="@Model.ImageUrl" alt="@Model.Name" style="max-width: 400px; max-height: 400px; border: 1px solid #ddd; border-radius: 4px;" />
-            </div>
-        }
+                            <!-- Giá -->
+                            <div class="mb-4">
+                                @if (Model.Price > 0)
+                                {
+                                    <h3 class="text-danger mb-0">
+                                        @Model.Price.ToString("N0") đ
+                                    </h3>
+                                }
+                                else
+                                {
+                                    <h4 class="text-muted">Chưa có giá</h4>
+                                }
+                            </div>
 
-        <table style="width: 100%; border-collapse: collapse;">
-            <tr style="border-bottom: 1px solid #eee;">
-                <td style="padding: 12px; font-weight: bold; width: 30%;">Tên sản phẩm:</td>
-                <td style="padding: 12px;">@Model.Name</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #eee;">
-                <td style="padding: 12px; font-weight: bold;">Mô tả:</td>
-                <td style="padding: 12px;">@Model.Description</td>
-            </tr>
-            <tr style="border-bottom: 1px solid #eee;">
-                <td style="padding: 12px; font-weight: bold;">Giá:</td>
-                <td style="padding: 12px; color: #dc3545; font-size: 18px; font-weight: bold;">
-                    @if (Model.Price > 0)
-                    {
-                        @Model.Price.ToString("N0") <text> VNĐ</text>
-                    }
-                    else
-                    {
-                        <text>Chưa có giá</text>
-                    }
-                </td>
-            </tr>
-            <tr style="border-bottom: 1px solid #eee;">
-                <td style="padding: 12px; font-weight: bold;">Tồn kho:</td>
-                <td style="padding: 12px;">
-                    @if (Model.Stock > 0)
-                    {
-                        <form asp-controller="Cart"
-                              asp-action="AddToCart"
-                              method="post"
-                              style="margin-top: 20px; text-align: center;">
+                            <!-- Mô tả -->
+                            <div class="mb-4">
+                                <h5 class="mb-2">
+                                    <i class="fas fa-info-circle me-2 text-primary"></i>Mô tả sản phẩm
+                                </h5>
+                                <p class="text-muted">
+                                    @if (!string.IsNullOrEmpty(Model.Description))
+                                    {
+                                        @Model.Description
+                                    }
+                                    else
+                                    {
+                                        <em>Chưa có mô tả</em>
+                                    }
+                                </p>
+                            </div>
 
-                            <input type="hidden" name="Id" value="@Model.Id" />
+                            <!-- Tồn kho -->
+                            <div class="mb-4">
+                                <h6>
+                                    <i class="fas fa-box me-2"></i>Tình trạng:
+                                    @if (Model.Stock > 0)
+                                    {
+                                        <span class="badge bg-success">Còn hàng (@Model.Stock sản phẩm)</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-danger">Hết hàng</span>
+                                    }
+                                </h6>
+                            </div>
 
-                            <input type="number"
-                                   name="quantity"
-                                   value="1"
-                                   min="1"
-                                   max="@Model.Stock"
-                                   style="width: 40px; padding: 6px; margin-right: 10px;" />
+                            <hr>
 
-                            <button type="submit"
-                                    style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                                🛒 Thêm vào giỏ hàng
+                            <!-- Thêm vào giỏ hàng -->
+                            @if (Model.Stock > 0)
+                            {
+                                <form asp-controller="Cart"
+                                      asp-action="AddToCart"
+                                      method="post"
+                                      class="mb-4">
+                                    <input type="hidden" name="Id" value="@Model.Id" />
+
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div>
+                                            <label class="form-label mb-1 small">Số lượng:</label>
+                                            <input type="number"
+                                                   name="quantity"
+                                                   value="1"
+                                                   min="1"
+                                                   max="@Model.Stock"
+                                                   class="form-control"
+                                                   style="width: 100px;" />
+                                        </div>
+                                        <div class="mt-auto">
+                                            <button type="submit" class="btn btn-primary btn-lg">
+                                                <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ hàng
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-outline-danger">
+                                        <i class="fas fa-heart me-2"></i>Yêu thích
+                                    </button>
+                                    <button class="btn btn-outline-secondary">
+                                        <i class="fas fa-share-alt me-2"></i>Chia sẻ
+                                    </button>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    <strong>Sản phẩm đã hết hàng!</strong> Vui lòng quay lại sau.
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions (Chỉnh sửa/Xóa) -->
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button onclick="history.back()" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Quay lại
+                        </button>
+
+                        <div class="d-flex gap-2">
+                            <a href="@Url.Action("Edit", new { id = Model.Id })"
+                               class="btn btn-warning">
+                                <i class="fas fa-edit me-2"></i>Chỉnh sửa
+                            </a>
+
+                            <button type="button"
+                                    class="btn btn-danger"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#deleteModal">
+                                <i class="fas fa-trash-alt me-2"></i>Xóa
                             </button>
-                        </form>
-                    }
-                    else
-                    {
-                        <p style="color: #dc3545; text-align: center; margin-top: 20px;">
-                            Sản phẩm đã hết hàng
-                        </p>
-                    }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-                </td>
-            </tr>
-        </table>
-
-        <div style="margin-top: 30px; display: flex; justify-content: center; gap: 10px; align-items: center;">
-            <a href="@Url.Action("Edit", new { id = Model.Id })"
-               style="padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 4px;">
-                Chỉnh sửa
-            </a>
-
-            <form asp-action="Delete" asp-route-id="@Model.Id" method="post" style="margin: 0;">
-                <button type="submit"
-                        style="padding: 10px 20px; background-color: orangered; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                    Xóa
+<!-- Modal xác nhận xóa -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-0">Bạn có chắc chắn muốn xóa sản phẩm <strong>@Model.Name</strong>?</p>
+                <p class="text-danger small mb-0 mt-2">
+                    <i class="fas fa-info-circle me-1"></i>Hành động này không thể hoàn tác!
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-2"></i>Hủy
                 </button>
-            </form>
-
-            <button onclick="history.back()"
-                    style="padding: 10px 20px; background-color: #6c757d; color: white; border: none; cursor: pointer; border-radius: 4px;">
-                ← Quay lại
-            </button>
+                <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-2"></i>Xóa sản phẩm
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </div>

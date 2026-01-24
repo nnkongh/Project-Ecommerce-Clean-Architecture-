@@ -6,7 +6,7 @@
 <div class="container my-5">
     <h2 class="mb-4">Giỏ hàng của bạn</h2>
 
-    @if (Model.Items == null || Model.Items.Count == 0)
+    @if (Model.Items == null || Model?.Items?.Count == 0)
     {
         <div class="alert alert-info text-center py-5">
             <i class="fas fa-shopping-cart fa-3x mb-3"></i>
@@ -71,7 +71,7 @@
                                                                     class="btn btn-outline-secondary btn-sm">
                                                                 <i class="fas fa-plus"></i>
                                                             </button>
-                                                        </div>
+                                                        </div>  
                                                     </form>
                                                 </div>
                                             </td>
@@ -79,8 +79,7 @@
                                                 <strong class="text-primary">@item.TotalPrice.ToString("N0") đ</strong>
                                             </td>
                                             <td class="text-center">
-                                                <form method="post" asp-action="RemoveFromCart" class="d-inline">
-                                                    <input type="hidden" name="id" value="@item.ProductId" />
+                                                <form method="post" asp-controller="Cart" asp-action="RemoveFromCart" asp-route-productId="@item.ProductId" class="d-inline">
                                                     <button type="submit"
                                                             class="btn btn-danger btn-sm"
                                                             onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
@@ -121,9 +120,9 @@
                             </button>
                         </form>
 
-                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary w-100">
-                            <i class="fas fa-arrow-left me-2"></i>Tiếp tục mua sắm
-                        </a>
+                        <button onclick="history.back()" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Quay lại
+                        </button>
                     </div>
                 </div>
             </div>

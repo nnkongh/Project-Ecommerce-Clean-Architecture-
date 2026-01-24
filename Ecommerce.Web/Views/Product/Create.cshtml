@@ -1,196 +1,160 @@
 ﻿@model ProductViewModel
 
-<form asp-action="Create" method="post" enctype="multipart/form-data" class="create-product-form">
-    <h2>Tạo sản phẩm mới</h2>
+@{
+    ViewData["Title"] = "Tạo sản phẩm mới";
+}
 
-    <div class="form-group mb-3">
-        <label asp-for="Name" class="form-label">Tên sản phẩm</label>
-        <input asp-for="Name" class="form-control" placeholder="Nhập tên sản phẩm" />
-        <span asp-validation-for="Name" class="text-danger"></span>
-    </div>
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-plus-circle me-2"></i>Tạo sản phẩm mới
+                    </h4>
+                </div>
 
-    <div class="form-group mb-3">
-        <label asp-for="Description" class="form-label">Mô tả</label>
-        <textarea asp-for="Description" class="form-control" rows="4" placeholder="Nhập mô tả sản phẩm"></textarea>
-        <span asp-validation-for="Description" class="text-danger"></span>
-    </div>
+                <div class="card-body p-4">
+                    <form asp-action="Create" method="post" enctype="multipart/form-data">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-    <div class="form-group mb-3">
-        <label asp-for="Image" class="form-label">Hình ảnh sản phẩm</label>
-        <input asp-for="Image" type="file" class="form-control" accept="image/*" onchange="previewImage(event)" />
-        <span asp-validation-for="Image" class="text-danger"></span>
+                        <!-- Upload hình ảnh -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Image" class="form-label">
+                                    <i class="fas fa-image me-1"></i>Hình ảnh sản phẩm
+                                </label>
+                                <input asp-for="Image" 
+                                       type="file" 
+                                       class="form-control" 
+                                       accept="image/*" 
+                                       onchange="previewImage(event)" />
+                                <span asp-validation-for="Image" class="text-danger small"></span>
+                            </div>
+                            <div class="col-md-6 text-center">
+                                <img id="preview" 
+                                     src="#" 
+                                     alt="Preview" 
+                                     class="img-thumbnail"
+                                     style="max-width: 150px; max-height: 150px; object-fit: contain; display: none;" />
+                            </div>
+                        </div>
 
-        <!-- Preview hình ảnh -->
-        <div id="imagePreview" class="mt-2" style="display: none;">
-            <img id="preview" src="" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px; border: 1px solid #ddd;" />
+                        <!-- Thông tin sản phẩm -->
+                        <div class="row g-3 mb-3">
+                            <!-- Tên sản phẩm -->
+                            <div class="col-md-8">
+                                <label asp-for="Name" class="form-label">
+                                    <i class="fas fa-tag me-1"></i>Tên sản phẩm <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Name" 
+                                       class="form-control" 
+                                       placeholder="Nhập tên sản phẩm" />
+                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Giá -->
+                            <div class="col-md-4">
+                                <label asp-for="Price" class="form-label">
+                                    <i class="fas fa-dollar-sign me-1"></i>Giá (VNĐ) <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Price" 
+                                       type="number" 
+                                       step="1000" 
+                                       class="form-control" 
+                                       placeholder="0" />
+                                <span asp-validation-for="Price" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Mô tả -->
+                            <div class="col-md-8">
+                                <label asp-for="Description" class="form-label">
+                                    <i class="fas fa-align-left me-1"></i>Mô tả
+                                </label>
+                                <textarea asp-for="Description" 
+                                          class="form-control" 
+                                          rows="3" 
+                                          placeholder="Nhập mô tả chi tiết"></textarea>
+                                <span asp-validation-for="Description" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Tồn kho -->
+                            <div class="col-md-4">
+                                <label asp-for="Stock" class="form-label">
+                                    <i class="fas fa-boxes me-1"></i>Tồn kho <span class="text-danger">*</span>
+                                </label>
+                                <input asp-for="Stock" 
+                                       type="number" 
+                                       min="0"
+                                       class="form-control" 
+                                       placeholder="0" />
+                                <span asp-validation-for="Stock" class="text-danger small"></span>
+                            </div>
+
+                            <!-- Danh mục cha -->
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    <i class="fas fa-layer-group me-1"></i>Danh mục cha
+                                </label>
+                                <select id="parentCategorySelect" class="form-select">
+                                    <option value="">-- Chọn danh mục cha --</option>
+                                    @if (Model.ParentCategories != null && Model.ParentCategories.Any())
+                                    {
+                                        @foreach (var category in Model.ParentCategories)
+                                        {
+                                            <option value="@category.Value">@category.Text</option>
+                                        }
+                                    }
+                                </select>
+                            </div>
+
+                            <!-- Danh mục con -->
+                            <div class="col-md-6" id="childCategoryGroup" style="display: none;">
+                                <label asp-for="CategoryId" class="form-label">
+                                    <i class="fas fa-tags me-1"></i>Danh mục con <span class="text-danger">*</span>
+                                </label>
+                                <select asp-for="CategoryId" id="childCategorySelect" class="form-select">
+                                    <option value="">-- Chọn danh mục con --</option>
+                                </select>
+                                <span asp-validation-for="CategoryId" class="text-danger small"></span>
+                            </div>
+                        </div>
+
+                        <!-- Buttons -->
+                        <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại
+                            </a>
+                            <div>
+                                <button type="reset" class="btn btn-outline-danger me-2" onclick="resetForm()">
+                                    <i class="fas fa-undo me-2"></i>Đặt lại
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save me-2"></i>Tạo sản phẩm
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="Price" class="form-label">Giá (VNĐ)</label>
-        <input asp-for="Price" type="number" step="0.01" class="form-control" placeholder="Nhập giá sản phẩm" />
-        <span asp-validation-for="Price" class="text-danger"></span>
-    </div>
-
-    <div class="form-group mb-3">
-        <label asp-for="Stock" class="form-label">Số lượng tồn kho</label>
-        <input asp-for="Stock" type="number" class="form-control" placeholder="Nhập số lượng" />
-        <span asp-validation-for="Stock" class="text-danger"></span>
-    </div>
-
-    <div class="form-group mb-3">
-    <label asp-for="CategoryId" class="form-label">
-        <i class="fas fa-layer-group"></i> Danh mục cha
-    </label>
-    <select id="parentCategorySelect" class="form-control">
-        <option value="">-- Chọn danh mục cha --</option>
-        @if (Model.ParentCategories != null && Model.ParentCategories.Any())
-        {
-            @foreach (var category in Model.ParentCategories)
-            {
-                <option value="@category.Value">@category.Text</option>
-            }
-        }
-    </select>
 </div>
 
-<div class="form-group mb-3" id="childCategoryGroup" style="display: none;">
-    <label asp-for="CategoryId" class="form-label">
-        <i class="fas fa-tags"></i> Danh mục con <span class="text-danger">*</span>
-    </label>
-    <select asp-for="CategoryId" id="childCategorySelect" class="form-control">
-        <option value="">-- Chọn danh mục con --</option>
-    </select>
-    <span asp-validation-for="CategoryId" class="text-danger"></span>
-    <small class="form-text text-muted">
-        Chọn danh mục cụ thể cho sản phẩm của bạn
-    </small>
-</div>
-
-    <div class="form-group mt-4">
-        <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i> Tạo sản phẩm
-        </button>
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="fas fa-times"></i> Hủy
-        </a>
-    </div>
-</form>
-
-<style>
-    .create-product-form {
-        max-width: 700px;
-        margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #ddd;
-        border-radius: 8px;
-        background-color: #f9f9f9;
-    }
-
-        .create-product-form h2 {
-            margin-bottom: 20px;
-            color: #333;
-            text-align: center;
-        }
-
-    .form-group label {
-        font-weight: 600;
-        margin-bottom: 5px;
-        display: block;
-        color: #555;
-    }
-
-    .form-control {
-        width: 100%;
-        padding: 10px 12px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        font-size: 0.95rem;
-    }
-
-        .form-control:focus {
-            border-color: #007bff;
-            outline: none;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-        }
-
-    textarea.form-control {
-        resize: vertical;
-    }
-
-    .btn-primary {
-        background-color: #007bff;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 6px;
-        color: white;
-        font-weight: 600;
-        cursor: pointer;
-    }
-
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-
-    .btn-secondary {
-        background-color: #6c757d;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 6px;
-        color: white;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-block;
-    }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
-        }
-
-    .text-danger {
-        font-size: 0.85rem;
-        margin-top: 3px;
-        display: block;
-    }
-
-    .mb-3 {
-        margin-bottom: 1rem;
-    }
-
-    .mt-2 {
-        margin-top: 0.5rem;
-    }
-
-    .mt-3 {
-        margin-top: 1rem;
-    }
-
-    .ms-2 {
-        margin-left: 0.5rem;
-    }
-
-    #imagePreview {
-        text-align: center;
-        padding: 10px;
-        background-color: #fff;
-        border-radius: 8px;
-    }
-</style>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script type="text/javascript">
+<script>
     const allCategories = @Html.Raw(Json.Serialize(Model.AllCategories.Select(c => new { 
         id = c.Id, 
         name = c.Name, 
         parentId = c.ParentId 
     })));
-    console.log('All categories:', allCategories);
+
     $(document).ready(function() {
-        // ===== CASCADING DROPDOWN =====
         const parentSelect = $('#parentCategorySelect');
         const childGroup = $('#childCategoryGroup');
         const childSelect = $('#childCategorySelect');
         
-        // Khi chọn category cha
+        // Khi chọn danh mục cha
         parentSelect.on('change', function() {
             const parentId = parseInt($(this).val());
             
@@ -200,57 +164,63 @@
                 return;
             }
             
-            // Lọc categories con
+            // Lọc danh mục con
             const childCategories = allCategories.filter(c => c.parentId === parentId);
             
             if (childCategories.length > 0) {
-                // Clear và thêm options mới
                 childSelect.empty();
                 childSelect.append('<option value="">-- Chọn danh mục con --</option>');
                 
                 childCategories.forEach(category => {
-                    childSelect.append(
-                        `<option value="${category.id}">${category.name}</option>`
-                    );
+                    childSelect.append(`<option value="${category.id}">${category.name}</option>`);
                 });
                 
-                // Hiển thị dropdown con
                 childGroup.slideDown(300);
             } else {
                 childGroup.slideUp(300);
                 childSelect.val('');
             }
         });
-        
-        // ===== KẾT NỐI IMAGE PREVIEW =====
-        $('#imageFile').on('change', function(event) {
-            previewImage(event);
-        });
-        
-        // Reset form
-        $('form').on('reset', function() {
-            childGroup.hide();
-            childSelect.val('');
-            parentSelect.val('');
-            $('#imagePreview').hide();
-            $('#preview').attr('src', '');
-        });
     });
+
     function previewImage(event) {
         const file = event.target.files[0];
         const preview = document.getElementById('preview');
-        const previewContainer = document.getElementById('imagePreview');
 
         if (file) {
+            // Kiểm tra kích thước (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Kích thước ảnh không được vượt quá 5MB');
+                event.target.value = '';
+                preview.style.display = 'none';
+                return;
+            }
+
+            // Kiểm tra định dạng
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+            if (!validTypes.includes(file.type)) {
+                alert('Chỉ chấp nhận file ảnh định dạng JPG, PNG, GIF');
+                event.target.value = '';
+                preview.style.display = 'none';
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = function(e) {
                 preview.src = e.target.result;
-                previewContainer.style.display = 'block';
+                preview.style.display = 'block';
             }
             reader.readAsDataURL(file);
         } else {
-            previewContainer.style.display = 'none';
+            preview.style.display = 'none';
         }
+    }
+
+    function resetForm() {
+        document.getElementById('preview').style.display = 'none';
+        document.getElementById('childCategoryGroup').style.display = 'none';
+        document.getElementById('parentCategorySelect').value = '';
+        document.getElementById('childCategorySelect').value = '';
     }
 </script>
 
