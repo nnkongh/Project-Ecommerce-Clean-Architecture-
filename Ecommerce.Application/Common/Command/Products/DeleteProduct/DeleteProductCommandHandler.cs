@@ -34,6 +34,7 @@ namespace Ecommerce.Application.Common.Command.Products.DeleteProduct
             {
                 return Result.Failure(new Error("", "Item not found"));
             }
+            await _productRepo.Delete(product);
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }

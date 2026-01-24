@@ -32,6 +32,8 @@ namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
 
             var order = Order.CreateOrder(request.order.User!.Id,
                                           request.order.User!.UserName,
+                                          request.order.User!.PhoneNumber!,
+                                          request.order.User!.Email!,
                                           request.order.User!.Address!.City!,
                                           request.order.User!.Address.Ward!,
                                           request.order.User!.Address.Street!,

@@ -75,6 +75,9 @@ namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
             if (user == null)
                 return Result.Failure<User>(new Error("USER_NOT_FOUND", "User không tồn tại"));
 
+            if(user.PhoneNumber == null)
+                return Result.Failure<User>(new Error("PHONE_NUMBER_EMPTY", "User chưa có số điện thoại"));
+
             if (user.Address == null)
                 return Result.Failure<User>(new Error("ADDRESS_EMPTY", "User chưa có địa chỉ"));
 

@@ -32,19 +32,23 @@ namespace Ecommerce.Application.Common.Command.Profile
 
 
             var user = await _userRepo.GetByIdAsync(request.userId);
-            if(user == null)
+            if (user == null)
             {
                 return Result.Failure<ProfileModel>(new Error("", "User is not found"));
             }
-            if(request.update.UserName != null)
+            if (request.update.UserName != null)
             {
                 user.UserName = request.update.UserName;
             }
-            if(request.update.ImageUrl != null)
+            if (request.update.ImageUrl != null)
             {
                 user.ImageUrl = request.update.ImageUrl;
             }
-            if(request.update.Address != null)
+            if (request.update.PhoneNumber != null)
+            {
+                user.PhoneNumber = request.update.PhoneNumber;
+            }
+            if (request.update.Address != null)
             {
                 user.Address ??= Address.Create(
                     district: "",
@@ -58,7 +62,7 @@ namespace Ecommerce.Application.Common.Command.Profile
                     city: request.update.Address.City ?? "",
                     province: request.update.Address.Province ?? "",
                     street: request.update.Address.Street ?? "",
-                    ward: request.update.Address.Ward ?? "" );
+                    ward: request.update.Address.Ward ?? "");
             }
 
             //await _userRepo.Update(user);
