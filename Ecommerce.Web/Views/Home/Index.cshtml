@@ -1,261 +1,54 @@
-﻿
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Trang chủ - Simple Ecommerce</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+﻿@{
+    ViewData["Title"] = "Trang chủ";
+}
 
-        body {
-            font-family: Arial, sans-serif;
-            background: #f8f9fa;
-        }
-
-        /* Header */
-        header {
-            background: #212529;
-            padding: 15px 0;
-        }
-
-            header nav {
-                max-width: 100%;
-                margin: 0 auto;
-            }
-
-        .navbar-nav {
-            list-style: none;
-            display: flex;
-            align-items: center;
-            padding: 0 30px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-        }
-
-        .nav-link {
-            color: white;
-            text-decoration: none;
-            padding: 8px 15px;
-            display: inline-block;
-        }
-
-            .nav-link:hover {
-                opacity: 0.8;
-            }
-
-        .me-auto {
-            margin-right: auto;
-        }
-
-        .search-form {
-            max-width: 400px;
-            width: 100%;
-            margin: 0 auto;
-            display: flex;
-            gap: 10px;
-        }
-
-            .search-form input {
-                flex: 1;
-                padding: 8px 15px;
-                border: 1px solid #ccc;
-                border-radius: 4px;
-            }
-
-            .search-form button {
-                padding: 8px 20px;
-                background: transparent;
-                border: 1px solid white;
-                color: white;
-                border-radius: 4px;
-                cursor: pointer;
-            }
-
-                .search-form button:hover {
-                    background: rgba(255,255,255,0.1);
-                }
-
-        .right-menu {
-            display: flex;
-            align-items: center;
-            gap: 30px;
-            margin-left: auto;
-        }
-
-        /* Container */
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px 20px;
-        }
-
-        /* Categories Section */
-        .categories {
-            margin-bottom: 40px;
-        }
-
-        h3 {
-            font-size: 24px;
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        .category-list {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-
-        .category {
-            background: white;
-            border: 1px solid #ddd;
-            padding: 20px;
-            width: 180px;
-            text-align: center;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-            .category:hover {
-                border-color: #667eea;
-                box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
-            }
-
-            .category i {
-                font-size: 40px;
-                color: #667eea;
-                margin-bottom: 10px;
-            }
-
-        /* Products Section */
-        .products {
-            margin-bottom: 40px;
-        }
-
-        .product-list {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .product {
-            background: white;
-            border: 1px solid #ddd;
-            padding: 20px;
-            width: 220px;
-            border-radius: 4px;
-            transition: all 0.3s;
-        }
-
-            .product:hover {
-                box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            }
-
-        .product-image {
-            width: 100%;
-            height: 180px;
-            background: #f0f0f0;
-            margin-bottom: 15px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #999;
-            font-size: 50px;
-        }
-
-        .product-name {
-            font-weight: bold;
-            margin-bottom: 10px;
-            color: #333;
-        }
-
-        .product-price {
-            color: #e74c3c;
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 15px;
-        }
-
-        .product button {
-            width: 100%;
-            padding: 10px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-            .product button:hover {
-                background: #5568d3;
-            }
-
-        /* Footer */
-        footer {
-            background: #f2f2f2;
-            border-top: 1px solid #ddd;
-            padding: 20px;
-            text-align: center;
-            margin-top: 50px;
-        }
-
-        .footer-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            color: #666;
-        }
-    </style>
-</head>
-<body>
-    <!-- Header giống _Layout -->
-   
-    <!-- Main Content -->
-    <div class="container">
-        <!-- Categories -->
-        <section class="categories">
-            <h3>Danh mục sản phẩm</h3>
-            <div class="category-list">
-                <div class="category">
-                    <i class="fas fa-laptop"></i>
-                    <div>Laptop</div>
-                </div>
-                <div class="category">
-                    <i class="fas fa-mobile-alt"></i>
-                    <div>Điện thoại</div>
-                </div>
-                <div class="category">
-                    <i class="fas fa-headphones"></i>
-                    <div>Tai nghe</div>
-                </div>
-                <div class="category">
-                    <i class="fas fa-keyboard"></i>
-                    <div>Bàn phím</div>
-                </div>
-                <div class="category">
-                    <i class="fas fa-mouse"></i>
-                    <div>Chuột</div>
+<!-- Hero Section -->
+<div class="bg-black text-white py-5">
+    <div class="container text-center">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-4">
+                    <i class="fas fa-store me-3"></i>Simple Ecommerce
+                </h1>
+                <p class="lead mb-4">
+                    Nền tảng mua sắm trực tuyến đơn giản và tiện lợi
+                </p>
+                <div class="d-flex gap-3 justify-content-center">
+                    <a href="@Url.Action("Index", "Category")" class="btn btn-outline-light btn-dark">
+                        <i class="fas fa-th-large me-2"></i>Xem danh mục
+                    </a>
+                    <a href="@Url.Action("Index", "Product")" class="btn btn-outline-light btn-dark">
+                        <i class="fas fa-shopping-bag me-2"></i>Sản phẩm
+                    </a>
                 </div>
             </div>
-        </section>
-
-        <!-- Products -->
-        <section class="products">
-        
-        </section>
+        </div>
     </div>
+</div>
 
- 
-</body>
-</html>
+<!-- Features -->
+<div class="container my-5">
+    <div class="row g-4 text-center">
+        <div class="col-md-4">
+            <div class="p-4">
+                <i class="fas fa-shipping-fast fa-3x text-primary mb-3"></i>
+                <h5>Giao hàng nhanh</h5>
+                <p class="text-muted">Miễn phí vận chuyển cho đơn từ 500.000đ</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4">
+                <i class="fas fa-shield-alt fa-3x text-success mb-3"></i>
+                <h5>Thanh toán an toàn</h5>
+                <p class="text-muted">Bảo mật thông tin khách hàng 100%</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="p-4">
+                <i class="fas fa-headset fa-3x text-info mb-3"></i>
+                <h5>Hỗ trợ 24/7</h5>
+                <p class="text-muted">Tư vấn nhiệt tình, giải đáp mọi thắc mắc</p>
+            </div>
+        </div>
+    </div>
+</div>

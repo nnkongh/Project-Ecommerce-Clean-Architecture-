@@ -68,7 +68,7 @@ namespace Ecommerce.Web.Features.Carts
             Session.SetObject(CartSessionKey, cart);
         }
 
-        public Task RemoveFromCartAsync(int productId)
+        public Task<bool> RemoveFromCartAsync(int productId)
         {
             var cart = Session.GetObject<CartViewModel>(CartSessionKey);
 
@@ -81,7 +81,7 @@ namespace Ecommerce.Web.Features.Carts
                     Session.SetObject(CartSessionKey, cart);
                 }
             }
-            return Task.CompletedTask;
+            return Task.FromResult(true);
 
         }
 

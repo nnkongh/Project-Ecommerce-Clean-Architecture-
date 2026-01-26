@@ -9,7 +9,7 @@ namespace Ecommerce.Web.Services.Strategy
         // Định nghĩa các phương thức hỗ trợ 
         Task<CartViewModel> GetCartAsync();
         Task AddToCartAsync(AddToCartRequest model);
-        Task RemoveFromCartAsync(int productId);
+        Task<bool> RemoveFromCartAsync(int productId);
         Task ClearCartAsync();
         Task UpdateCartAsync(int productId, int quantity);
     }

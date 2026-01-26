@@ -41,12 +41,12 @@
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     <img src="@item.ImageUrl"
-                                                         alt="@item.Name"
+                                                         alt="@item.ProductName"
                                                          class="img-thumbnail me-3"
                                                          style="width: 80px; height: 80px; object-fit: cover;"
                                                          onerror="this.src='/images/no-image.png'">
                                                     <div>
-                                                        <h6 class="mb-0">@item.Name</h6>
+                                                        <h6 class="mb-0">@item.ProductName</h6>
                                                     </div>
                                                 </div>
                                             </td>
@@ -55,8 +55,7 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex justify-content-center align-items-center">
-                                                    <form method="post" asp-action="UpdateQuantity" class="d-inline">
-                                                        <input type="hidden" name="id" value="@item.ProductId" />
+                                                    <form method="post" asp-action="UpdateQuantity" asp-route-productId="@item.ProductId" class="d-inline">
                                                         <div class="input-group" style="width: 130px;">
                                                             <button type="submit" name="quantity" value="@(item.Quantity - 1)"
                                                                     class="btn btn-outline-secondary btn-sm"

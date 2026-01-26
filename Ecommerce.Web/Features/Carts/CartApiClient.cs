@@ -75,17 +75,18 @@ namespace Ecommerce.Web.Features.Carts
             return mapped;
         }
 
-        public async Task RemoveFromCartAsync(int productId)
+        public async Task<bool> RemoveFromCartAsync(int productId)
         {
             var response = await _httpClient.DeleteAsync($"carts/{productId}");
 
-            var result = await response.Content.ReadFromJsonAsync<ApiResponse<CartViewModel>>();
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<bool>>();
 
             if (result == null || !result.IsSuccess)
             {
                 throw new Exception("Failed to remove product from cart.");
             }
-
+           
+            return true;
         }
 
         public async Task UpdateCartAsync(int productId, int quantity)

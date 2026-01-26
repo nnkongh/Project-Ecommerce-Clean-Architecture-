@@ -3,6 +3,7 @@ using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Web.Interface;
 using Ecommerce.Web.ViewModels;
 using Ecommerce.Web.ViewModels.ApiResponse;
+using System.Data.SqlTypes;
 
 namespace Ecommerce.Web.Features.Carts
 {
@@ -10,6 +11,7 @@ namespace Ecommerce.Web.Features.Carts
     {
         private readonly HttpClient _httpClient;
         private readonly IMapper _mapper;
+        
         public CheckoutCartClient(IHttpClientFactory clientFactory, IMapper mapper)
         {
             _httpClient = clientFactory.CreateClient("ApiClient");
@@ -18,18 +20,22 @@ namespace Ecommerce.Web.Features.Carts
 
         public async Task<ApiResponse<OrderViewModel>> CheckoutCartAsync()
         {
-            var response = await _httpClient.PostAsync("carts/checkout", null);
-
-            var result = await response.Content.ReadFromJsonAsync<ApiResponse<OrderModel>>();
-
-            if(result == null || !result.IsSuccess)
+            try
             {
-                return ApiResponse<OrderViewModel>.Fail("Failed to checkout cart.");
-            }
-            
-            var orderViewModel = _mapper.Map<OrderViewModel>(result.Value);
+                var response = await _httpClient.PostAsync("carts/checkout", null);
 
-            return ApiResponse<OrderViewModel>.Success(orderViewModel);
+                if (!response.IsSuccessStatusCode)
+                {
+                    return ApiResponse<OrderViewModel>.Fail("Failed to checkout cart.");
+                }
+
+                return ApiResponse<OrderViewModel>.Success(null);
+            }
+            catch(Exception ex)
+            {
+                return ApiResponse<OrderViewModel>.Fail($"Failed do: {ex}");
+            }
+           
         }
     }
 }
