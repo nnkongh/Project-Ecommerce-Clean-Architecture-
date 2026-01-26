@@ -10,11 +10,11 @@ namespace Ecommerce.Domain.Models
     public class Cart
     {
         public int Id { get; set; }
-        public User? User { get; set; }        
+        public User? User { get; set; }
         public string? UserId { get; set; }
         public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
-        public DateTime? ExpiredAt { get;set; }
+        public DateTime? ExpiredAt { get; set; }
         public CartStatus Status { get; set; }
         public List<CartItem> Items { get; set; } = [];
 
@@ -33,14 +33,14 @@ namespace Ecommerce.Domain.Models
         }
         public void AddItem(int productId, int quantity, string? ImageUrl, decimal unitPrice, string productName)
         {
-            if(quantity < 0 || unitPrice < 0)
+            if (quantity < 0 || unitPrice < 0)
             {
                 throw new ArgumentException("Quantity/Price cannot be negative");
             }
             var existingItem = Items.FirstOrDefault(i => i.ProductId == productId);
-            if(existingItem != null)
+            if (existingItem != null)
             {
-                existingItem.IncreaseQuantity(quantity);
+                existingItem.SetQuantity(quantity);
             }
             else
             {
@@ -60,8 +60,8 @@ namespace Ecommerce.Domain.Models
             var existingItem = Items.FirstOrDefault(x => x.ProductId == productId);
             if (existingItem != null)
             {
-                existingItem.IncreaseQuantity(quantity);
-               
+                existingItem.SetQuantity(quantity);
+
             }
             else
             {
@@ -79,20 +79,23 @@ namespace Ecommerce.Domain.Models
         public void RemoveItem(int productId)
         {
             var item = Items.FirstOrDefault(i => i.ProductId == productId);
-            if(item != null)
+            if (item != null)
             {
                 Items.Remove(item);
-                item.DecreaseQuantity(item.Quantity);
             }
             MarkAsUpdated();
-        }
-        public void ReduceItemQuantity(int productId,int quantity) {
-            var item = Items.FirstOrDefault(x => x.ProductId == productId);
-            if(item != null)
+        }   
+        public int UpdateQuantity(int productId, int quantity)
+        {
+            var item = GetItem(productId);
+            if (item == null)
             {
-                item.DecreaseQuantity(quantity);
+                throw new Exception();
             }
+            var delta = quantity - item.Quantity;
+            item.SetQuantity(quantity);
             MarkAsUpdated();
+            return delta;
         }
         public void Clear()
         {
@@ -107,6 +110,10 @@ namespace Ecommerce.Domain.Models
         {
             UpdatedAt = DateTime.UtcNow;
             ExpiredAt = DateTime.UtcNow.AddDays(1);
+        }
+        public CartItem GetItem(int cartId)
+        {
+            return Items.SingleOrDefault(x => x.ProductId == cartId);
         }
     }
 }

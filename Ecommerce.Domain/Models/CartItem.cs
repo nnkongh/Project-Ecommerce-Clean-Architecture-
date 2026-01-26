@@ -19,17 +19,7 @@ namespace Ecommerce.Domain.Models
         public Product Product { get; set; } = default!;    
         public int ProductId { get; set; }
 
-        public void IncreaseQuantity(int quantity) => Quantity += quantity;
-        public void DecreaseQuantity(int quantity)
-        {
-            if(quantity >= Quantity)
-            {
-                Quantity = 0;
-            }
-            else
-            {
-                Quantity -= quantity;
-            }
-        }
+        public void SetQuantity(int quantity) => Quantity = quantity;
+
     }
 }

@@ -11,6 +11,7 @@ namespace Ecommerce.Domain.Models
         public int Id { get; set; }
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
+        public bool IsActive { get; set; }
         public string ImageUrl { get; set; } = null!;
         public decimal Price { get; set; }
         public int Stock { get; set; }
@@ -67,7 +68,6 @@ namespace Ecommerce.Domain.Models
         }
         public void AdjustStock(int stock)
         {
-            if (stock < 0) throw new ArgumentException("Price cannot be negative");
             Stock += stock;
         }
     }

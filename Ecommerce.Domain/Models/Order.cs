@@ -12,6 +12,8 @@ namespace Ecommerce.Domain.Models
         public int Id { get; set; }
         public string CustomerId { get; set; }
         public DateTime OrderDate { get; set; } //
+        public string? PhoneNumber { get; set; }
+        public string? Email { get; set; }
         public string CustomerName { get; set; } = null!;
         public Address? Address { get; set; }
         public User? User { get; set; }
@@ -19,11 +21,13 @@ namespace Ecommerce.Domain.Models
         public decimal TotalAmount { get; set; }
         public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending; 
 
-        public static Order CreateOrder(string userId, string customerName, string city, string ward, string district, string street, string? province)
+        public static Order CreateOrder(string userId, string customerName, string phoneNumber, string email, string city, string ward, string district, string street, string? province)
         {
             var order = new Order()
             {
                 CustomerId = userId,
+                PhoneNumber = phoneNumber,
+                Email = email,
                 OrderStatus = OrderStatus.Pending,
                 Address = Address.Create(district, city, province, street, ward),
                 CustomerName = customerName,
