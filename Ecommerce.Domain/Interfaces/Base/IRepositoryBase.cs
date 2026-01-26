@@ -24,5 +24,8 @@ namespace Ecommerce.Domain.Interfaces.Base
         Task<T?> UpdatePartialAsync(TKey id, T entity, params Expression<Func<T, object>>[] propertiesToUpdate);
         Task<T> Update(T entity);
         Task Delete(T entity);
+
+        // Pagination
+        Task<int> CountAsync(ISpecification<T> spec);
     }
 }
