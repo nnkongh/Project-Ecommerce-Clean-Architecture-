@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Infrastructure.Repository.Base
 {
-    public class GenericRepository<T,TKey> : IRepositoryBase<T,TKey> where T : class
+    public class GenericRepository<T, TKey> : IRepositoryBase<T, TKey> where T : class
     {
         protected readonly ApplicationDbContext _context;
         public GenericRepository(ApplicationDbContext context)
@@ -116,6 +116,11 @@ namespace Ecommerce.Infrastructure.Repository.Base
         {
             _context.Set<T>().Update(entity);
             return Task.FromResult(entity);
+        }
+
+        public async Task<int> CountAsync(ISpecification<T> spec)
+        {
+            return await ApplySpecification(spec).CountAsync();
         }
     }
 }
