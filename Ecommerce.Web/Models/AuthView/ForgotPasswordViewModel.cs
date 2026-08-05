@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
 
 namespace Ecommerce.WebApi.ViewModels.AuthView
 {
     public class ForgotPasswordViewModel
     {
+        [Required(ErrorMessage = "Email là bắt buộc")]
+        [EmailAddress(ErrorMessage = "Email không hợp lệ")]
         public string Email { get; set; }
+
         public string ClientUrl { get; set; }
     }
 }
