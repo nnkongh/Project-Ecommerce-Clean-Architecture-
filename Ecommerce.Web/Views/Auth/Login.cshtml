@@ -3,77 +3,113 @@
 @model LoginPageViewModel
 @{
     ViewData["Title"] = "Đăng nhập";
+    ViewData["HideAuthHeader"] = true;
+    ViewData["HideFooter"] = true;
 }
-<div class="row justify-content-center">
-    <div class="col-md-6 col-lg-5">
-        <div class="card shadow">
-            <div class="card-body p-5">
-                <h2 class="text-center mb-4">@ViewData["Title"]</h2>
+
+<div class="auth-page">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
 
                 @if (TempData["SuccessMessage"] != null)
                 {
-                    <div class="alert alert-success alert-dismissible fade show">
-                        @TempData["SuccessMessage"]
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle me-1"></i> @TempData["SuccessMessage"]
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 }
 
                 @if (TempData["ErrorMessage"] != null)
                 {
-                    <div class="alert alert-danger alert-dismissible fade show">
-                        @TempData["ErrorMessage"]
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle me-1"></i> @TempData["ErrorMessage"]
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 }
 
-                <form asp-action="Login" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-                    <input type="hidden" />
-
-                    <div class="mb-3">
-                        <label asp-for="Email" class="form-label">Email</label>
-                        <input asp-for="Email" class="form-control" placeholder="email@example.com" autofocus />
-                        <span asp-validation-for="Email" class="text-danger"></span>
+                <div class="card auth-card">
+                    <div class="card-header">
+                        <div class="brand-icon">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <h2>Chào mừng trở lại</h2>
+                        <p>Đăng nhập để tiếp tục mua sắm</p>
                     </div>
+                    <div class="card-body">
+                        <form asp-action="Login" method="post">
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                            <input type="hidden" />
 
-                    <div class="mb-3">
-                        <label asp-for="Password" class="form-label">Mật khẩu</label>
-                        <input asp-for="Password" type="password" class="form-control" placeholder="Nhập mật khẩu" />
-                        <span asp-validation-for="Password" class="text-danger"></span>
+                            <div class="form-floating">
+                                <input asp-for="Email" class="form-control" placeholder="email@example.com" autofocus />
+                                <label asp-for="Email">Email</label>
+                                <i class="fas fa-envelope input-icon"></i>
+                                <span asp-validation-for="Email" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-floating">
+                                <input asp-for="Password" type="password" class="form-control" placeholder="Nhập mật khẩu" id="loginPassword" />
+                                <label asp-for="Password">Mật khẩu</label>
+                                <i class="fas fa-lock input-icon"></i>
+                                <button type="button" class="password-toggle" onclick="togglePassword()" tabindex="-1">
+                                    <i class="fas fa-eye" id="togglePasswordIcon"></i>
+                                </button>
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div class="form-check">
+                                    <input asp-for="RememberMe" class="form-check-input" />
+                                    <label asp-for="RememberMe" class="form-check-label">Ghi nhớ đăng nhập</label>
+                                </div>
+                                <a asp-action="ForgotPassword" class="forgot-link">Quên mật khẩu?</a>
+                            </div>
+
+                            <button type="submit" class="auth-btn">
+                                <i class="fas fa-sign-in-alt me-2"></i>Đăng nhập
+                            </button>
+                        </form>
+
+                        <div class="auth-divider">
+                            <span>hoặc đăng nhập với</span>
+                        </div>
+
+                        <a class="social-btn mb-2"
+                           href="@Url.Action("ExternalLogin", "Auth", new { provider = "Google", redirectUri = "/" })">
+                            <i class="fab fa-google" style="color: #4285F4;"></i>
+                            Tiếp tục với Google
+                        </a>
+
+                        <div class="auth-links">
+                            Chưa có tài khoản? <a asp-action="Register">Đăng ký ngay</a>
+                        </div>
                     </div>
-
-                    <div class="d-grid mb-3">
-                        <button type="submit" class="btn btn-primary btn-lg">Đăng nhập</button>
-                    </div>
-
-                    <div class="text-center mb-3">
-                        <a asp-action="ForgotPassword">Quên mật khẩu?</a>
-                    </div>
-
-                    <hr />
-                </form>
-                <a class="btn btn-danger w-100"
-                   href="@Url.Action("ExternalLogin", "Auth", new { provider = "Google" , redirectUri = "/"})">
-                    Login with Google
-                </a>
-
-                <div class="text-center mt-3">
-                    <p>Chưa có tài khoản? <a asp-action="Register">Đăng ký ngay</a></p>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
+@section Styles {
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+}
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        function loginWithGoogle() {
-            window.location.href = '@Url.Action("ExternalLogin", new { provider = "Google", returnUrl = ViewData["ReturnUrl"] })';
-        }
-
-        function loginWithFacebook() {
-            window.location.href = '@Url.Action("ExternalLogin", new { provider = "Facebook", returnUrl = ViewData["ReturnUrl"] })';
+        function togglePassword() {
+            var input = document.getElementById('loginPassword');
+            var icon = document.getElementById('togglePasswordIcon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
         }
     </script>
 }
