@@ -9,16 +9,17 @@ namespace Ecommerce.Domain.Models
 {
     public class Cart
     {
-        public int Id { get; set; }
-        public User? User { get; set; }
-        public string? UserId { get; set; }
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-        public DateTime? ExpiredAt { get; set; }
-        public CartStatus Status { get; set; }
-        public List<CartItem> Items { get; set; } = [];
+        public int Id { get; private set; }
+        public User? User { get; private set; }
+        public string? UserId { get; private set; }
+        public DateTime? CreatedAt { get; private set; }
+        public DateTime? UpdatedAt { get; private set; }
+        public DateTime? ExpiredAt { get; private set; }
+        public CartStatus Status { get; private set; }
+        public ICollection<CartItem> Items => _items.AsReadOnly();
+        private readonly List<CartItem> _items = new List<CartItem>();
 
-
+        private Cart() { }
         public static Cart CreateCart(string UserId)
         {
             var cart = new Cart()
@@ -31,75 +32,37 @@ namespace Ecommerce.Domain.Models
             };
             return cart;
         }
-        public void AddItem(int productId, int quantity, string? ImageUrl, decimal unitPrice, string productName)
-        {
-            if (quantity < 0 || unitPrice < 0)
-            {
-                throw new ArgumentException("Quantity/Price cannot be negative");
-            }
-            var existingItem = Items.FirstOrDefault(i => i.ProductId == productId);
-            if (existingItem != null)
-            {
-                existingItem.SetQuantity(quantity);
-            }
-            else
-            {
-                Items.Add(new CartItem()
-                {
-                    ImageUrl = ImageUrl,
-                    Quantity = quantity,
-                    ProductId = productId,
-                    ProductName = productName,
-                    UnitPrice = unitPrice,
-                });
-            }
-            MarkAsUpdated();
-        }
-        public void AddItemFromWishlist(int productId, string productName, decimal unitPrice, int quantity = 1)  // 1 Wishlist không chứa nhiều product có cùng 1 id
-        {
-            var existingItem = Items.FirstOrDefault(x => x.ProductId == productId);
-            if (existingItem != null)
-            {
-                existingItem.SetQuantity(quantity);
-
-            }
-            else
-            {
-                Items.Add(new CartItem()
-                {
-                    ProductId = productId,
-                    ProductName = productName,
-                    Quantity = quantity,
-                    UnitPrice = unitPrice,
-
-                });
-            }
-            MarkAsUpdated();
-        }
-        public void RemoveItem(int productId)
-        {
-            var item = Items.FirstOrDefault(i => i.ProductId == productId);
-            if (item != null)
-            {
-                Items.Remove(item);
-            }
-            MarkAsUpdated();
-        }   
-        public int UpdateQuantity(int productId, int quantity)
+        public void AddItem(int productId, string productName, int quantity, decimal unitPrice, string? imageUrl = null)
         {
             var item = GetItem(productId);
-            if (item == null)
+            if (item != null)
             {
-                throw new Exception();
+                item.IncreaseQuantity();
             }
-            var delta = quantity - item.Quantity;
-            item.SetQuantity(quantity);
+            else
+            {
+                var cartItem = CartItem.Create(productId, productName, quantity, unitPrice, imageUrl);
+                _items.Add(cartItem);
+                MarkAsUpdated();
+            }
+        }
+        public void RemoveItem(CartItem item)
+        {
+            _items.Remove(item);
             MarkAsUpdated();
-            return delta;
+        }
+        public void UpdateQuantity(int productId, int quantity)
+        {
+            var item = GetItem(productId);
+            if (item != null)
+            {
+                item.SetQuantity(quantity);
+                MarkAsUpdated();
+            }
         }
         public void Clear()
         {
-            Items.Clear();
+            _items.Clear();
         }
         public void MarkAsExpired()
         {
@@ -111,9 +74,9 @@ namespace Ecommerce.Domain.Models
             UpdatedAt = DateTime.UtcNow;
             ExpiredAt = DateTime.UtcNow.AddDays(1);
         }
-        public CartItem GetItem(int cartId)
+        public CartItem? GetItem(int productId)
         {
-            return Items.SingleOrDefault(x => x.ProductId == cartId);
+            return Items.SingleOrDefault(x => x.ProductId == productId);
         }
     }
 }

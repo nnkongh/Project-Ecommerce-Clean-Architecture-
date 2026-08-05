@@ -14,7 +14,6 @@ namespace Ecommerce.Domain.Models
         public string? Ward { get; private set; }
         public string? Street { get; private set; }
 
-        private Address() { }
         public bool Equals(Address? other)
         {
             if(other == null)
@@ -25,7 +24,7 @@ namespace Ecommerce.Domain.Models
         }
         public static Address Create(string? district, string? city, string? province, string? street, string? ward)
         {
-            var address = new Address()
+            var address = new Address
             {
                 District = district,
                 City = city,
@@ -34,14 +33,6 @@ namespace Ecommerce.Domain.Models
                 Ward = ward
             };
             return address;
-        }
-        public void Update(string? district, string? city, string? province, string? street, string? ward)
-        {
-            if(district != null) District = district;
-            if(city != null) City = city;
-            if(province != null) Province = province;
-            if(street != null) Street = street;
-            if(ward != null) Ward = ward;
         }
     }
 }

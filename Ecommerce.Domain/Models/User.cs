@@ -10,18 +10,52 @@ namespace Ecommerce.Domain.Models
 {
     public class User
     {
-        public string Id { get; set; } = default!;
-        public bool EmailConfirmed { get; set; }
-        public string? UserName { get; set; }
-        public string? ImageUrl { get; set; }
-        public string? PhoneNumber { get; set; }
-        public string Email { get; set; } = default!;
-        public List<string?> Role { get; set; } = [];
-        public DateTime CreateAt { get; set; }
-        public Address? Address { get; set; }
-        public List<Wishlist?> Wishlist { get; set; } = [];
-        public Cart? Cart { get; set; }
-        public List<Order> Orders { get; set; } = [];
+        public string Id { get; private set; } = default!;
+        public bool EmailConfirmed { get; private set; }
+        public string? UserName { get; private set; }
+        public string? ImageUrl { get; private set; }
+        public string? PhoneNumber { get; private set; }
+        public string Email { get; private set; } = default!;
+        public bool IsActive { get; private set; }
+        public List<string?> Role { get; private set; } = [];
+        public DateTime CreateAt { get; private set; }
+        public Address? Address { get; private set; }
+        public Cart? Cart { get; private set; }
+        public IReadOnlyList<Order> Orders => _orders.AsReadOnly();
+        public IReadOnlyList<Wishlist> Wishlist => _wishlist.AsReadOnly();
 
+        private readonly List<Order> _orders = new List<Order>();
+        private readonly List<Wishlist> _wishlist = new List<Wishlist>();
+
+        public static User Create(string userName, string email, string phoneNumber)
+        {
+            if (string.IsNullOrWhiteSpace(userName)) throw new DomainException("Tên người dùng không được trống");
+            if (string.IsNullOrWhiteSpace(email)) throw new DomainException("Email người dùng không được trống");
+            if (string.IsNullOrWhiteSpace(phoneNumber)) throw new DomainException("Số điện thoại người dùng không được trống");
+
+            return new User
+            {
+                UserName = userName,
+                Email = email,
+                PhoneNumber = phoneNumber,
+                CreateAt = DateTime.Now,
+                Role = {"User"},
+                IsActive = true
+            };
+        }
+        public void UpdateAddress(Address address) {
+            if (address != null) Address = address;
+        }
+        public void UpdateAvatarUrl(string avatarUrl)
+        {
+            if (avatarUrl != null) ImageUrl = avatarUrl;
+        }
+        public void UpdatePhoneNumber(string phoneNumber)
+        {
+            if (phoneNumber != null) PhoneNumber = phoneNumber;
+        }
+        public void MarkAsEmailConfirmed() => EmailConfirmed = true;
+        public void DeactivateAccount() => IsActive = false;
+        public void ReactiveAccount() => IsActive = true;
     }
 }
