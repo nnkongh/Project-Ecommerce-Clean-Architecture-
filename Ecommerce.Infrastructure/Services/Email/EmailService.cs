@@ -22,7 +22,7 @@ namespace Ecommerce.Infrastructure.Services.Email
         { 
             _emailConfiguration = opt.Value ?? throw new InvalidOperationException("Emailconfig not load"); 
         }
-        public async Task SendEmail(Message msg)
+        public async Task SendEmailAsync(Message msg)
         {
             var mimeMessage = new MimeMessage();
             mimeMessage.From.Add(new MailboxAddress("",_emailConfiguration.FromAddress));

@@ -32,7 +32,7 @@ namespace Ecommerce.Infrastructure.Services
     public class AuthService : IAuthService
     {
         private readonly IIdentityUserProvider _userAuthenticationService;
-        private readonly IUserTokenService _userTokenService;
+        private readonly IUserAuthTokenService _userTokenService;
         private readonly IIdentityManagementUserProvider _userManagementService;
         private readonly IEmailService _emailService;
         private readonly IMapper _mapper;
@@ -40,7 +40,7 @@ namespace Ecommerce.Infrastructure.Services
         private readonly IEnumerable<IExternalLoginService> _externalAuthProvider;
 
         public AuthService(IIdentityUserProvider userAuthenticationService,
-            IUserTokenService userTokenService,
+            IUserAuthTokenService userTokenService,
             IEmailService emailService,
             IMapper mapper,
             IIdentityManagementUserProvider userManagementService,
@@ -69,16 +69,16 @@ namespace Ecommerce.Infrastructure.Services
                 }
                 // tạo token, param là 1 dictionary chứa token và email. callback sẽ chứa clientUrl và param. cuối cùng là message sẽ được gửi đến email của người dùng
                 var mapped = _mapper.Map<UserModel>(user);
-                var token = await _userTokenService.GeneratePasswordResetTokenAsync(user);
+                var token = await _userTokenService.GenerateTokenAsync(user.Id);
                 var encodedToken = WebUtility.UrlEncode(token);
-                var param = new Dictionary<string, string> { { "token", encodedToken }, { "email", forgotPasswordDto.Email } };
+                var param = new Dictionary<string, string> { { "token", encodedToken! }, { "email", forgotPasswordDto.Email } };
                 //var callback = QueryHelpers.AddQueryString(forgotPasswordDto.ClientUrl, param!);
 
                 var resetLink = $"{forgotPasswordDto.ClientUrl}/Auth/ResetPassword" + $"?email={user.Email}&token={encodedToken}";
 
                 var msgBody = $@"Xin chào {user.UserName} đây là link reset mật khẩu {resetLink}";
                 var msg = new Message([user.Email!], "Reset password", msgBody);
-                await _emailService.SendEmail(msg);
+                await _emailService.SendEmailAsync(msg);
                 return Result.Success();
 
             }
@@ -168,7 +168,7 @@ namespace Ecommerce.Infrastructure.Services
                     return Result.Failure(new Error("", "Email does not exist"));
                 }
                 //var decodedToken = WebUtility.UrlDecode(model.Token);
-                var result = await _userTokenService.ResetPasswordAsync(user, model.Token, model.NewPassword);
+                var result = await _userTokenService.ResetPasswordAsync(user.Id, model.Token, model.NewPassword);
                 if (result == false)
                 {
                     return Result.Failure(new Error("", "Token invalid"));

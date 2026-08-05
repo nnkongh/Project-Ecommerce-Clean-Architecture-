@@ -1,6 +1,6 @@
 ﻿using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
-using Ecommerce.Infrastructure.Interfaces;
+using Ecommerce.Application.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using System;
@@ -21,27 +21,26 @@ namespace Ecommerce.Infrastructure.Services
             _cloudinary = new Cloudinary(acc);
         }
 
-        public async Task<ImageUploadResult> AddPhotoAsync(IFormFile file)
+        public async Task<string> CreatePhotoAsync(byte[] fileBytes, string fileName)
         {
             var uploadResult = new ImageUploadResult();
-            if(file.Length > 0)
+            if(fileBytes.Length > 0)
             {
-                using var stream = file.OpenReadStream();
+                using var stream = new MemoryStream(fileBytes);
                 var uploadParams = new ImageUploadParams
                 {
-                    File = new FileDescription(file.FileName, stream),
+                    File = new FileDescription(fileName, stream),
                     Transformation = new Transformation().Height(500).Width(500).Crop("fill").Gravity("face")
                 };
                 uploadResult = await _cloudinary.UploadAsync(uploadParams);
             }
-            return uploadResult;
+            return uploadResult.SecureUrl.ToString();
         }
 
-        public async Task<DeletionResult> DeletePhotoAsync(string id)
+        public async Task DeletePhotoAsync(string avatarUrl)
         {
-            var deleteParams = new DeletionParams(id);
-            var result = await _cloudinary.DestroyAsync(deleteParams);
-            return result;
+            var deleteParams = new DeletionParams(avatarUrl);
+            await _cloudinary.DestroyAsync(deleteParams);
         }
     }
     public class CloudinarySettings
