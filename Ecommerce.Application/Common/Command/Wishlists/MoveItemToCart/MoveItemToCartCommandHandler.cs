@@ -5,11 +5,6 @@ using Ecommerce.Domain.Interfaces.UnitOfWork;
 using Ecommerce.Domain.Models;
 using Ecommerce.Domain.Shared;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Wishlists.MoveItemToCart
 {
@@ -34,17 +29,16 @@ namespace Ecommerce.Application.Common.Command.Wishlists.MoveItemToCart
         public async Task<Result<CartModel>> Handle(MoveItemToCartCommand request, CancellationToken cancellationToken)
         {
             var user = await _userRepo.GetByIdAsync(request.userId);
-            if (user == null) return Result.Failure<CartModel>(new Error("", "User not found"));
-
+            if (user == null) return Result.Failure<CartModel>(new Error("", "Người dùng không tồn tại"));
 
             var wishlist = await _wishlistRepo.GetWishlistWithItemByIdAsync(request.wishlistId);
-            if (wishlist == null) return Result.Failure<CartModel>(new Error("", "Wishlist not found"));
+            if (wishlist == null) return Result.Failure<CartModel>(new Error("", "Wishlist không tồn tại"));
 
             var product = await _productRepo.GetByIdAsync(request.request.ProductId);
-            if (product == null) return Result.Failure<CartModel>(new Error("", "Product not found"));
+            if (product == null) return Result.Failure<CartModel>(new Error("", "Sản phẩm không tồn tại"));
 
             var wishlistItem = wishlist.Items.FirstOrDefault(x => x.ProductId == request.request.ProductId);
-            if(wishlistItem == null) return Result.Failure<CartModel>(new Error("", "Product not found in wishlist"));
+            if (wishlistItem == null) return Result.Failure<CartModel>(new Error("", "Sản phẩm không tồn tại trong wishlist"));
 
             var cart = await _cartRepo.GetCartWithItemByUserIdAsync(request.userId);
             if (cart == null)
@@ -52,9 +46,8 @@ namespace Ecommerce.Application.Common.Command.Wishlists.MoveItemToCart
                 cart = Cart.CreateCart(request.userId);
                 await _cartRepo.AddAsync(cart);
             }
-            cart.AddItemFromWishlist(product.Id, wishlistItem.ProductName!, product.Price);
-            wishlist.RemoveItem(wishlistItem.Id);
-            await _wishlistRepo.Delete(wishlist);
+            cart.AddItem(product.Id, wishlistItem.ProductName!, 1, product.Price, product.ImageUrl);
+            wishlist.RemoveItem(request.request.ProductId);
             await _uow.SaveChangesAsync(cancellationToken);
             var mapped = _mapper.Map<CartModel>(cart);
             return Result.Success(mapped);
