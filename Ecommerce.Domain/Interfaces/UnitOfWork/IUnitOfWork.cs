@@ -13,5 +13,6 @@ namespace Ecommerce.Domain.Interfaces.UnitOfWork
         IProductRepository ProductRepository { get; }
         ICartRepository CartRepository { get; }
         IOrderRepository OrderRepository { get; }
+        IUserRepository UserRepository { get; }
     }
 }

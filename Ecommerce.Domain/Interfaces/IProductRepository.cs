@@ -11,5 +11,6 @@ namespace Ecommerce.Domain.Interfaces
 {
     public interface IProductRepository : IRepositoryBase<Product, int>
     {
+        Task<IReadOnlyList<Product>> GetProductsByIdsAsync(IEnumerable<int> ids);
     }
 }
