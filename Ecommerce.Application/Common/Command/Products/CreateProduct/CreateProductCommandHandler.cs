@@ -29,22 +29,26 @@ namespace Ecommerce.Application.Common.Command.Products.CreateProduct
 
         public async Task<Result<ProductModel>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(request.create.Name))
+            var productRequest = request.create;
+            if (string.IsNullOrWhiteSpace(productRequest.Name))
             {
                 return Result.Failure<ProductModel>(new Error("", "Tên sản phẩm không được để trống"));
             }
-            if (request.create.Price <= 0)
+            if (productRequest.Price <= 0)
             {
                 return Result.Failure<ProductModel>(new Error("", "Giá sản phẩm phải lớn hơn 0"));
             }
-
-            var existing = await _categoryRepo.GetByIdAsync(request.create.CategoryId);
+            if (productRequest.ImageUrl == null)
+            {
+                return Result.Failure<ProductModel>(new Error("", "Hình ảnh sản phẩm không được để trống"));
+            }
+            var existing = await _categoryRepo.GetByIdAsync(productRequest.CategoryId);
             if (existing == null)
             {
                 return Result.Failure<ProductModel>(new Error("", $"Danh mục không tồn tại"));
             }
-            var entity = _mapper.Map<Product>(request.create);
-            var item = await _productRepo.AddAsync(entity);
+            var product = Product.Create(productRequest.Name, productRequest.ImageUrl, productRequest.Price,productRequest.Stock, productRequest.CategoryId, productRequest.Description);
+            var item = await _productRepo.AddAsync(product); 
             var mapped = _mapper.Map<ProductModel>(item);
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success(mapped);
