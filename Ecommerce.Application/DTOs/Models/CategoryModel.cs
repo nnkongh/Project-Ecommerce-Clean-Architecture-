@@ -17,5 +17,6 @@ namespace Ecommerce.Application.DTOs.Models
 
         [JsonIgnore]
         public List<ProductModel>? Products { get; set; }
+        public int TotalProducts { get; set; }
     }
 }
