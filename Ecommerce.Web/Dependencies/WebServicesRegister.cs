@@ -1,4 +1,5 @@
 ﻿using CloudinaryDotNet;
+using Ecommerce.Application.Interfaces;
 using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Dependency_Injection;
@@ -83,7 +84,7 @@ namespace Ecommerce.Web.Dependencies
             services.AddTransient<AuthTokenHandler>();
 
             services.AddHttpClient("ApiClient", client =>
-            {
+            {   
                 client.BaseAddress = new Uri(config["ApiSettings:BaseUrl"]!);
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             })
@@ -96,6 +97,7 @@ namespace Ecommerce.Web.Dependencies
             services.AddScoped<ICategoryClient, CategoryClient>();
             services.AddScoped<ICommentClient, CommentClient>();
             services.AddScoped<IWishlistClient, WishlistClient>();
+            services.AddScoped<IAddressClient, AddressClient>();
             services.AddScoped<ICheckoutCartClient,CheckoutCartClient>();
 
             services.AddScoped<CartApiClient>();
