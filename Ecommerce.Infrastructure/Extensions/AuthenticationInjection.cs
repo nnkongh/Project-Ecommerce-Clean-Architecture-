@@ -45,7 +45,7 @@ namespace Ecommerce.Infrastructure.Dependency_Injection
         {
             services.AddScoped<IIdentityManagementUserProvider, UserManagementService>();
             services.AddScoped<IIdentityUserProvider, UserAuthenticationService>();
-            services.AddScoped<IUserTokenService, UserTokenService>();
+            services.AddScoped<IUserAuthTokenService, UserTokenService>();
             services.AddScoped<IIdentityRole, UserRoleService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<ITokenService, TokenService>();

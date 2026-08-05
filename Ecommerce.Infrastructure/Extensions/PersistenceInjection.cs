@@ -26,7 +26,7 @@ namespace Ecommerce.Infrastructure.Dependency_Injection
 
             var connectionString = config.GetConnectionString("DefaultConnection");
             services.AddDbContext<AppIdentityDbContext>(opt =>
-            {
+           {
                 opt.UseSqlServer(connectionString);
             });
 
@@ -48,6 +48,8 @@ namespace Ecommerce.Infrastructure.Dependency_Injection
             services.AddScoped<ICategoryRepository, CategoryRepository>();
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IWishlistRepository, WishlistRepository>();
+            services.AddScoped<IUserAddressRepository, UserAddressRepository>();
+            services.AddScoped<ICommentRepository, CommentRepository>();
             return services;
 
         }

@@ -1,4 +1,5 @@
-﻿using Ecommerce.Infrastructure.Interfaces.Authentication;
+﻿using Ecommerce.Application.Interfaces;
+using Ecommerce.Infrastructure.Interfaces.Authentication;
 using Ecommerce.Infrastructure.Services.Email;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
