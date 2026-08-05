@@ -22,7 +22,7 @@ namespace Ecommerce.Web.Services
         public Task AddToCartAsync(AddToCartRequest request) => GetCartStrategy.AddToCartAsync(request);
         public Task ClearCartAsync() => GetCartStrategy.ClearCartAsync();
         public Task<CartViewModel> GetCartAsync() => GetCartStrategy.GetCartAsync();
-        public Task RemoveFromCartAsync(int productId) => GetCartStrategy.RemoveFromCartAsync(productId);
+        public Task<bool> RemoveFromCartAsync(int productId) => GetCartStrategy.RemoveFromCartAsync(productId);
         public Task UpdateCartAsync(int productId, int quantity) => GetCartStrategy.UpdateCartAsync(productId, quantity);
     }
 }
