@@ -2,6 +2,7 @@
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.Product;
 using Ecommerce.Application.DTOs.ModelsRequest.Users;
+using Ecommerce.Domain.Shared;
 using Ecommerce.Web.ViewModels;
 using Ecommerce.Web.ViewModels.Profile;
 
@@ -30,8 +31,14 @@ namespace Ecommerce.Web.Mapping
             CreateMap<UpdateProfileRequest, ProfileModel>();
             CreateMap<AddressRequest, AddressModel>();
 
+            CreateMap<UserAddressModel, UserAddressModel>();
+            CreateMap<WishlistModel, WishlistViewModel>();
+            CreateMap<ItemWishlistModel, ItemWishlistViewModel>();
 
+            CreateMap<CommentModel, CommentViewModel>();
 
+            CreateMap<PagedResult<ProductModel>, PagedResult<ProductViewModel>>();
+            CreateMap<PagedResult<CategoryModel>, PagedResult<CategoryViewModel>>();
         }
     }
 }
