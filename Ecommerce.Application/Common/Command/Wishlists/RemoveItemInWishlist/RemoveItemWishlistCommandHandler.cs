@@ -1,26 +1,16 @@
-﻿using Ecommerce.Application.DTOs;
-using Ecommerce.Domain.Interfaces;
+﻿using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Interfaces.UnitOfWork;
-using Ecommerce.Domain.Models;
 using Ecommerce.Domain.Shared;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Wishlists.RemoveItemInWishlist
 {
     public sealed class RemoveItemWishlistCommandHandler : IRequestHandler<RemoveItemWishlistCommand, Result>
     {
-        private readonly IUserRepository _userRepo;
         private readonly IWishlistRepository _wishlistRepo;
         private readonly IUnitOfWork _uow;
-        public RemoveItemWishlistCommandHandler(IUserRepository userRepo, IWishlistRepository wishlistRepo, IUnitOfWork uow)
+        public RemoveItemWishlistCommandHandler(IWishlistRepository wishlistRepo, IUnitOfWork uow)
         {
-            _userRepo = userRepo;
             _wishlistRepo = wishlistRepo;
             _uow = uow;
         }
@@ -30,7 +20,12 @@ namespace Ecommerce.Application.Common.Command.Wishlists.RemoveItemInWishlist
             var wishlist = await _wishlistRepo.GetWishlistWithItemByIdAsync(request.wishlistId);
             if (wishlist == null)
             {
-                return Result.Failure(new Error("", "wishlist is empty"));
+                return Result.Failure(new Error("", "Wishlist không tồn tại"));
+            }
+            var item = wishlist.Items.FirstOrDefault(x => x.ProductId == request.productId);
+            if (item == null)
+            {
+                return Result.Failure(new Error("", "Sản phẩm không tồn tại trong wishlist"));
             }
             wishlist.RemoveItem(request.productId);
             await _uow.SaveChangesAsync(cancellationToken);
