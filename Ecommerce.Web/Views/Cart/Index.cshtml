@@ -78,10 +78,10 @@
                                                 <strong class="text-primary">@item.TotalPrice.ToString("N0") đ</strong>
                                             </td>
                                             <td class="text-center">
-                                                <form method="post" asp-controller="Cart" asp-action="RemoveFromCart" asp-route-productId="@item.ProductId" class="d-inline">
-                                                    <button type="submit"
-                                                            class="btn btn-danger btn-sm"
-                                                            onclick="return confirm('Bạn có chắc muốn xóa sản phẩm này?')">
+                                                <form method="post" asp-controller="Cart" asp-action="RemoveFromCart" asp-route-productId="@item.ProductId" class="d-inline delete-form">
+                                                    <button type="button"
+                                                            class="btn btn-danger btn-sm btn-delete"
+                                                            data-product-name="@item.ProductName">
                                                         <i class="fas fa-trash-alt"></i>
                                                     </button>
                                                 </form>
@@ -129,15 +129,53 @@
     }
 </div>
 
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content" style="border-radius: 16px;">
+            <div class="modal-body text-center py-4">
+                <div class="mb-3">
+                    <div style="width: 64px; height: 64px; background: #fef2f2; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-trash-alt" style="font-size: 1.5rem; color: #dc2626;"></i>
+                    </div>
+                </div>
+                <h5 class="mb-1">Xác nhận xóa</h5>
+                <p class="text-muted mb-0">Bạn có chắc muốn xóa</p>
+                <strong id="deleteProductName" class="d-block mb-1"></strong>
+                <p class="text-muted">khỏi giỏ hàng?</p>
+                <div class="d-flex gap-2 justify-content-center mt-3">
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal" style="border-radius: 10px;">Hủy</button>
+                    <button type="button" class="btn btn-danger px-4" id="confirmDeleteBtn" style="border-radius: 10px;">
+                        <i class="fas fa-trash-alt me-1"></i>Xóa
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
-        // Optional: Add animation when removing items
-        document.querySelectorAll('form[asp-action="RemoveFromCart"]').forEach(form => {
-            form.addEventListener('submit', function(e) {
-                const row = this.closest('tr');
-                row.style.transition = 'opacity 0.3s';
-                row.style.opacity = '0.5';
+        let activeDeleteForm = null;
+
+        document.querySelectorAll('.btn-delete').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                activeDeleteForm = this.closest('.delete-form');
+                document.getElementById('deleteProductName').textContent = this.dataset.productName;
+                var modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+                modal.show();
             });
+        });
+
+        document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
+            if (activeDeleteForm) {
+                const row = activeDeleteForm.closest('tr');
+                if (row) {
+                    row.style.transition = 'opacity 0.3s';
+                    row.style.opacity = '0.5';
+                }
+                activeDeleteForm.submit();
+            }
         });
     </script>
 }

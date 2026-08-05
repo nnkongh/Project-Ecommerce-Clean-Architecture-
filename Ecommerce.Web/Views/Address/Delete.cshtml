@@ -1,0 +1,41 @@
+@using Ecommerce.Web.Models
+@model UserAddressViewModel
+@{
+    ViewData["Title"] = "Xóa địa chỉ";
+}
+
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa địa chỉ</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">Bạn có chắc chắn muốn xóa địa chỉ này?</p>
+                    <div class="bg-light p-3 rounded mb-3">
+                        <p class="mb-1"><strong>Đường:</strong> @Model.Street</p>
+                        <p class="mb-1"><strong>Phường/Xã:</strong> @Model.Ward</p>
+                        <p class="mb-1"><strong>Quận/Huyện:</strong> @Model.District</p>
+                        <p class="mb-1"><strong>Thành phố:</strong> @Model.City</p>
+                        <p class="mb-1"><strong>Tỉnh:</strong> @Model.Province</p>
+                        @if (Model.IsDefault)
+                        {
+                            <span class="badge bg-dark">Mặc định</span>
+                        }
+                    </div>
+                    <form asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post">
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash me-1"></i>Xóa
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Quay lại
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

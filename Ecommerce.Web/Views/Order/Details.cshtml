@@ -1,0 +1,131 @@
+@using Ecommerce.Domain.Enum
+@model OrderViewModel
+@{
+    ViewData["Title"] = $"Chi tiết đơn hàng #{Model.Id}";
+}
+
+<div class="container my-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Order" asp-action="Index">Đơn hàng</a></li>
+            <li class="breadcrumb-item active">Chi tiết đơn hàng #@Model.Id</li>
+        </ol>
+    </nav>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h4 class="mb-0"><i class="fas fa-receipt me-2"></i>Đơn hàng #@Model.Id</h4>
+            @switch (Model.OrderStatus)
+            {
+                case OrderStatus.Pending:
+                    <span class="badge bg-warning text-dark fs-6 px-3 py-2">
+                        <i class="fas fa-clock me-1"></i>Chờ xử lý
+                    </span>
+                    break;
+                case OrderStatus.Processing:
+                    <span class="badge bg-info fs-6 px-3 py-2">
+                        <i class="fas fa-spinner me-1"></i>Đang xử lý
+                    </span>
+                    break;
+                case OrderStatus.Finished:
+                    <span class="badge bg-success fs-6 px-3 py-2">
+                        <i class="fas fa-check-circle me-1"></i>Hoàn thành
+                    </span>
+                    break;
+            }
+        </div>
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5 class="text-primary mb-3"><i class="fas fa-user me-2"></i>Thông tin khách hàng</h5>
+                    <table class="table table-borderless">
+                        <tr>
+                            <td class="fw-bold" style="width: 120px;">Tên:</td>
+                            <td>@Model.CustomerName</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">Email:</td>
+                            <td>@Model.Email</td>
+                        </tr>
+                        <tr>
+                            <td class="fw-bold">SĐT:</td>
+                            <td>@Model.PhoneNumber</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="text-primary mb-3"><i class="fas fa-map-marker-alt me-2"></i>Địa chỉ giao hàng</h5>
+                    @if (Model.Address != null)
+                    {
+                        <p class="mb-1">@Model.Address.Street</p>
+                        <p class="mb-1">@Model.Address.Ward, @Model.Address.District</p>
+                        <p>@Model.Address.City</p>
+                    }
+                </div>
+            </div>
+
+            <hr />
+
+            <h5 class="text-primary mb-3"><i class="fas fa-shopping-bag me-2"></i>Sản phẩm đã đặt</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 100px">Hình ảnh</th>
+                            <th>Sản phẩm</th>
+                            <th class="text-center" style="width: 120px">Đơn giá</th>
+                            <th class="text-center" style="width: 80px">SL</th>
+                            <th class="text-end" style="width: 130px">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Items)
+                        {
+                            <tr>
+                                <td class="text-center">
+                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                    {
+                                        <img src="@item.ImageUrl" alt="@item.ProductName"
+                                             style="width: 80px; height: 80px; object-fit: cover;"
+                                             class="img-thumbnail" />
+                                    }
+                                    else
+                                    {
+                                        <div class="bg-light d-flex align-items-center justify-content-center"
+                                             style="width: 80px; height: 80px;">
+                                            <i class="fas fa-image fa-2x text-muted"></i>
+                                        </div>
+                                    }
+                                </td>
+                                <td class="align-middle fw-bold">@item.ProductName</td>
+                                <td class="text-center align-middle">@item.Price.ToString("N0") đ</td>
+                                <td class="text-center align-middle">
+                                    <span class="badge bg-primary fs-6">@item.Quantity</span>
+                                </td>
+                                <td class="text-end align-middle">
+                                    <strong class="text-danger">@((item.Price * item.Quantity).ToString("N0")) đ</strong>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <td colspan="4" class="text-end">
+                                <strong class="fs-5">Tổng cộng:</strong>
+                            </td>
+                            <td class="text-end">
+                                <strong class="text-danger fs-5">@Model.TotalAmount.ToString("N0") đ</strong>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="mt-4">
+                <a asp-controller="Order" asp-action="Index" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left me-1"></i>Quay lại danh sách
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,88 @@
+@using Ecommerce.Web.Models
+@model IReadOnlyList<UserAddressViewModel>
+@{
+    ViewData["Title"] = "Địa chỉ của tôi";
+}
+
+<div class="container py-4">
+    <h2 class="mb-4">
+        <i class="fas fa-map-marker-alt me-2"></i>Địa chỉ của tôi
+    </h2>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <p class="text-muted mb-0">Quản lý thông tin địa chỉ giao hàng</p>
+        <a asp-action="Create" class="btn btn-dark">
+            <i class="fas fa-plus me-1"></i>Thêm địa chỉ mới
+        </a>
+    </div>
+
+    @if (Model == null || Model.Count == 0)
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-map-marked-alt fa-4x text-muted mb-3"></i>
+            <h5 class="text-muted">Bạn chưa có địa chỉ nào</h5>
+            <a asp-action="Create" class="btn btn-primary mt-3">
+                <i class="fas fa-plus me-1"></i>Thêm địa chỉ mới
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-3">
+            @foreach (var addr in Model)
+            {
+                <div class="col-md-6">
+                    <div class="card shadow-sm @(addr.IsDefault ? "border border-dark" : "")">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <h6 class="card-title mb-1">
+                                        <i class="fas fa-home me-1"></i>@addr.Street
+                                        @if (addr.IsDefault)
+                                        {
+                                            <span class="badge bg-dark ms-2">Mặc định</span>
+                                        }
+                                    </h6>
+                                    <p class="card-text text-muted small mb-1">
+                                        @addr.Street, @addr.Ward, @addr.District, @addr.Province, @addr.City
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="d-flex gap-2 mt-2 pt-2 border-top">
+                                @if (!addr.IsDefault)
+                                {
+                                    <form asp-action="SetDefault" asp-route-id="@addr.Id" method="post">
+                                        <button type="submit" class="btn btn-outline-dark btn-sm">
+                                            <i class="fas fa-check-circle me-1"></i>Đặt làm mặc định
+                                        </button>
+                                    </form>
+                                }
+                                <a asp-action="Edit" asp-route-id="@addr.Id" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-edit me-1"></i>Sửa
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@addr.Id" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-trash me-1"></i>Xóa
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

@@ -1,18 +1,84 @@
-﻿@using Ecommerce.Web.ViewModels
-@model IReadOnlyList<ProductViewModel>
+﻿@using Ecommerce.Domain.Shared
+@using Ecommerce.Web.ViewModels
+@model PagedResult<ProductViewModel>
+
+@{
+    ViewData["Title"] = "Sản phẩm";
+    var sortBy = Context.Request.Query["sortBy"];
+    var minPrice = Context.Request.Query["minPrice"];
+    var maxPrice = Context.Request.Query["maxPrice"];
+
+    int totalPages = Model.TotalPages;
+    int currentPage = Model.PageIndex;
+    string queryString(Dictionary<string, string?> overrides)
+    {
+        var q = new Dictionary<string, string?>
+        {
+            ["sortBy"] = sortBy,
+            ["minPrice"] = minPrice,
+            ["maxPrice"] = maxPrice,
+            ["searchTerm"] = Context.Request.Query["searchTerm"]
+        };
+        foreach (var kv in overrides)
+            q[kv.Key] = kv.Value;
+        var parts = q.Where(kv => !string.IsNullOrEmpty(kv.Value))
+                     .Select(kv => $"{kv.Key}={Uri.EscapeDataString(kv.Value!)}");
+        return string.Join("&", parts);
+    }
+}
 
 <div class="container my-5">
-
+    <!-- Filter & Sort Bar -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Sắp xếp</label>
+                    <select name="sortBy" class="form-select form-select-sm" onchange="this.form.submit()">
+                        <option value="">Mặc định</option>
+                        <option value="price_asc" selected="@(sortBy == "price_asc")">Giá: Thấp đến Cao</option>
+                        <option value="price_desc" selected="@(sortBy == "price_desc")">Giá: Cao đến Thấp</option>
+                        <option value="name_asc" selected="@(sortBy == "name_asc")">Tên: A-Z</option>
+                        <option value="name_desc" selected="@(sortBy == "name_desc")">Tên: Z-A</option>
+                        <option value="newest" selected="@(sortBy == "newest")">Mới nhất</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold">Giá từ</label>
+                    <input type="number" name="minPrice" class="form-control form-control-sm" value="@minPrice" placeholder="0" min="0" />
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label small fw-bold">Đến</label>
+                    <input type="number" name="maxPrice" class="form-control form-control-sm" value="@maxPrice" placeholder="999999" min="0" />
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label small fw-bold">Tìm kiếm</label>
+                    <input type="text" name="searchTerm" class="form-control form-control-sm" value="@Context.Request.Query["searchTerm"]" placeholder="Tên sản phẩm..." />
+                </div>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm w-100">
+                        <i class="fas fa-filter me-1"></i>Lọc
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-outline-secondary btn-sm w-100">
+                        <i class="fas fa-undo me-1"></i>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <div class="card shadow-sm">
-        <div class="card-header bg-white">
-        </div>
-
         <div class="card-body">
-            @if (Model != null && Model.Any())
+            @if (Model != null && Model.Items.Any())
             {
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text-muted small">
+                        @Model.TotalItems sản phẩm
+                        (trang @currentPage / @totalPages)
+                    </span>
+                </div>
                 <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-                    @foreach (var product in Model)
+                    @foreach (var product in Model.Items)
                     {
                         <div class="col">
                             <div class="card h-100 product-card">
@@ -23,7 +89,7 @@
                                         <img src="@product.ImageUrl"
                                              class="card-img-top"
                                              alt="@product.Name"
-                                             style="height: 200px; object-fit: cover;">
+                                             style="height: 200px; object-fit: cover;" />
                                     }
                                     else
                                     {
@@ -40,35 +106,117 @@
                                         </h6>
                                         @if (product.Price > 0)
                                         {
-                                            <p class="card-text text-danger fw-bold fs-5 mb-0">
+                                            <p class="card-text text-danger fw-bold fs-5 mb-1">
                                                 @product.Price.ToString("N0") đ
                                             </p>
                                         }
                                         else
                                         {
-                                            <p class="card-text text-muted mb-0">Liên hệ</p>
+                                            <p class="card-text text-muted mb-1">Liên hệ</p>
                                         }
+                                        <div>
+                                            @if (product.Stock > 10)
+                                            {
+                                                <span class="badge bg-success">Còn hàng</span>
+                                            }
+                                            else if (product.Stock > 0)
+                                            {
+                                                <span class="badge bg-warning text-dark">Sắp hết (@product.Stock)</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">Hết hàng</span>
+                                            }
+                                        </div>
                                     </div>
                                 </a>
                                 <div class="card-footer bg-transparent border-0 pt-0">
-                                    <form asp-controller="Cart" asp-action="AddToCart" method="post">
-                                        <input type="hidden" name="Id" value="@product.Id" />
-                                        <input type="hidden" name="quantity" value="1" />
-                                        <button type="submit" class="btn btn-outline-dark btn-sm w-100">
-                                            <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
+                                    @if (product.Stock > 0)
+                                    {
+                                        <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                                            <input type="hidden" name="Id" value="@product.Id" />
+                                            <input type="hidden" name="quantity" value="1" />
+                                            <button type="submit" class="btn btn-outline-dark btn-sm w-100">
+                                                <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
+                                            </button>
+                                        </form>
+                                    }
+                                    else
+                                    {
+                                        <button class="btn btn-secondary btn-sm w-100" disabled>
+                                            <i class="fas fa-times me-2"></i>Hết hàng
                                         </button>
-                                    </form>
+                                    }
                                 </div>
                             </div>
                         </div>
                     }
                 </div>
+
+                <!-- Pagination -->
+                @if (totalPages > 1)
+                {
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center mb-0">
+                            <li class="page-item @(currentPage <= 1 ? "disabled" : "")">
+                                <a class="page-link" href="?page=@(currentPage - 1)&@queryString(new Dictionary<string, string?>())">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+
+                            @{
+                                int startPage = Math.Max(1, currentPage - 2);
+                                int endPage = Math.Min(totalPages, startPage + 4);
+                                if (endPage - startPage < 4)
+                                    startPage = Math.Max(1, endPage - 4);
+                            }
+
+                            @if (startPage > 1)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=1&@queryString(new Dictionary<string, string?>())">1</a>
+                                </li>
+                                @if (startPage > 2)
+                                {
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                }
+                            }
+
+                            @for (int i = startPage; i <= endPage; i++)
+                            {
+                                <li class="page-item @(i == currentPage ? "active" : "")">
+                                    <a class="page-link" href="?page=@i&@queryString(new Dictionary<string, string?>())">@i</a>
+                                </li>
+                            }
+
+                            @if (endPage < totalPages)
+                            {
+                                @if (endPage < totalPages - 1)
+                                {
+                                    <li class="page-item disabled"><span class="page-link">...</span></li>
+                                }
+                                <li class="page-item">
+                                    <a class="page-link" href="?page=@totalPages&@queryString(new Dictionary<string, string?>())">@totalPages</a>
+                                </li>
+                            }
+
+                            <li class="page-item @(currentPage >= totalPages ? "disabled" : "")">
+                                <a class="page-link" href="?page=@(currentPage + 1)&@queryString(new Dictionary<string, string?>())">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
             }
             else
             {
                 <div class="text-center py-5">
                     <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
-                    <p class="text-muted mb-0">Chưa có sản phẩm nào</p>
+                    <p class="text-muted mb-0">Không tìm thấy sản phẩm phù hợp</p>
+                    <a href="@Url.Action("Index")" class="btn btn-primary mt-3">
+                        <i class="fas fa-undo me-1"></i>Xem tất cả
+                    </a>
                 </div>
             }
         </div>

@@ -1,11 +1,12 @@
 ﻿@using Ecommerce.Application.DTOs.Models
+@using Ecommerce.Domain.Shared
 @model IReadOnlyList<CategoryViewModel>
 
 @{
     ViewData["Title"] = "Danh mục con";
     var parentId = ViewBag.ParentCategoryId as int?;
     var selectedCategoryId = ViewBag.SelectedCategoryId as int?;
-    var displayProducts = ViewBag.DisplayProducts as List<ProductViewModel> ?? new List<ProductViewModel>();
+    var categoryPaged = ViewBag.CategoryPagedResult as PagedResult<CategoryViewModel>;
     var selectedCategory = Model?.FirstOrDefault(c => c.Id == selectedCategoryId);
 }
 
@@ -60,22 +61,31 @@
                         </div>
                     }
                 </div>
-            </div>
-        </div>
-    }
 
-    <!-- Filter Info -->
-    @if (selectedCategoryId.HasValue && selectedCategory != null)
-    {
-        <div class="alert alert-info d-flex justify-content-between align-items-center">
-            <span>
-                <i class="fas fa-filter me-2"></i>
-                Đang lọc: <strong>@selectedCategory.Name</strong>
-            </span>
-            <a href="@Url.Action("ChildCategories", "Category", new { id = parentId })"
-               class="btn btn-sm btn-outline-secondary">
-                <i class="fas fa-times me-1"></i>Xóa bộ lọc
-            </a>
+                @if (categoryPaged != null && categoryPaged.TotalPages > 1)
+                {
+                    <nav class="mt-4">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item @(categoryPaged.PageIndex <= 1 ? "disabled" : "")">
+                                <a class="page-link" href="@Url.Action("ChildCategories", new { id = parentId, page = categoryPaged.PageIndex - 1, pageSize = categoryPaged.PageSize })">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                            @for (var i = 1; i <= categoryPaged.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == categoryPaged.PageIndex ? "active" : "")">
+                                    <a class="page-link" href="@Url.Action("ChildCategories", new { id = parentId, page = i, pageSize = categoryPaged.PageSize })">@i</a>
+                                </li>
+                            }
+                            <li class="page-item @(categoryPaged.PageIndex >= categoryPaged.TotalPages ? "disabled" : "")">
+                                <a class="page-link" href="@Url.Action("ChildCategories", new { id = parentId, page = categoryPaged.PageIndex + 1, pageSize = categoryPaged.PageSize })">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                }
+            </div>
         </div>
     }
 
@@ -94,71 +104,85 @@
                         <span>Tất cả sản phẩm</span>
                     }
                 </h5>
-                <span class="badge bg-primary">@displayProducts.Count sản phẩm</span>
+                <span class="badge bg-primary">@((categoryPaged?.TotalItems ?? 0).ToString()) sản phẩm</span>
             </div>
         </div>
 
         <div class="card-body">
-            @if (displayProducts != null && displayProducts.Any())
+            @if (Model != null && Model.Any())
             {
-                <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-                    @foreach (var product in displayProducts)
-                    {
-                        <div class="col">
-                            <div class="card h-100 product-card">
-                                <a href="@Url.Action("Detail", "Product", new { id = product.Id })"
-                                   class="text-decoration-none">
-                                    @if (!string.IsNullOrEmpty(product.ImageUrl))
-                                    {
-                                        <img src="@product.ImageUrl"
-                                             class="card-img-top"
-                                             alt="@product.Name"
-                                             style="height: 200px; object-fit: cover;">
-                                    }
-                                    else
-                                    {
-                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
-                                             style="height: 200px;">
-                                            <i class="fas fa-image fa-3x text-muted"></i>
-                                        </div>
-                                    }
-
-                                    <div class="card-body">
-                                        <h6 class="card-title text-dark mb-2"
-                                            style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                            @product.Name
-                                        </h6>
-                                        @if (product.Price > 0)
+                var allProducts = Model.SelectMany(c => c.Products ?? new List<ProductViewModel>()).ToList();
+                if (allProducts.Any())
+                {
+                    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+                        @foreach (var product in allProducts)
+                        {
+                            <div class="col">
+                                <div class="card h-100 product-card">
+                                    <a href="@Url.Action("Detail", "Product", new { id = product.Id })"
+                                       class="text-decoration-none">
+                                        @if (!string.IsNullOrEmpty(product.ImageUrl))
                                         {
-                                            <p class="card-text text-danger fw-bold fs-5 mb-0">
-                                                @product.Price.ToString("N0") đ
-                                            </p>
+                                            <img src="@product.ImageUrl"
+                                                 class="card-img-top"
+                                                 alt="@product.Name"
+                                                 style="height: 200px; object-fit: cover;">
                                         }
                                         else
                                         {
-                                            <p class="card-text text-muted mb-0">Liên hệ</p>
+                                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
+                                                 style="height: 200px;">
+                                                <i class="fas fa-image fa-3x text-muted"></i>
+                                            </div>
                                         }
+
+                                        <div class="card-body">
+                                            <h6 class="card-title text-dark mb-2"
+                                                style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                                @product.Name
+                                            </h6>
+                                            @if (product.Price > 0)
+                                            {
+                                                <p class="card-text text-danger fw-bold fs-5 mb-0">
+                                                    @product.Price.ToString("N0") đ
+                                                </p>
+                                            }
+                                            else
+                                            {
+                                                <p class="card-text text-muted mb-0">Liên hệ</p>
+                                            }
+                                        </div>
+                                    </a>
+                                    <div class="card-footer bg-transparent border-0 pt-0">
+                                        <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                                            <input type="hidden" name="Id" value="@product.Id" />
+                                            <input type="hidden" name="quantity" value="1" />
+                                            <button type="submit" class="btn btn-outline-primary btn-sm w-100">
+                                                <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
+                                            </button>
+                                        </form>
                                     </div>
-                                </a>
-                                <div class="card-footer bg-transparent border-0 pt-0">
-                                    <form asp-controller="Cart" asp-action="AddToCart" method="post">
-                                        <input type="hidden" name="Id" value="@product.Id" />
-                                        <input type="hidden" name="quantity" value="1" />
-                                        <button type="submit" class="btn btn-outline-primary btn-sm w-100">
-                                            <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
-                                        </button>
-                                    </form>
                                 </div>
                             </div>
-                        </div>
-                    }
-                </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-5">
+                        <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+                        <p class="text-muted">Chưa có sản phẩm nào trong danh mục này</p>
+                        <a href="@Url.Action("Index", "Category")" class="btn btn-primary mt-2">
+                            Xem danh mục khác
+                        </a>
+                    </div>
+                }
             }
             else
             {
                 <div class="text-center py-5">
                     <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
-                    <p class="text-muted">Chưa có sản phẩm nào trong danh mục này</p>
+                    <p class="text-muted">Chưa có danh mục nào</p>
                     <a href="@Url.Action("Index", "Category")" class="btn btn-primary mt-2">
                         Xem danh mục khác
                     </a>

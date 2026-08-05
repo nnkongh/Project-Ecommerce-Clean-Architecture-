@@ -74,6 +74,11 @@
                                         </a>
                                     </li>
                                     <li>
+                                        <a class="dropdown-item" asp-controller="Address" asp-action="Index">
+                                            <i class="fas fa-map-marker-alt me-2"></i>Địa chỉ
+                                        </a>
+                                    </li>
+                                    <li>
                                         <a class="dropdown-item" asp-controller="Wishlist" asp-action="Index">
                                             <i class="fas fa-heart me-2"></i>Yêu thích
                                         </a>
@@ -118,27 +123,45 @@
         @RenderBody()
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-black text-white mt-auto py-3">
-        <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-4 text-center text-md-start mb-2 mb-md-0">
-                    <span class="fw-bold"><i class="fas fa-store me-1"></i>Ecommerce</span>
-                </div>
-                <div class="col-md-4 text-center mb-2 mb-md-0">
-                    <small class="text-muted">
-                        <a href="#" class="text-muted text-decoration-none me-3">Về chúng tôi</a>
-                        <a href="#" class="text-muted text-decoration-none me-3">Chính sách</a>
-                        <a href="#" class="text-muted text-decoration-none">Hỗ trợ</a>
-                    </small>
-                </div>
-                <div class="col-md-4 text-center text-md-end">
-                    <small class="text-muted">© 2026 Simple Ecommerce</small>
+    @{
+        var hideFooter = ViewData["HideFooter"] as bool? ?? false;
+    }
+
+    @if (!hideFooter)
+    {
+        <!-- Footer -->
+        <footer class="bg-black text-white mt-auto py-3">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-4 text-center text-md-start mb-2 mb-md-0">
+                        <span class="fw-bold"><i class="fas fa-store me-1"></i>Ecommerce</span>
+                    </div>
+                    <div class="col-md-4 text-center mb-2 mb-md-0">
+                        <small class="text-muted">
+                            <a href="#" class="text-muted text-decoration-none me-3">Về chúng tôi</a>
+                            <a href="#" class="text-muted text-decoration-none me-3">Chính sách</a>
+                            <a href="#" class="text-muted text-decoration-none">Hỗ trợ</a>
+                        </small>
+                    </div>
+                    <div class="col-md-4 text-center text-md-end">
+                        <small class="text-muted">© 2026 Simple Ecommerce</small>
+                    </div>
                 </div>
             </div>
-        </div>
-    </footer>
+        </footer>
+    }
 
+    <partial name="_Toast" />
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.toast').forEach(function (el) {
+                var delay = el.getAttribute('data-bs-delay') || 3000;
+                var toast = new bootstrap.Toast(el, { delay: parseInt(delay) });
+                toast.show();
+            });
+        });
+    </script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

@@ -1,0 +1,50 @@
+@{
+    var successMsg = TempData["Success"] as string ?? TempData["SuccessMessage"] as string;
+    var errorMsg = TempData["Error"] as string;
+    var failedMsg = TempData["Failed"] as string;
+}
+
+@if (!string.IsNullOrEmpty(successMsg))
+{
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100">
+        <div class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-2">
+                    <i class="fas fa-check-circle"></i>
+                    <span>@successMsg</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(errorMsg))
+{
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100">
+        <div class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-2">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <span>@errorMsg</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(failedMsg))
+{
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1100">
+        <div class="toast align-items-center text-bg-warning border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="5000">
+            <div class="d-flex">
+                <div class="toast-body d-flex align-items-center gap-2">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <span>@failedMsg</span>
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+            </div>
+        </div>
+    </div>
+}

@@ -1,5 +1,8 @@
-﻿@{
+﻿@using Ecommerce.Web.ViewModels
+@{
     ViewData["Title"] = "Trang chủ";
+    var categories = ViewBag.Categories as List<CategoryViewModel> ?? new();
+    var latestProducts = ViewBag.LatestProducts as List<ProductViewModel> ?? new();
 }
 
 <!-- Hero Section -->
@@ -14,10 +17,10 @@
                     Nền tảng mua sắm trực tuyến đơn giản và tiện lợi
                 </p>
                 <div class="d-flex gap-3 justify-content-center">
-                    <a href="@Url.Action("Index", "Category")" class="btn btn-outline-light btn-dark">
+                    <a href="@Url.Action("Index", "Category")" class="btn btn-outline-light btn-lg">
                         <i class="fas fa-th-large me-2"></i>Xem danh mục
                     </a>
-                    <a href="@Url.Action("Index", "Product")" class="btn btn-outline-light btn-dark">
+                    <a href="@Url.Action("Index", "Product")" class="btn btn-outline-light btn-lg">
                         <i class="fas fa-shopping-bag me-2"></i>Sản phẩm
                     </a>
                 </div>
@@ -25,6 +28,82 @@
         </div>
     </div>
 </div>
+
+<!-- Danh mục nổi bật -->
+@if (categories.Any())
+{
+    <div class="container my-5">
+        <h3 class="mb-4 text-center">
+            <i class="fas fa-th-large me-2 text-primary"></i>Danh mục sản phẩm
+        </h3>
+        <div class="row g-3 justify-content-center">
+            @foreach (var cat in categories.Take(6))
+            {
+                <div class="col-md-4 col-lg-2">
+                    <a href="@Url.Action("ChildCategories", "Category", new { id = cat.Id })"
+                       class="text-decoration-none">
+                        <div class="card text-center border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <i class="fas fa-folder-open fa-3x text-primary mb-3"></i>
+                                <h6 class="card-title text-dark">@cat.Name</h6>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<!-- Sản phẩm mới nhất -->
+@if (latestProducts.Any())
+{
+    <div class="container my-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3>
+                <i class="fas fa-clock me-2 text-success"></i>Sản phẩm mới nhất
+            </h3>
+            <a href="@Url.Action("Index", "Product")" class="btn btn-outline-primary btn-sm">
+                Xem tất cả <i class="fas fa-arrow-right ms-1"></i>
+            </a>
+        </div>
+        <div class="row row-cols-2 row-cols-md-4 g-3">
+            @foreach (var product in latestProducts)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm product-card">
+                        <a href="@Url.Action("Detail", "Product", new { id = product.Id })" class="text-decoration-none">
+                            @if (!string.IsNullOrEmpty(product.ImageUrl))
+                            {
+                                <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name"
+                                     style="height: 180px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                </div>
+                            }
+                            <div class="card-body">
+                                <h6 class="card-title text-dark text-truncate">@product.Name</h6>
+                                <p class="card-text text-danger fw-bold mb-0">@product.Price.ToString("N0") đ</p>
+                            </div>
+                        </a>
+                        <div class="card-footer bg-transparent border-0 pt-0">
+                            <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                                <input type="hidden" name="Id" value="@product.Id" />
+                                <input type="hidden" name="quantity" value="1" />
+                                <button type="submit" class="btn btn-outline-dark btn-sm w-100">
+                                    <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
 
 <!-- Features -->
 <div class="container my-5">

@@ -124,12 +124,12 @@
                                 </form>
 
                                 <div class="d-flex gap-2">
-                                    <button class="btn btn-outline-danger">
-                                        <i class="fas fa-heart me-2"></i>Yêu thích
-                                    </button>
-                                    <button class="btn btn-outline-secondary">
-                                        <i class="fas fa-share-alt me-2"></i>Chia sẻ
-                                    </button>
+                                    <form asp-controller="Wishlist" asp-action="AddToWishlist" method="post">
+                                        <input type="hidden" name="productId" value="@Model.Id" />
+                                        <button type="submit" class="btn btn-outline-danger">
+                                            <i class="fas fa-heart me-2"></i>Yêu thích
+                                        </button>
+                                    </form>
                                 </div>
                             }
                             else
@@ -169,6 +169,161 @@
         </div>
     </div>
 </div>
+
+<div class="row mt-4">
+    <div class="col-lg-10 mx-auto">
+        <div class="card shadow-sm">
+            <div class="card-header bg-white d-flex align-items-center gap-2 py-3">
+                <i class="fas fa-comments text-primary"></i>
+                <h5 class="mb-0">Bình luận</h5>
+                <span class="badge bg-primary rounded-pill ms-auto" id="commentCount">0</span>
+            </div>
+            <div class="card-body">
+                <div id="comments-list">
+                    <div class="text-center py-5 text-muted" id="loadingComments">
+                        <div class="spinner-border spinner-border-sm mb-2" role="status"></div>
+                        <p class="mb-0 small">Đang tải bình luận...</p>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <form id="commentForm">
+                    <input type="hidden" id="productId" value="@Model.Id" />
+                    <div class="d-flex gap-3">
+                        <div class="flex-shrink-0">
+                            <div class="comment-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="mb-2">
+                                <textarea id="commentContent" class="form-control" rows="2" placeholder="Chia sẻ suy nghĩ của bạn về sản phẩm này..."></textarea>
+                            </div>
+                            <div class="d-flex justify-content-end">
+                                <button type="submit" class="btn btn-primary btn-sm" id="submitComment">
+                                    <i class="fas fa-paper-plane me-1"></i>Gửi bình luận
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            loadComments();
+
+            $('#commentForm').submit(function (e) {
+                e.preventDefault();
+                var content = $('#commentContent').val().trim();
+                if (!content) return;
+
+                $('#submitComment').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Đang gửi...');
+
+                $.ajax({
+                    url: '/comments/create',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ productId: @Model.Id, content: content }),
+                    success: function (response) {
+                        if (response.isSuccess) {
+                            $('#commentContent').val('');
+                            loadComments();
+                        } else {
+                            alert(response.error?.message || 'Không thể thêm bình luận');
+                        }
+                    },
+                    error: function () {
+                        alert('Có lỗi xảy ra khi gửi bình luận');
+                    },
+                    complete: function () {
+                        $('#submitComment').prop('disabled', false).html('<i class="fas fa-paper-plane me-1"></i>Gửi bình luận');
+                    }
+                });
+            });
+        });
+
+        function loadComments() {
+            $.get('/comments/product/' + @Model.Id, function (response) {
+                if (response.isSuccess && response.value) {
+                    var html = '';
+                    var count = response.value.length;
+                    $('#commentCount').text(count);
+
+                    if (count === 0) {
+                        html = '<div class="text-center py-5 text-muted">' +
+                            '    <i class="far fa-comment-dots fa-3x mb-3 d-block"></i>' +
+                            '    <p class="mb-0">Chưa có bình luận nào. Hãy là người đầu tiên!</p>' +
+                            '</div>';
+                    } else {
+                        $.each(response.value, function (i, comment) {
+                            var initials = (comment.userName || '?').charAt(0).toUpperCase();
+                            var date = new Date(comment.createdAt);
+                            var dateStr = date.toLocaleDateString('vi-VN', { year: 'numeric', month: 'short', day: 'numeric' });
+                            var timeStr = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+
+                            var avatarHtml = comment.avatarUrl
+                                ? '<img src="' + comment.avatarUrl + '" alt="' + escapeHtml(comment.userName || '') + '" class="comment-avatar-img" onerror="this.style.display=\'none\'">'
+                                : '<div class="comment-avatar">' + initials + '</div>';
+
+                            html += '<div class="comment-item d-flex gap-3">' +
+                                '    <div class="flex-shrink-0">' +
+                                        avatarHtml +
+                                '    </div>' +
+                                '    <div class="flex-grow-1">' +
+                                '        <div class="d-flex align-items-center gap-2 mb-1">' +
+                                '            <strong class="comment-author">' + (comment.userName || 'Người dùng') + '</strong>' +
+                                '            <span class="text-muted small">' + dateStr + ' lúc ' + timeStr + '</span>' +
+                                '            <button class="btn btn-sm btn-link text-danger p-0 ms-auto delete-comment" data-id="' + comment.id + '" title="Xóa bình luận">' +
+                                '                <i class="fas fa-trash-alt"></i>' +
+                                '            </button>' +
+                                '        </div>' +
+                                '        <p class="comment-content mb-3">' + escapeHtml(comment.content) + '</p>' +
+                                '    </div>' +
+                                '</div>';
+
+                            if (i < count - 1) {
+                                html += '<hr class="comment-divider">';
+                            }
+                        });
+                    }
+                    $('#comments-list').html(html);
+                }
+            });
+        }
+
+        function escapeHtml(text) {
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(text));
+            return div.innerHTML;
+        }
+
+        $(document).on('click', '.delete-comment', function () {
+            var id = $(this).data('id');
+            if (!confirm('Xóa bình luận này?')) return;
+
+            $.ajax({
+                url: '/comments/' + id,
+                type: 'DELETE',
+                success: function (response) {
+                    if (response.isSuccess) {
+                        loadComments();
+                    } else {
+                        alert(response.error?.message || 'Không thể xóa bình luận');
+                    }
+                },
+                error: function () {
+                    alert('Có lỗi xảy ra khi xóa bình luận');
+                }
+            });
+        });
+    </script>
+}
 
 <!-- Modal xác nhận xóa -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
