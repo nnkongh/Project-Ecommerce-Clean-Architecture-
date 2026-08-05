@@ -30,12 +30,14 @@ namespace Ecommerce.Application.Common.Command.Carts.DeleteCart
             {
                 return Result.Failure(new Error("CartNotFound", "The specified cart does not exist."));
             }
-            foreach(var item in cart.Items)
+            var productIds = cart.Items.Select(i => i.ProductId).ToList();
+            var products = await _productRepo.GetProductsByIdsAsync(productIds);
+            var productMap = products.ToDictionary(p => p.Id);
+            foreach (var item in cart.Items)
             {
-                var product = await _productRepo.GetByIdAsync(item.ProductId);
-                if (product != null)
+                if(productMap.TryGetValue(item.ProductId, out var product))
                 {
-                    product.Stock += item.Quantity;
+                    product.AdjustStock(item.Quantity);
                 }
             }
             await _cartRepository.Delete(cart);

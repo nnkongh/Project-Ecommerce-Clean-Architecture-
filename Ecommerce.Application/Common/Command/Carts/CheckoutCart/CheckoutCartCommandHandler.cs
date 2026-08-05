@@ -19,57 +19,52 @@ namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
 {
     public sealed class CheckoutCartCommandHandler : IRequestHandler<CheckoutCartCommand, Result<OrderModel>>
     {
-        private readonly ICartRepository _cartRepo;
+        private readonly ICartRepository _cartRepository;
         private readonly IUserRepository _userRepository;
+        private readonly IOrderRepository _orderRepository;
         private readonly IProductRepository _productRepository;
         private readonly IUnitOfWork _uow;
-        private readonly IMediator _mediator;
         private readonly IMapper _mapper;
 
-        public CheckoutCartCommandHandler(ICartRepository cartRepo, IMapper mapper, IMediator mediator, IUserRepository userRepository, IProductRepository productRepository, IUnitOfWork uow)
+        public CheckoutCartCommandHandler(ICartRepository cartRepository, IMapper mapper, IUserRepository userRepository, IProductRepository productRepository, IUnitOfWork uow, IOrderRepository orderRepository)
         {
-            _cartRepo = cartRepo;
+            _cartRepository = cartRepository;
             _mapper = mapper;
-            _mediator = mediator;
             _userRepository = userRepository;
             _productRepository = productRepository;
             _uow = uow;
+            _orderRepository = orderRepository;
         }
 
         public async Task<Result<OrderModel>> Handle(CheckoutCartCommand request, CancellationToken cancellationToken)
         {
-            //Kiểm tra thông tin cơ bản của người dùng
             var userResult = await ValidatingUserInformation(request.userId);
             if (!userResult.IsSuccess)
                 return Result.Failure<OrderModel>(userResult.Error);
 
-            //Kiểm tra thông tin về số lượng sản phẩm của cart và tồn kho
             var cartResult = await ValidateCartItemAndStockProduct(userResult.Value.Id);
             if (!cartResult.IsSuccess)
                 return Result.Failure<OrderModel>(cartResult.Error);
 
-            var cartDto = _mapper.Map<CartModel>(cartResult.Value);
-            var userDto = _mapper.Map<UserModel>(userResult.Value);
-
-            var orderRequest = new CreateOrderRequest
+            var u = userResult.Value;
+            var order = Order.CreateOrder(u.Id, u.UserName!, u.PhoneNumber, u.Email, u.Address!);
+            foreach (var item in cartResult.Value.Items)
             {
-                User = userDto,
-                Cart = cartDto,
-            };
-
-            var result = await _mediator.Send(new CreateOrderByCartCommand(orderRequest), cancellationToken);
-
-            if (!result.IsSuccess)
-            {
-                return Result.Failure<OrderModel>(new Error("ORDER_CREATE_FAILED", "Không thể tạo đơn hàng"));
+                order.AddItem(item.ImageUrl!, item.ProductName, item.ProductId, item.UnitPrice, item.Quantity);
+                var product = await _productRepository.GetByIdAsync(item.ProductId);
+                if (product != null)
+                    product.AdjustStock(-item.Quantity);
             }
 
+            var mapped = _mapper.Map<OrderModel>(order);
+
             cartResult.Value.Clear();
-            await _cartRepo.Delete(cartResult.Value);
+            await _orderRepository.AddAsync(order);
+            await _cartRepository.Delete(cartResult.Value);
             await _uow.SaveChangesAsync(cancellationToken);
-            return Result.Success(result.Value);
+            return Result.Success(mapped);
         }
-        private async Task<Result<User>> ValidatingUserInformation(string id)
+        private async Task<Result<User>> ValidatingUserInformation(string id)   
         {
             var user = await _userRepository.GetByIdAsync(id);
             if (user == null)
@@ -94,7 +89,7 @@ namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
 
         private async Task<Result<Cart>> ValidateCartItemAndStockProduct(string userId)
         {
-            var cart = await _cartRepo.GetCartWithItemByUserIdAsync(userId);
+            var cart = await _cartRepository.GetCartWithItemByUserIdAsync(userId);
             if (cart == null)
                 return Result.Failure<Cart>(new Error("CART_NOT_FOUND", "Cart không tồn tại"));
 

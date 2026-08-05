@@ -48,8 +48,18 @@ namespace Ecommerce.Application.Common.Command.Carts.UpdateCart
             {
                 return Result.Failure<CartModel>(new Error("", "Cart not found"));
             }
-            cart.ReduceItemQuantity(request.productId, request.quantity);
-            product.Stock += request.quantity;
+
+            var item = cart.GetItem(request.productId);
+            if (item == null)
+            {
+                return Result.Failure<CartModel>(new Error("", "Item not found in cart"));
+            }
+
+            var delta = request.quantity - item.Quantity;
+
+            cart.UpdateQuantity(request.productId, request.quantity);
+            product.AdjustStock(-delta);
+            
             await _uow.SaveChangesAsync(cancellationToken);
             var mapped = _mapper.Map<CartModel>(cart);
             return Result.Success(mapped);

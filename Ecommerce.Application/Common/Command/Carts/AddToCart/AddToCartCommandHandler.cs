@@ -51,8 +51,8 @@ namespace Ecommerce.Application.Common.Command.Carts.AddToCart
                 cart = Cart.CreateCart(handler.userId);
                 await _cartRepo.AddAsync(cart);
             }
-
-            cart.AddItem(handler.request.Id, handler.request.quantity, product.ImageUrl, product.Price, product.Name);
+            
+            cart.AddItem(handler.request.Id, product.Name, handler.request.quantity, product.Price, product.ImageUrl);
             await _uow.SaveChangesAsync(cancellationToken);
 
             var mapped = _mapper.Map<CartModel>(cart);
