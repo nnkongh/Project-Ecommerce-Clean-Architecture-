@@ -31,7 +31,6 @@ namespace Ecommerce.Infrastructure.Services.Authentication
     {
         private readonly IConfiguration _config;
         private readonly IIdentityUserProvider _userAuthenticationService;
-        private readonly IIdentityManagementUserProvider _userManagermentService;
         private readonly IIdentityRole _userRoleService;
         private readonly UserManager<AppUser> _userManager;
         private readonly SymmetricSecurityKey _key;
@@ -39,15 +38,13 @@ namespace Ecommerce.Infrastructure.Services.Authentication
         private readonly ILogger<TokenService> _logger;
         public TokenService(IIdentityUserProvider userAuthenticationService,
             IConfiguration config,
-            IIdentityManagementUserProvider userManagermentService,
             IIdentityRole userRoleService,
-            IUserTokenService userTokenService,
+            IUserAuthTokenService userTokenService,
             IMapper mapper,
             IUserRepository userRepository,
             ILogger<TokenService> logger,
             UserManager<AppUser> userManager)
         {
-            _userManagermentService = userManagermentService;
             _userRoleService = userRoleService;
             _key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]!));
             _config = config;
