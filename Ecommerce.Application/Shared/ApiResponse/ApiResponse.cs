@@ -10,7 +10,7 @@ namespace Ecommerce.Web.ViewModels.ApiResponse
         public Error Error { get; set; }
 
         public ApiResponse() { }
-        public static ApiResponse<T> Success(T data, string? message = null)
+        public static ApiResponse<T> Success(T? data, string? message = null)
         {
             return new ApiResponse<T>
             {
