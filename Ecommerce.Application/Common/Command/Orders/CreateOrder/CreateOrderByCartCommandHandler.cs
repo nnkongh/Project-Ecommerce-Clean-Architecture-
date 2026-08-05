@@ -29,20 +29,18 @@ namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
 
         public async Task<Result<OrderModel>> Handle(CreateOrderByCartCommand request, CancellationToken cancellationToken)
         {
+            var address = Ecommerce.Domain.Models.Address.Create(request.order.User!.Address!.District!,
+                                              request.order.User!.Address.City!,
+                                              request.order.User!.Address.Province,
+                                              request.order.User!.Address.Street!,
+                                              request.order.User!.Address.Ward!);
 
-            var order = Order.CreateOrder(request.order.User!.Id,
-                                          request.order.User!.UserName,
-                                          request.order.User!.PhoneNumber!,
-                                          request.order.User!.Email!,
-                                          request.order.User!.Address!.City!,
-                                          request.order.User!.Address.Ward!,
-                                          request.order.User!.Address.Street!,
-                                          request.order.User!.Address.District!,
-                                          request.order.User!.Address.Province);
+            var user = request.order.User;
+            var order = Order.CreateOrder(user.Id, user.UserName, user.PhoneNumber, user.Email, address);
 
             foreach(var item in request.order.Cart.Items)
             {
-                order.AddItem(item.ProductId, item.Quantity, item.ImageUrl, item.UnitPrice, item.ProductName!);
+                order.AddItem(item.ImageUrl, item.ProductName!, item.ProductId, item.UnitPrice, item.Quantity);
             }
             await _orderRepo.AddAsync(order);
             await _uow.SaveChangesAsync(cancellationToken);
