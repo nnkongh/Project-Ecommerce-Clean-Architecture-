@@ -1,6 +1,7 @@
 ﻿using Ecommerce.Application.Interfaces;
 using Ecommerce.Application.Services;
 using Ecommerce.Infrastructure.Dependency_Injection;
+using Ecommerce.Infrastructure.Services;
 using Ecommerce.WebApi.Services;
 
 namespace Ecommerce.WebApi.Dependencies
@@ -14,18 +15,19 @@ namespace Ecommerce.WebApi.Dependencies
             services.AddHostedService<CartBackgroundService>();
             return services;
         }
-
         public static IServiceCollection AddWebApiServices(this IServiceCollection services, IConfiguration configuration)
         {
-
             services.AddIdentityCore();
-
             services.AddIdentityService();
-
             services.AddJwtAuthentication(configuration);
-
             services.AddAdapterServices();
-
+            services.AddPhotoService(configuration);
+            return services;
+        }
+        public static IServiceCollection AddPhotoService(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddScoped<IPhotoService, PhotoService>();
+            services.Configure<CloudinarySettings>(configuration.GetSection("Cloudinary"));
             return services;
         }
     }
