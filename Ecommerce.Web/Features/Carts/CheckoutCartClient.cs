@@ -3,7 +3,6 @@ using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Web.Interface;
 using Ecommerce.Web.ViewModels;
 using Ecommerce.Web.ViewModels.ApiResponse;
-using System.Data.SqlTypes;
 
 namespace Ecommerce.Web.Features.Carts
 {
@@ -23,19 +22,20 @@ namespace Ecommerce.Web.Features.Carts
             try
             {
                 var response = await _httpClient.PostAsync("carts/checkout", null);
+                var result = await response.Content.ReadFromJsonAsync<ApiResponse<OrderModel>>();
 
-                if (!response.IsSuccessStatusCode)
+                if (result == null || !result.IsSuccess)
                 {
-                    return ApiResponse<OrderViewModel>.Fail("Failed to checkout cart.");
+                    return ApiResponse<OrderViewModel>.Fail(result?.Error?.Message ?? "Thanh toán thất bại");
                 }
 
-                return ApiResponse<OrderViewModel>.Success(null);
+                var mapped = _mapper.Map<OrderViewModel>(result.Value);
+                return ApiResponse<OrderViewModel>.Success(mapped);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return ApiResponse<OrderViewModel>.Fail($"Failed do: {ex}");
+                return ApiResponse<OrderViewModel>.Fail($"Lỗi: {ex.Message}");
             }
-           
         }
     }
 }

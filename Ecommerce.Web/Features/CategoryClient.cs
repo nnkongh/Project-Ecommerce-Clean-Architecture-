@@ -83,6 +83,38 @@ namespace Ecommerce.Web.Services
 
         }
 
+        public async Task<ApiResponse<PagedResult<CategoryViewModel>>> GetRootCategoriesPagedAsync(int page, int pageSize)
+        {
+            var response = await _httpClient.GetAsync($"categories/root/paged?page={page}&pageSize={pageSize}");
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResult<CategoryModel>>>();
+
+            if (result == null || !result.IsSuccess)
+            {
+                return ApiResponse<PagedResult<CategoryViewModel>>.Fail(result?.Error?.Message ?? "Không thể lấy danh mục");
+            }
+
+            var mapped = _mapper.Map<PagedResult<CategoryViewModel>>(result.Value);
+
+            return ApiResponse<PagedResult<CategoryViewModel>>.Success(mapped);
+        }
+
+        public async Task<ApiResponse<PagedResult<CategoryViewModel>>> GetChildCategoriesPagedAsync(int parentId, int page, int pageSize)
+        {
+            var response = await _httpClient.GetAsync($"categories/{parentId}/children/paged?page={page}&pageSize={pageSize}");
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResult<CategoryModel>>>();
+
+            if (result == null || !result.IsSuccess)
+            {
+                return ApiResponse<PagedResult<CategoryViewModel>>.Fail(result?.Error?.Message ?? "Không thể lấy danh mục con");
+            }
+
+            var mapped = _mapper.Map<PagedResult<CategoryViewModel>>(result.Value);
+
+            return ApiResponse<PagedResult<CategoryViewModel>>.Success(mapped);
+        }
+
         public async Task<ApiResponse<CategoryViewModel>> GetCategoryByIdAsync(int? id)
         {
             var response = await _httpClient.GetAsync($"categories/{id}");

@@ -59,7 +59,7 @@ namespace Ecommerce.Web.Features.Carts
                 {
                     ProductId = product.Id,
                     Quantity = 1,
-                    Name = productDb.Value.Name!,
+                    ProductName = productDb.Value.Name!,
                     TotalPrice = productDb.Value.Price,
                     ImageUrl = productDb.Value.ImageUrl!
                 });
