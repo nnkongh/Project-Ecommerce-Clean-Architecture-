@@ -1,4 +1,5 @@
-﻿using Ecommerce.Web.ViewModels;
+﻿using Ecommerce.Domain.Shared;
+using Ecommerce.Web.ViewModels;
 using Ecommerce.Web.ViewModels.ApiResponse;
 
 namespace Ecommerce.Web.Interface
@@ -13,7 +14,18 @@ namespace Ecommerce.Web.Interface
         Task<ApiResponse<IReadOnlyList<ProductViewModel>>> GetAllProductsByCategoryAsync(int categoryId);
         Task<ApiResponse<IReadOnlyList<ProductViewModel>>> GetAllProductsByNameAsync(string name);
         Task<ApiResponse<IReadOnlyList<ProductViewModel>>> GetAllProductsAsync();
+        Task<PagedResult<ProductViewModel>> GetAllProductsByPaginationAsync(int page, int pageSize, string? sortBy = null,
+            decimal? minPrice = null,
+            decimal? maxPrice = null,
+            int? categoryId = null,
+            string? searchTerm = null);
 
+        Task<ApiResponse<IReadOnlyList<ProductViewModel>>> GetFilteredProductsAsync(
+            string? sortBy = null,
+            decimal? minPrice = null,
+            decimal? maxPrice = null,
+            int? categoryId = null,
+            string? searchTerm = null);
 
     }
 }
