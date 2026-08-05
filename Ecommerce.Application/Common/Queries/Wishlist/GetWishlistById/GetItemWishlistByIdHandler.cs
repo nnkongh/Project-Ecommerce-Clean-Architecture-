@@ -3,11 +3,6 @@ using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Shared;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Wishlist.GetWishlistById
 {
@@ -26,15 +21,10 @@ namespace Ecommerce.Application.Common.Queries.Wishlist.GetWishlistById
             var wishlist = await _wishlistRepo.GetWishlistWithItemByIdAsync(request.wishlistId);
             if(wishlist == null)
             {
-                return Result.Failure<WishlistModel>(new Error("", "Wishlist not found"));
-            }
-            if(wishlist.Items.Count == 0 || wishlist.Items == null)
-            {
-                return Result.Failure<WishlistModel>(new Error("","Wishlist is empty"));
+                return Result.Failure<WishlistModel>(new Error("", "Wishlist không tồn tại"));
             }
             var mapped = _mapper.Map<WishlistModel>(wishlist);
             return Result.Success(mapped);
-
         }
     }
 }
