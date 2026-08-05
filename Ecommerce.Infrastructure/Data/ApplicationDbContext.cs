@@ -19,6 +19,8 @@ namespace Ecommerce.Infrastructure.Data
         public DbSet<Comment> Comments { get; set; } = null!;
         public DbSet<Wishlist> Wishlist { get; set; } = null!;
         public DbSet<User> User { get; set; } = null!;
+        public DbSet<Category> Categories { get; set; } = null!;
+        public DbSet<UserAddress> UserAddresses { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -60,6 +62,17 @@ namespace Ecommerce.Infrastructure.Data
                     a.Property(p => p.City).IsRequired();
                 });
 
+            modelBuilder.Entity<UserAddress>()
+                .HasKey(x => x.Id);
+            modelBuilder.Entity<UserAddress>()
+                .Property(x => x.Street).IsRequired();
+            modelBuilder.Entity<UserAddress>()
+                .Property(x => x.Ward).IsRequired();
+            modelBuilder.Entity<UserAddress>()
+                .Property(x => x.District).IsRequired();
+            modelBuilder.Entity<UserAddress>()
+                .Property(x => x.City).IsRequired();
+
             modelBuilder.Entity<Wishlist>()
                 .HasMany(x => x.Items)
                 .WithOne(x => x.WishList)
@@ -76,6 +89,22 @@ namespace Ecommerce.Infrastructure.Data
                 .WithMany(c => c.Children)
                 .HasForeignKey(c => c.ParentId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.Product)
+                .WithMany(c => c.Comments)
+                .HasForeignKey(c => c.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Comment>()
+                .HasOne(c => c.User)
+                .WithMany()
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Comment>()
+                .HasIndex(c => c.UserId);
         }
     }
 }
+,
