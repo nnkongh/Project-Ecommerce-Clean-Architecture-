@@ -11,6 +11,7 @@ using Ecommerce.Infrastructure.Identity;
 using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -29,33 +30,30 @@ namespace Ecommerce.WebApi.Controllers
         {
             var command = new LoginCommand(login);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(new ApiResponse<TokenModel> { Value = result.Value, IsSuccess = true}) 
-                                    : BadRequest(new ApiResponse<TokenModel> { IsSuccess = false, Error = result.Error});
+            return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterModel register)
         {
             var command = new RegisterCommand(register);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(new ApiResponse<UserModel> { Value = result.Value, IsSuccess = true}) 
-                                    : BadRequest(new ApiResponse<TokenModel> { IsSuccess = false, Error = result.Error });
+            return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
         }
-     
+        [Authorize]
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordModel forgotPasswordDto)
         {
             var command = new ForgotPasswordCommand(forgotPasswordDto);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(new ApiResponse<UserModel> { IsSuccess = true }) 
-                                    : BadRequest(new ApiResponse<TokenModel> { IsSuccess = false, Error = result.Error });
+            return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
         }
+        [Authorize]
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordModel resetPasswordDto)
         {
             var command = new ResetPasswordCommand(resetPasswordDto);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(new ApiResponse<UserModel> { IsSuccess = true }) 
-                                    : BadRequest(new ApiResponse<TokenModel> { IsSuccess = false, Error = result.Error });
+            return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
         }
     }
 }

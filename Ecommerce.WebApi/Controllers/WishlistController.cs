@@ -5,7 +5,6 @@ using Ecommerce.Application.Common.Queries.Wishlist.GetWishlistById;
 using Ecommerce.Application.Common.Queries.Wishlist.GetWishlistsByUserId;
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.Wishlist;
-using Ecommerce.Domain.Models;
 using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
@@ -22,38 +21,44 @@ namespace Ecommerce.WebApi.Controllers
         public WishlistController(ISender sender) : base(sender)
         {
         }
+
         [HttpPost]
         public async Task<IActionResult> AddItemToWishlist(AddToWishlistRequest request)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if(userId == null)
+            if (userId == null)
             {
                 return Unauthorized();
             }
-            var command = new AddToWishListCommand(request,userId);
+            var command = new AddToWishListCommand(request, userId);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(new ApiResponse<WishlistModel> { IsSuccess = true, Value = result.Value })
-                                      : BadRequest(new ApiResponse<WishlistModel> { IsSuccess = false, Error = result.Error });
+            return result.IsSuccess
+                ? Ok(new ApiResponse<WishlistModel> { IsSuccess = true, Value = result.Value })
+                : BadRequest(new ApiResponse<WishlistModel> { IsSuccess = false, Error = result.Error });
         }
+
         [HttpDelete("{productId}")]
-        public async Task<IActionResult> DeleteItemInWishlist(int productId,[FromQuery] int wishlistId)
+        public async Task<IActionResult> DeleteItemInWishlist(int productId, [FromQuery] int wishlistId)
         {
             var command = new RemoveItemWishlistCommand(productId, wishlistId);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(new ApiResponse<WishlistModel> { IsSuccess = true })
-                                     : BadRequest(new ApiResponse<WishlistModel> { IsSuccess = false, Error = result.Error });
+            return result.IsSuccess
+                ? Ok(new ApiResponse<WishlistModel> { IsSuccess = true })
+                : BadRequest(new ApiResponse<WishlistModel> { IsSuccess = false, Error = result.Error });
         }
+
         [HttpGet("{wishlistId}")]
         public async Task<IActionResult> GetWishlistById(int wishlistId)
         {
-
             var query = new GetItemWishlistByIdQuery(wishlistId);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(new ApiResponse<WishlistModel> { IsSuccess = true, Value = result.Value })
-                                       : BadRequest(new ApiResponse<WishlistModel> { IsSuccess = false, Error = result.Error });
+            return result.IsSuccess
+                ? Ok(new ApiResponse<WishlistModel> { IsSuccess = true, Value = result.Value })
+                : BadRequest(new ApiResponse<WishlistModel> { IsSuccess = false, Error = result.Error });
         }
-        [HttpGet]
-        public async Task<IActionResult> GetWishlistsByUserId()
+
+        [HttpGet("my")]
+        public async Task<IActionResult> GetMyWishlist()
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
@@ -62,21 +67,9 @@ namespace Ecommerce.WebApi.Controllers
             }
             var query = new GetWishlistsByUserIdQuery(userId);
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<WishlistModel>> { IsSuccess = true, Value = result.Value })
-                                      : BadRequest(new ApiResponse<WishlistModel> { IsSuccess = false, Error = result.Error });
-        }
-        [HttpPost("{wishlistId}")]
-        public async Task<IActionResult> MoveItemToCart(int wishlistId, [FromBody]MovetoCartRequest request)
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
-            {
-                return Unauthorized();
-            }
-            var command = new MoveItemToCartCommand(userId, wishlistId, request);
-            var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(new ApiResponse<CartModel> { IsSuccess = true, Value = result.Value })
-                                      : BadRequest(new ApiResponse<CartModel> { IsSuccess = false, Error = result.Error });
+            var wishlists = result.Value;
+            var wishlist = wishlists != null && wishlists.Count > 0 ? wishlists[0] : null;
+            return Ok(new ApiResponse<WishlistModel?> { IsSuccess = true, Value = wishlist });
         }
     }
 }

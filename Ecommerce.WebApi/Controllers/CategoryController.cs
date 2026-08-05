@@ -4,13 +4,18 @@ using Ecommerce.Application.Common.Command.Categories.UpdateCategory;
 using Ecommerce.Application.Common.Queries.Category.GetAllCategories;
 using Ecommerce.Application.Common.Queries.Category.GetByIdCategory;
 using Ecommerce.Application.Common.Queries.Category.GetCategoryById;
+using Ecommerce.Application.Common.Queries.Category.GetChildCategoriesPaged;
+using Ecommerce.Application.Common.Queries.Category.GetDetailCategory;
+using Ecommerce.Application.Common.Queries.Category.GetRootCategoriesPaged;
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.Category;
+using Ecommerce.Domain.Shared;
 using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Ecommerce.WebApi.Controllers
 {
@@ -40,7 +45,7 @@ namespace Ecommerce.WebApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateCategory(int id, UpdateCategoryRequest model)
         {
-            var command = new UpdateCategoryCommand(id,model);
+            var command = new UpdateCategoryCommand(id, model);
             var result = await Sender.Send(command);
             return result.IsSuccess ? Ok(new ApiResponse<CategoryModel> { IsSuccess = true, Value = result.Value })
                                     : BadRequest(new ApiResponse<CategoryModel> { IsSuccess = false, Error = result.Error });
@@ -51,7 +56,7 @@ namespace Ecommerce.WebApi.Controllers
         {
             var query = new GetRootCategoriesQuery();
             var result = await Sender.Send(query);
-            return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<CategoryModel>> { IsSuccess = true, Value = result.Value})
+            return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<CategoryModel>> { IsSuccess = true, Value = result.Value })
                                     : BadRequest(new ApiResponse<IReadOnlyList<CategoryModel>> { IsSuccess = false, Error = result.Error });
         }
         [HttpGet("{id}/children")]
@@ -73,6 +78,28 @@ namespace Ecommerce.WebApi.Controllers
                                     : BadRequest(new ApiResponse<IReadOnlyList<CategoryModel>> { IsSuccess = false, Error = result.Error });
 
         }
+        [HttpGet("root/paged")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetRootCategoriesPaged([FromQuery] int page = 1, [FromQuery] int pageSize = 12)
+        {
+            var query = new GetRootCategoriesPagedQuery(page, pageSize);
+            var result = await Sender.Send(query);
+            return result.IsSuccess
+                ? Ok(new ApiResponse<PagedResult<CategoryModel>> { IsSuccess = true, Value = result.Value })
+                : BadRequest(new ApiResponse<PagedResult<CategoryModel>> { IsSuccess = false, Error = result.Error });
+        }
+
+        [HttpGet("{parentId}/children/paged")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetChildCategoriesPaged(int parentId, [FromQuery] int page = 1, [FromQuery] int pageSize = 12)
+        {
+            var query = new GetChildCategoriesPagedQuery(parentId, page, pageSize);
+            var result = await Sender.Send(query);
+            return result.IsSuccess
+                ? Ok(new ApiResponse<PagedResult<CategoryModel>> { IsSuccess = true, Value = result.Value })
+                : BadRequest(new ApiResponse<PagedResult<CategoryModel>> { IsSuccess = false, Error = result.Error });
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCategoryById(int id)
         {
@@ -80,6 +107,19 @@ namespace Ecommerce.WebApi.Controllers
             var result = await Sender.Send(query);
             return result.IsSuccess ? Ok(new ApiResponse<CategoryModel> { IsSuccess = true, Value = result.Value })
                                     : BadRequest(new ApiResponse<CategoryModel> { IsSuccess = false, Error = result.Error });
+        }
+        [HttpGet("{parentCategoryId}/details")]
+        public async Task<IActionResult> GetCategoryDetail(int parentCategoryId, [FromQuery] int? selectedCategoryId)
+        {
+            var query = new GetCategoryDetailQuery
+            {
+                ParentCategoryId = parentCategoryId,
+                SelectedCategoryId = selectedCategoryId
+            };
+            var result = await Sender.Send(query);
+            return result.IsSuccess
+                ? Ok(new ApiResponse<PagedResult<CategoryDetailModel>> { IsSuccess = true, Value = result.Value })
+                : BadRequest(new ApiResponse<PagedResult<CategoryDetailModel>> { IsSuccess = false, Error = result.Error });
         }
     }
 }

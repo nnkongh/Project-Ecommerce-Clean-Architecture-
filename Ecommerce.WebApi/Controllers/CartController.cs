@@ -51,8 +51,8 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(new ApiResponse<CartModel> { Value = result.Value, IsSuccess = true}) 
                                     : BadRequest(new ApiResponse<CartModel> {IsSuccess = false, Error = result.Error});
         }
-        [HttpDelete]
-        public async Task<IActionResult> DeleteItemInCart([FromRoute]int productId)
+        [HttpDelete("{productId}")]
+        public async Task<IActionResult> DeleteItemInCart(int productId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if(userId == null)
