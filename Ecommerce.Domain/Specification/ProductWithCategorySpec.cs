@@ -28,7 +28,11 @@ namespace Ecommerce.Domain.Specification
             AddOrderBy(p => p.Name);
             AddIncludes(p => p.Category);
         }
-
+        public ProductWithCategorySpec(List<int> categoryId)
+            : base(p => categoryId.Contains(p.CategoryId))
+        {
+            AddIncludes(p => p.Category);
+        }
     }
 
 }
