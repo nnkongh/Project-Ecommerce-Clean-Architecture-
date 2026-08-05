@@ -10,7 +10,7 @@ namespace Ecommerce.Application.DTOs.ModelsRequest.Order
 {
     public class CreateOrderRequest
     {
-        public CartModel Cart { get; set; } 
-        public UserModel User { get; set; }
+        public CartModel Cart { get; set; } = default!;
+        public UserModel User { get; set; } = default!;
     }
 }
