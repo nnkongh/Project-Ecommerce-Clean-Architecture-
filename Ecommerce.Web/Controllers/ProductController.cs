@@ -1,4 +1,5 @@
 ﻿using CloudinaryDotNet.Actions;
+using Ecommerce.Application.Interfaces;
 using Ecommerce.Domain.Models;
 using Ecommerce.Domain.Shared;
 using Ecommerce.Infrastructure.Interfaces;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Web.Controllers
 {
+    
     public class ProductController : Controller
     {
         private readonly ICategoryClient _categoryClient;
@@ -25,10 +27,17 @@ namespace Ecommerce.Web.Controllers
         }
 
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 12, string? sortBy = null,
+            decimal? minPrice = null,
+            decimal? maxPrice = null,
+            int? categoryId = null,
+            string? searchTerm = null)
         {
-            var product = await _productClient.GetAllProductsAsync();
-            return View(product.Value);
+            if (page < 1) page = 1;
+            if (pageSize < 1) pageSize = 12;
+
+            var result = await _productClient.GetAllProductsByPaginationAsync(page, pageSize, sortBy, minPrice, maxPrice, categoryId, searchTerm);
+            return View(result);
         }
 
         [HttpGet]
@@ -42,13 +51,14 @@ namespace Ecommerce.Web.Controllers
         private async Task LoadCategories(ProductViewModel model)
         {
             var categories = await _categoryClient.GetRootCategoriesAsync();
-
-            model.ParentCategories = categories.Value.Select(c => new SelectListItem
+            if (categories.Value != null)
             {
-                Value = c.Id.ToString(),
-                Text = c.Name
-            }).ToList();
-
+                model.ParentCategories = categories.Value.Select(c => new SelectListItem
+                {
+                    Value = c.Id.ToString(),
+                    Text = c.Name
+                }).ToList();
+            }
             var allCategories = await _categoryClient.GetAllCategoriesAsync();
 
             if (allCategories.IsSuccess)
@@ -68,13 +78,11 @@ namespace Ecommerce.Web.Controllers
             {
                 if (model.Image != null && model.Image.Length > 0)
                 {
-                    var upload = await _photoService.AddPhotoAsync(model.Image);
+                    using var memoryStream = new MemoryStream();
+                    await model.Image.CopyToAsync(memoryStream);
+                    var bytes = memoryStream.ToArray();
 
-                    if (upload.Error != null)
-                    {
-                        ModelState.AddModelError("", "Lỗi upload file");
-                    }
-                    model.ImageUrl = upload.SecureUrl.ToString();
+                    model.ImageUrl = await _photoService.CreatePhotoAsync(bytes, model.Image.FileName);
                 }
 
                 var result = await _productClient.CreateProductAsync(model);
@@ -136,13 +144,10 @@ namespace Ecommerce.Web.Controllers
                             await _photoService.DeletePhotoAsync(oldPublicId);
                         }
                     }
-                    var uploadResult = await _photoService.AddPhotoAsync(model.Image);
-                    if (uploadResult.Error != null)
-                    {
-                        ModelState.AddModelError("", "Lỗi upload ảnh: " + uploadResult.Error.Message);
-                        return View(model);
-                    }
-                    model.ImageUrl = uploadResult.SecureUrl.ToString();
+                    using var memoryStream = new MemoryStream();
+                    await model.Image.CopyToAsync(memoryStream);
+                    var bytes = memoryStream.ToArray();
+                    model.ImageUrl = await _photoService.CreatePhotoAsync(bytes, model.Image.FileName);
                 }
                 var result = await _productClient.UpdateProductAsync(id, model);
                 if (!result.IsSuccess)
@@ -190,7 +195,7 @@ namespace Ecommerce.Web.Controllers
             {
                 TempData["Error"] = "Có lỗi xảy ra khi xóa sản phẩm!";
             }
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index","Category");
         }
 
         private string GetPublicIdFromUrl(string imageUrl)
@@ -233,16 +238,15 @@ namespace Ecommerce.Web.Controllers
         }
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> Search([FromQuery]string name)
+        public async Task<IActionResult> Search([FromQuery] string name, int page = 1, int pageSize = 12)
         {
-            var result = await _productClient.GetAllProductsByNameAsync(name);
-            if (!result.IsSuccess)
+            var result = await _productClient.GetAllProductsByPaginationAsync(page, pageSize, searchTerm: name);
+            if (!result.Items.Any())
             {
-                TempData["Error"] = result.Error.Message;
-                return RedirectToAction("Index");
+                TempData["Error"] = "Không tìm thấy sản phẩm";
             }
             ViewBag.SearchTerm = name;
-            return View("Index",result.Value);
+            return View("Index", result);
         }
     }
 

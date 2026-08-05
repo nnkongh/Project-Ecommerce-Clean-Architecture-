@@ -55,10 +55,14 @@ namespace Ecommerce.Web.Controllers
             return View();
         }
         [HttpGet]
-        public IActionResult Login(string returnUrl = null)
+        public IActionResult Login(string returnUrl = null, string expired = null)
         {
             ViewData["HideAuthHeader"] = true;
             ViewData["ReturnUrl"] = returnUrl;
+            if (expired == "true")
+            {
+                TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
+            }
             return View();
         }
         [HttpPost]
@@ -84,25 +88,11 @@ namespace Ecommerce.Web.Controllers
             }
             _cookieTokenService.SetTokenInsideCookie(loginResult.Value);
 
-            //var principal = _principalFactory.CreatePrincipalFromToken(token);
-            //if (principal == null)
-            //{
-            //    ModelState.AddModelError(string.Empty, "Token không hợp lệ.");
-            //    return View(model);
-            //}
-
-            //await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal,
-            //    new AuthenticationProperties
-            //    {
-            //        IsPersistent = model.RememberMe,
-
-            //    });
-
             var result = await _signinManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: true);
 
             if (result.Succeeded)
-                return RedirectToAction("Index", "Home");
-            return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Category");
+            return View(model);
         }
 
 
@@ -202,7 +192,6 @@ namespace Ecommerce.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
         {
-            // model.ClientUrl = $"{Request.Scheme}://{Request.Host}";
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -261,7 +250,7 @@ namespace Ecommerce.Web.Controllers
         {
             await _signinManager.SignOutAsync();    
             _cookieTokenService.RemoveTokenFromCookie();
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("Login", "Auth");
         }
     }
 }

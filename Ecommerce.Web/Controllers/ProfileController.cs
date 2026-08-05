@@ -1,5 +1,6 @@
 ﻿using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.Users;
+using Ecommerce.Application.Interfaces;
 using Ecommerce.Domain.Models;
 using Ecommerce.Domain.Shared;
 using Ecommerce.Infrastructure.Interfaces;
@@ -68,20 +69,17 @@ namespace Ecommerce.Web.Controllers
         {
             try
             {
-                if(request.Avatar != null || request.Avatar.Length > 0)
+                if (request.Avatar != null && request.Avatar.Length > 0)
                 {
-                    if(!string.IsNullOrEmpty(request.AvatarUrl))
+                    if (!string.IsNullOrEmpty(request.AvatarUrl))
                     {
                         await _photoService.DeletePhotoAsync(request.AvatarUrl);
                     }
-                    var photoResult = await _photoService.AddPhotoAsync(request.Avatar);
-                    if(photoResult.Error != null)
-                    {
-                        TempData["Error"] = "Lỗi tải ảnh lên. Vui lòng thử lại.";
-                        return View(request);
-                    }
-                    var photoUrl = photoResult.SecureUrl.ToString();
-                    request.AvatarUrl = photoUrl;
+                    using var memoryStream = new MemoryStream();
+                    await request.Avatar.CopyToAsync(memoryStream);
+                    var bytes = memoryStream.ToArray();
+
+                    request.AvatarUrl = await _photoService.CreatePhotoAsync(bytes, request.Avatar.FileName);
                 }
                 var result = await _profileService.UpdateProfileAsync(request);
                 if (!result.IsSuccess)

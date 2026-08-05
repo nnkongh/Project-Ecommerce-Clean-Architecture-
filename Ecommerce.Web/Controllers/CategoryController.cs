@@ -1,4 +1,5 @@
 ﻿using Ecommerce.Domain.Models;
+using Ecommerce.Domain.Shared;
 using Ecommerce.Web.Interface;
 using Ecommerce.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -13,6 +14,7 @@ namespace Ecommerce.Web.Controllers
     {
         private readonly ICategoryClient _categoryClient;
         private readonly IProductClient _productClient;
+
         public CategoryController(ICategoryClient categoryClient, IProductClient productClient)
         {
             _categoryClient = categoryClient;
@@ -21,84 +23,38 @@ namespace Ecommerce.Web.Controllers
 
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 12, int productPage = 1)
         {
-            var result = await _categoryClient.GetRootCategoriesAsync();
+            var result = await _categoryClient.GetRootCategoriesPagedAsync(page, pageSize);
             if (!result.IsSuccess)
             {
                 ModelState.AddModelError(string.Empty, result.Error.Message);
                 return RedirectToAction("Login", "Auth");
             }
 
-            var categories = result.Value.ToList();
-            List<ProductViewModel> displayProducts = new();
+            var products = await _productClient.GetAllProductsByPaginationAsync(productPage, 8);
 
-            var productTasks = categories.Select(c => _productClient.GetAllProductsAsync());
-
-            var productResult = await Task.WhenAll(productTasks);
-
-            displayProducts = productResult
-                .Where(c => c.IsSuccess)
-                .SelectMany(c => c.Value)
-                .ToList();
-
-            ViewBag.DisplayProducts = displayProducts;
-            return View(categories);
+            ViewBag.DisplayProducts = products;
+            return View(result.Value);
         }
         [HttpGet("detailed/{id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> ChildCategories(int id, int? selectCategoryId = null)
+        public async Task<IActionResult> ChildCategories(int id, int? selectCategoryId = null, int page = 1, int pageSize = 12)
         {
-            var categoriesResult = await _categoryClient.GetChildCategoriesAsync(id);
+            var categoriesResult = await _categoryClient.GetChildCategoriesPagedAsync(id, page, pageSize);
 
             if (!categoriesResult.IsSuccess)
             {
                 return NotFound();
             }
 
-            var categories = categoriesResult.Value.ToList();
-            List<ProductViewModel> displayProducts = new();
-
-            // Nếu có chọn category con cụ thể
-            if (selectCategoryId.HasValue)
-            {
-                var categoryProducts = await _productClient.GetAllProductsByCategoryAsync(selectCategoryId.Value);
-                if (categoryProducts.IsSuccess)
-                {
-                    displayProducts = categoryProducts.Value.ToList();
-                }
-            }
-            else
-            {
-                // Lấy products của TẤT CẢ các category con song song
-                var productTasks = categories
-                    .Where(c => c.Id.HasValue)
-                    .Select(c => _productClient.GetAllProductsByCategoryAsync(c.Id.Value));
-
-                var productResults = await Task.WhenAll(productTasks);
-
-                displayProducts = productResults
-                    .Where(r => r.IsSuccess)
-                    .SelectMany(r => r.Value)
-                    .ToList();
-            }
-
-            // GÁN products cho từng category để hiển thị
-            foreach (var category in categories.Where(c => c.Id.HasValue))
-            {
-                var categoryProducts = await _productClient.GetAllProductsByCategoryAsync(category.Id.Value);
-                if (categoryProducts.IsSuccess)
-                {
-                    category.Products = categoryProducts.Value.ToList();
-                }
-            }
+            var categories = categoriesResult.Value.Items.ToList();
 
             ViewBag.ParentCategoryId = id;
             ViewBag.SelectedCategoryId = selectCategoryId;
-            ViewBag.DisplayProducts = displayProducts;
+            ViewBag.CategoryPagedResult = categoriesResult.Value;
 
             return View(categories);
-
         }
     }
 }
