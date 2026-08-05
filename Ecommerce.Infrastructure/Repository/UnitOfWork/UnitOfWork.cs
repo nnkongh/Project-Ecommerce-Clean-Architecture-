@@ -17,6 +17,7 @@ namespace Ecommerce.Infrastructure.Repository.UnitOfWork
         private IProductRepository _productRepo;
         private ICartRepository _cartRepo;
         private IOrderRepository _orderRepo;
+        private IUserRepository _userRepo;
         public UnitOfWork(ApplicationDbContext dbContext)
         {
             _dbContext = dbContext;
@@ -29,6 +30,7 @@ namespace Ecommerce.Infrastructure.Repository.UnitOfWork
 
         public IOrderRepository OrderRepository => _orderRepo ??= new OrderRepository(_dbContext);
 
+        public IUserRepository UserRepository => _userRepo ??= new UserRepository(_dbContext);
 
         public async Task SaveChangesAsync(CancellationToken cancellationToken)
         {

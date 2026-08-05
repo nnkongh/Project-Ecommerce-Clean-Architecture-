@@ -120,7 +120,7 @@ namespace Ecommerce.Infrastructure.Repository.Base
 
         public async Task<int> CountAsync(ISpecification<T> spec)
         {
-            return await ApplySpecification(spec).CountAsync();
+            return await ApplySpecification(spec).AsNoTracking().CountAsync();
         }
     }
 }

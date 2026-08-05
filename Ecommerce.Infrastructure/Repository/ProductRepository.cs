@@ -18,5 +18,10 @@ namespace Ecommerce.Infrastructure.Repository
         public ProductRepository(ApplicationDbContext context) : base(context)
         {
         }
+
+        public async Task<IReadOnlyList<Product>> GetProductsByIdsAsync(IEnumerable<int> ids)
+        {
+            return await _context.Products.Where(p => ids.Contains(p.Id)).ToListAsync();
+        }
     }
 }
