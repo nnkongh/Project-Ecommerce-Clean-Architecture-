@@ -15,6 +15,8 @@ namespace Ecommerce.Domain.Models
         public string? UserName { get; private set; }
         public string? ImageUrl { get; private set; }
         public string? PhoneNumber { get; private set; }
+        public int? ShopId { get; private set; }
+        public Shop? Shop { get; private set; }
         public string Email { get; private set; } = default!;
         public bool IsActive { get; private set; }
         public List<string?> Role { get; private set; } = [];
@@ -23,10 +25,14 @@ namespace Ecommerce.Domain.Models
         public Cart? Cart { get; private set; }
         public IReadOnlyList<Order> Orders => _orders.AsReadOnly();
         public IReadOnlyList<Wishlist> Wishlist => _wishlist.AsReadOnly();
+        public IReadOnlyList<Notification> Notifications => _notifications.AsReadOnly();
+        public IReadOnlyList<Review> Reviews => _reviews.AsReadOnly();
 
+
+        private readonly List<Review> _reviews = new List<Review>();
         private readonly List<Order> _orders = new List<Order>();
         private readonly List<Wishlist> _wishlist = new List<Wishlist>();
-
+        private readonly List<Notification> _notifications = new List<Notification>();
         public static User Create(string userName, string email, string phoneNumber)
         {
             if (string.IsNullOrWhiteSpace(userName)) throw new DomainException("Tên người dùng không được trống");

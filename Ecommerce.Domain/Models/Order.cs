@@ -44,7 +44,10 @@ namespace Ecommerce.Domain.Models
             };
             return order;
         }
-
+        public void UpdateStatus(OrderStatus orderStatus)
+        {
+            OrderStatus = orderStatus;
+        }
         public void AddItem(string imageUrl, string productName, int productId, decimal price, int quantity)
         {
             if (IsExistItem(productId))
