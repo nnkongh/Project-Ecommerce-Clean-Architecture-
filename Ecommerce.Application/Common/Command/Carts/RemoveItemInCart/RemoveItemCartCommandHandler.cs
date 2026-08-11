@@ -35,13 +35,14 @@ namespace Ecommerce.Application.Common.Command.Carts.RemoveItemInCart
             {
                 return Result.Failure(new Error("", "Product not found"));
             }
-            var existingItem = cart.Items.FirstOrDefault(x => x.ProductId == request.productId);
+            var existingItem = cart.GetItem(product.Id);
             if (existingItem == null) 
             {
                 return Result.Failure(new Error("", $"Can not delete because your cart does not contain item {product.Name}"));
             }
             cart.RemoveItem(existingItem);
-            product.Stock += existingItem.Quantity;
+            var quantity = existingItem.Quantity;
+            product.AdjustStock(quantity);
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }
