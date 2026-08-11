@@ -1,4 +1,5 @@
-﻿using Ecommerce.Domain.Models;
+﻿using Ecommerce.Domain;
+using Ecommerce.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Asn1.IsisMtt.X509;
 using System;
@@ -21,6 +22,10 @@ namespace Ecommerce.Infrastructure.Data
         public DbSet<User> User { get; set; } = null!;
         public DbSet<Category> Categories { get; set; } = null!;
         public DbSet<UserAddress> UserAddresses { get; set; } = null!;
+        public DbSet<Notification> Notifications { get; set; } = null!;
+        public DbSet<Shop> Shops { get; set; } = null!;
+        public DbSet<Review> Reviews { get; set; } = null!;
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -104,7 +109,40 @@ namespace Ecommerce.Infrastructure.Data
 
             modelBuilder.Entity<Comment>()
                 .HasIndex(c => c.UserId);
+
+            modelBuilder.Entity<User>()
+                .HasMany(u => u.Notifications)
+                .WithOne(u => u.User)
+                .HasForeignKey(u => u.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Shop>()
+                .HasMany(s => s.Products)
+                .WithOne(s => s.Shop)
+                .HasForeignKey(s => s.ShopId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<User>()
+                .HasMany(r => r.Reviews)
+                .WithOne(r => r.User)
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Shop)
+                .WithOne(u => u.User)
+                .HasForeignKey<Shop>(u => u.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Review>()
+                .HasOne(r => r.Product)
+                .WithMany(p => p.Reviews)
+                .HasForeignKey(r => r.ProductId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Shop>()
+                .OwnsOne(s => s.Address);
+
         }
     }
 }
-,
