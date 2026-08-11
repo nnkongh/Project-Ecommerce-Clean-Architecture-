@@ -15,6 +15,7 @@ using Ecommerce.WebApi.Controllers.BaseController;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Ecommerce.WebApi.Controllers
 {
@@ -67,7 +68,12 @@ namespace Ecommerce.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> AddProduct([FromBody] CreateProductRequest request)
         {
-            var command = new CreateProductCommand(request);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var command = new CreateProductCommand(userId,request);
             var result = await Sender.Send(command);
             return result.IsSuccess ? Ok(new ApiResponse<ProductModel> { IsSuccess = true, Value = result.Value })
                                     : BadRequest(new ApiResponse<ProductModel> { IsSuccess = false, Error = result.Error });
@@ -75,7 +81,12 @@ namespace Ecommerce.WebApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] UpdateProductRequest request)
         {
-            var command = new UpdateProductCommand(id, request);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var command = new UpdateProductCommand(userId,id, request);
             var result = await Sender.Send(command);
             return result.IsSuccess ? Ok(new ApiResponse<ProductModel> { IsSuccess = true, Value = result.Value })
                                     : BadRequest(new ApiResponse<ProductModel> { IsSuccess = false, Error = result.Error });
@@ -83,6 +94,11 @@ namespace Ecommerce.WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
             var command = new DeleteProductCommand(id);
             var result = await Sender.Send(command);
             return result.IsSuccess ? Ok(new ApiResponse<bool> { IsSuccess = true })
