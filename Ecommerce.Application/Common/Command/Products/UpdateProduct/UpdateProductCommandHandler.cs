@@ -18,14 +18,16 @@ namespace Ecommerce.Application.Common.Command.Products.UpdateProduct
     public sealed class UpdateProductCommandHandler : IRequestHandler<UpdateProductCommand, Result<ProductModel>>
     {
         private readonly IProductRepository _productRepo;
+        private readonly IShopRepository _shopRepository;
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
 
-        public UpdateProductCommandHandler(IMapper mapper, IProductRepository productRepo, IUnitOfWork uow)
+        public UpdateProductCommandHandler(IMapper mapper, IProductRepository productRepo, IUnitOfWork uow, IShopRepository shopRepository)
         {
             _mapper = mapper;
             _productRepo = productRepo;
             _uow = uow;
+            _shopRepository = shopRepository;
         }
 
         public async Task<Result<ProductModel>> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
@@ -40,24 +42,19 @@ namespace Ecommerce.Application.Common.Command.Products.UpdateProduct
                 return Result.Failure<ProductModel>(new Error("", "Tên không được rỗng"));
             }
 
-            var product = await _productRepo.GetByIdAsync(request.id);
-
+            var product = await _productRepo.GetByIdAsync(request.ProductId);
             if (product == null)
             {
-                return Result.Failure<ProductModel>(new Error("", $"Product with id {request.id} is not found"));
+                return Result.Failure<ProductModel>(new Error("", $"Product with id {request.ProductId} is not found"));
             }
-
-            product.Name = request.update.Name ?? product.Name;
-
-            product.Price = request.update.Price ?? product.Price;
-
-            product.Stock = request.update.Stock ?? product.Stock;
-
-            product.ImageUrl = request.update.ImageUrl ?? product.ImageUrl;
-
-            product.Description = request.update.Description ?? product.Description;
-
-            //await _productRepo.Update(product);
+            var shop = await _shopRepository.GetByUserIdAsync(request.UserId);
+            if (shop == null)
+            {
+                return Result.Failure<ProductModel>(new Error("", "Sản phẩm này không thuộc về cửa hàng của bạn"));
+            }
+            var newProduct = request.update;
+            product.UpdateProduct(newProduct.Name, newProduct.Description, newProduct.ImageUrl, newProduct.Price, newProduct.Stock);
+            await _productRepo.Update(product);
             await _uow.SaveChangesAsync(cancellationToken);
             var mapped = _mapper.Map<ProductModel>(product);
             return Result.Success(mapped);

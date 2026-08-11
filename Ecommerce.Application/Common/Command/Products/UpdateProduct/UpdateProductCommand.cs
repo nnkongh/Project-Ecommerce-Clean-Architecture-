@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Products.UpdateProduct
 {
-    public sealed record UpdateProductCommand(int id, UpdateProductRequest update) : IRequest<Result<ProductModel>>
+    public sealed record UpdateProductCommand(string UserId,int ProductId, UpdateProductRequest update) : IRequest<Result<ProductModel>>
     {
     }
 }
