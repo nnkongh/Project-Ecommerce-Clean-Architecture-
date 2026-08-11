@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -46,20 +47,21 @@ namespace Ecommerce.Domain.Models
             };
             return product;
         }
-        public void UpdateDetail(string name, string? description = null)
-        {
-            if (string.IsNullOrEmpty(name)) throw new DomainException("Tên sản phẩm không được để trống");
-            Name = name;
-            Description = description;
-        }
-        public void UpdatePrice(decimal newPrice)
-        {
-            if (newPrice < 0) throw new DomainException("Giá sản phẩm không được để trống");
-            Price = newPrice;
-        }
         public void AdjustStock(int stock)
         {
             Stock += stock;
+        }
+        public void UpdateProduct(string? name = null, string? description = null, string? imageUrl = null, decimal? price = null, int? stock = null)
+        {
+            if (price.HasValue && price.Value < 0) throw new DomainException("Giá sản phẩm không được âm");
+            if (stock.HasValue && stock.Value < 0) throw new DomainException("Tồn kho không được âm");
+
+            Name = name ?? Name;
+            Description = description ?? Description;
+            ImageUrl = imageUrl ?? ImageUrl;
+            Price = price ?? Price;
+            Stock = stock ?? Stock;
+
         }
     }
 }
