@@ -22,12 +22,32 @@ namespace Ecommerce.WebApi.Dependencies
             services.AddJwtAuthentication(configuration);
             services.AddAdapterServices();
             services.AddPhotoService(configuration);
+            services.AddCors();
+            services.AddSignalRService();
             return services;
         }
         public static IServiceCollection AddPhotoService(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddScoped<IPhotoService, PhotoService>();
             services.Configure<CloudinarySettings>(configuration.GetSection("Cloudinary"));
+            return services;
+        }
+        public static IServiceCollection AddSignalRService(this IServiceCollection services)
+        {
+            services.AddSignalR();
+            services.AddScoped<INotificationService,NotificationService>();
+            return services;
+        }
+        public static IServiceCollection AddCORS(this IServiceCollection services)
+        {
+            services.AddCors(opt =>
+            {
+                opt.AddPolicy("SignalRPolicy", policy =>
+                {
+                    policy.WithOrigins("https://localhost:7214")
+                          .AllowCredentials();
+                });
+            });
             return services;
         }
     }
