@@ -49,7 +49,7 @@ namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
             var order = Order.CreateOrder(user.Id, user.UserName!, user.PhoneNumber, user.Email, user.Address);
             order.AddItem(product.ImageUrl,product.Name,product.Id,product.Price,command.quantity);
             await _orderRepo.AddAsync(order);
-            product.Stock -= command.quantity;
+            //product.Stock -= command.quantity;
 
             await _uow.SaveChangesAsync(cancellationToken);
             var orderDto = _mapper.Map<OrderModel>(order);

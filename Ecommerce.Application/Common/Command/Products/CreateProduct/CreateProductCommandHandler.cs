@@ -16,15 +16,17 @@ namespace Ecommerce.Application.Common.Command.Products.CreateProduct
     public sealed class CreateProductCommandHandler : IRequestHandler<CreateProductCommand, Result<ProductModel>>
     {
         private readonly IProductRepository _productRepo;
+        private readonly IShopRepository _shopRepository; 
         private readonly ICategoryRepository _categoryRepo;
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
-        public CreateProductCommandHandler(IProductRepository productRepo, IMapper mapper, IUnitOfWork uow, ICategoryRepository categoryRepo)
+        public CreateProductCommandHandler(IProductRepository productRepo, IMapper mapper, IUnitOfWork uow, ICategoryRepository categoryRepo, IShopRepository shopRepository)
         {
             _productRepo = productRepo;
             _mapper = mapper;
             _uow = uow;
             _categoryRepo = categoryRepo;
+            _shopRepository = shopRepository;
         }
 
         public async Task<Result<ProductModel>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
@@ -47,7 +49,12 @@ namespace Ecommerce.Application.Common.Command.Products.CreateProduct
             {
                 return Result.Failure<ProductModel>(new Error("", $"Danh mục không tồn tại"));
             }
-            var product = Product.Create(productRequest.Name, productRequest.ImageUrl, productRequest.Price,productRequest.Stock, productRequest.CategoryId, productRequest.Description);
+            var shop = await _shopRepository.GetByUserIdAsync(request.userId);
+            if (shop == null)
+            {
+                return Result.Failure<ProductModel>(new Error("", $"Chỉ có cửa hàng được tạo sản phẩm"));
+            }
+            var product = Product.Create(productRequest.Name, productRequest.ImageUrl,shop.Id, productRequest.Price,productRequest.Stock, productRequest.CategoryId, productRequest.Description);
             var item = await _productRepo.AddAsync(product); 
             var mapped = _mapper.Map<ProductModel>(item);
             await _uow.SaveChangesAsync(cancellationToken);
