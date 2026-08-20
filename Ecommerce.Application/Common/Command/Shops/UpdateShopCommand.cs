@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Shops
 {
-    public sealed record UpdateShopCommand(string UserId, string ShopId, string Name) : IRequest<Result<ShopModel>>
+    public sealed record UpdateShopCommand(string UserId, int ShopId, string Name) : IRequest<Result<ShopModel>>
     {
     }
     public sealed class UpdateShopHandler : IRequestHandler<UpdateShopCommand, Result<ShopModel>>
@@ -30,7 +30,7 @@ namespace Ecommerce.Application.Common.Command.Shops
 
         public async Task<Result<ShopModel>> Handle(UpdateShopCommand request, CancellationToken cancellationToken)
         {
-            var shop = await _shopRepository.GetByUserIdAsync(request.UserId);
+            var shop = await _shopRepository.GetByIdAsync(request.ShopId);
             if (shop == null)
             {
                 return Result.Failure<ShopModel>(new Error("404", "Không tìm thấy cửa hàng nào"));
