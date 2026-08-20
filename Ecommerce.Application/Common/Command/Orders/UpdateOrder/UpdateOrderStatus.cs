@@ -30,7 +30,7 @@ namespace Ecommerce.Application.Common.Command.Orders.UpdateOrder
 
         public async Task<Result> Handle(UpdateOrderStatus request, CancellationToken cancellationToken)
         {
-            var order = await _orderRepository.GetOrderByIdAsync(request.OrderId);
+            var order = await _orderRepository.GetOrderByIdAsync(request.OrderId);  
             if (order == null)
             {
                 return Result.Failure(new Error("404", "Không tìm thấy sản phẩm"));
