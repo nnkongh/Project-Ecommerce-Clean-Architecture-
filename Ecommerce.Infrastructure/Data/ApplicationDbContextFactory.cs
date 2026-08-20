@@ -18,9 +18,11 @@ namespace Ecommerce.Infrastructure.Data
             {
                 basePath = Path.Combine(Directory.GetCurrentDirectory(), "Ecommerce.WebApi");
             }
+            var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
             var config = new ConfigurationBuilder()
                 .SetBasePath(basePath)
                 .AddJsonFile("appsettings.json")
+                .AddJsonFile($"appsettings.{env}.json",optional: true)
                 .Build();
 
             var optionsBuilder = new DbContextOptionsBuilder<ApplicationDbContext>();
