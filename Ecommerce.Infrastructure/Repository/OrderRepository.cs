@@ -24,7 +24,7 @@ namespace Ecommerce.Infrastructure.Repository
             var item = new OrderWithItemSpecification(userId);
             return await GetAsync(item);
         }
-        public async Task<Order> GetOrderByIdAsync(int orderId)
+        public async Task<Order?> GetOrderByIdAsync(int orderId)
         {
             var item = new OrderWithItemSpecification(orderId);
             return await GetEnityWithSpecAsync(item);
