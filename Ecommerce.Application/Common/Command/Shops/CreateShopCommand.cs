@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs.Models;
-using Ecommerce.Domain;
+using Ecommerce.Domain.Models;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Interfaces.UnitOfWork;
 using Ecommerce.Domain.Shared;

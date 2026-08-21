@@ -39,7 +39,7 @@ namespace Ecommerce.Application.Common.Command.Shops
             await _shopRepository.Delete(shop);
             await _uow.SaveChangesAsync(cancellationToken);
 
-            return Result.Success(model);
+            return Result.Success();
         }
     }
 }
