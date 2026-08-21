@@ -1,7 +1,7 @@
 ﻿using Ecommerce.Application.Interfaces;
-using Ecommerce.Domain;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Interfaces.UnitOfWork;
+using Ecommerce.Domain.Models;
 using Ecommerce.Domain.Shared;
 using MediatR;
 using System;
