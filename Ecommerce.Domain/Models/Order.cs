@@ -54,6 +54,8 @@ namespace Ecommerce.Domain.Models
             {
                 var item = FindOrderItem(productId);
                 item!.Quantity++;
+                CalculateTotal();
+                return;
             }
             var orderItem = OrderItem.Create(imageUrl, productName, productId, price, quantity);
             _items.Add(orderItem);
@@ -67,7 +69,7 @@ namespace Ecommerce.Domain.Models
 
         public void RemoveItem(OrderItem item)
         {
-            Items.Remove(item);
+            _items.Remove(item);
             CalculateTotal();
         }
         public OrderItem? FindOrderItem(int productId)
