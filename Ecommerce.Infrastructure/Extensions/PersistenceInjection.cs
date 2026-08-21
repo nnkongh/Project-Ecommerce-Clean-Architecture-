@@ -49,6 +49,8 @@ namespace Ecommerce.Infrastructure.Dependency_Injection
             services.AddScoped<IOrderRepository, OrderRepository>();
             services.AddScoped<IWishlistRepository, WishlistRepository>();
             services.AddScoped<IUserAddressRepository, UserAddressRepository>();
+            services.AddScoped<IShopRepository, ShopRepository>();
+            services.AddScoped<IReviewRepository, ReviewRepository>();
             services.AddScoped<ICommentRepository, CommentRepository>();
             return services;
 
