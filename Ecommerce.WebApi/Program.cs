@@ -6,6 +6,7 @@ using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Dependency_Injection;
 using Ecommerce.Infrastructure.Mapper;
+using Ecommerce.Infrastructure.Services;
 using Ecommerce.Infrastructure.Services.ExternalAuth;
 using Ecommerce.WebApi.Dependencies;
 using Ecommerce.WebApi.Services;
@@ -45,10 +46,10 @@ namespace Ecommerce.WebApi
             // Configure the HTTP request pipeline.
 
             app.UseHttpsRedirection();
-
+            app.UseCors("SignalRPolicy");
             app.UseAuthentication();
             app.UseAuthorization();
-
+            app.MapHub<ChatHub>("/chatHub");
 
             app.MapControllers();
 
