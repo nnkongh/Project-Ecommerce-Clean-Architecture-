@@ -46,6 +46,9 @@ namespace Ecommerce.Application.Mappers
                 .ForMember(d => d.UserName, opt => opt.MapFrom(src => src.User != null ? src.User.UserName : null))
                 .ForMember(d => d.AvatarUrl, opt => opt.MapFrom(src => src.User != null ? src.User.ImageUrl : null));
 
+            CreateMap<Shop, Ecommerce.Application.Common.Command.Shops.ShopModel>()
+                .ForMember(d => d.ShopName, opt => opt.MapFrom(src => src.Name));
+
 
         }
     }
