@@ -1,5 +1,4 @@
-﻿using Ecommerce.Domain;
-using Ecommerce.Domain.Models;
+﻿using Ecommerce.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Asn1.IsisMtt.X509;
 using System;
