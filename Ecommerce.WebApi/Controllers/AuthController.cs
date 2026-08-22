@@ -21,23 +21,30 @@ namespace Ecommerce.WebApi.Controllers
     [Route("auth")]
     public class AuthController : ApiController
     {
-        public AuthController(ISender sender) : base(sender)
+        private readonly ITokenService _tokenService;
+
+        public AuthController(ISender sender, ITokenService tokenService) : base(sender)
         {
+            _tokenService = tokenService;
         }
 
-        [HttpPost("login")]
+        [HttpPost("login")] 
         public async Task<IActionResult> Login(LoginModel login)
         {
             var command = new LoginCommand(login);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+            return result.IsSuccess
+                ? Ok(new ApiResponse<TokenModel> { IsSuccess = true, Value = result.Value })
+                : BadRequest(new ApiResponse<TokenModel> { IsSuccess = false, Error = result.Error });
         }
         [HttpPost("register")]
         public async Task<IActionResult> Register(RegisterModel register)
         {
             var command = new RegisterCommand(register);
             var result = await Sender.Send(command);
-            return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+            return result.IsSuccess
+                ? Ok(new ApiResponse<UserModel> { IsSuccess = true, Value = result.Value })
+                : BadRequest(new ApiResponse<UserModel> { IsSuccess = false, Error = result.Error });
         }
         [Authorize]
         [HttpPost("forgot-password")]
@@ -47,13 +54,28 @@ namespace Ecommerce.WebApi.Controllers
             var result = await Sender.Send(command);
             return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
         }
-        [Authorize]
         [HttpPost("reset-password")]
         public async Task<IActionResult> ResetPassword(ResetPasswordModel resetPasswordDto)
         {
             var command = new ResetPasswordCommand(resetPasswordDto);
             var result = await Sender.Send(command);
             return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
+        }
+
+        [Authorize]
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized(new ApiResponse<string> { IsSuccess = false, Message = "Invalid token" });
+            }
+
+            var result = await _tokenService.RevokeRefreshToken(userId);
+            return result.IsSuccess
+                ? Ok(new ApiResponse<string> { IsSuccess = true, Message = "Logged out successfully" })
+                : BadRequest(new ApiResponse<string> { IsSuccess = false, Message = "Logout failed", Error = result.Error });
         }
     }
 }

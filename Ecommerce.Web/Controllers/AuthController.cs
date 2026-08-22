@@ -248,7 +248,16 @@ namespace Ecommerce.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await _signinManager.SignOutAsync();    
+            try
+            {
+                await _authClient.LogoutAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Revoke refresh token failed, continuing local logout");
+            }
+
+            await _signinManager.SignOutAsync();
             _cookieTokenService.RemoveTokenFromCookie();
             return RedirectToAction("Login", "Auth");
         }
