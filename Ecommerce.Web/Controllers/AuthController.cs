@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Ecommerce.Application.Common.Command.AuthenticationExternal;
+﻿using Ecommerce.Application.Common.Command.AuthenticationExternal;
 using Ecommerce.Application.Interfaces;
 using Ecommerce.Application.DTOs.Authentication;
 using Ecommerce.Domain.Enum;
@@ -8,14 +7,11 @@ using Ecommerce.Infrastructure.Identity;
 using Ecommerce.Infrastructure.Interfaces.Authentication;
 using Ecommerce.WebApi.ViewModels.AuthView;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using MediatR;
-using System.Runtime.CompilerServices;
-using Ecommerce.Infrastructure.Data;
 using Ecommerce.Web.Interface;
 using Ecommerce.Web.ViewModels;
 
@@ -28,26 +24,23 @@ namespace Ecommerce.Web.Controllers
         private readonly IPrincipalFactory _principalFactory;
         private readonly SignInManager<AppUser> _signinManager;
         private readonly ICookieTokenService _cookieTokenService;
-        private readonly IMapper _mapper;
-        private readonly HttpClient _httpClient;
+        private readonly ITokenService _tokenService;
         private readonly ILogger<AuthController> _logger;
         public AuthController(IAuthenticationClient authClient,
             IMediator mediator,
-            HttpClient httpClient,
             SignInManager<AppUser> signinManager,
             IPrincipalFactory principalFactory,
             ILogger<AuthController> logger,
-            IMapper mapper,
-            ICookieTokenService cookieTokenService)
+            ICookieTokenService cookieTokenService,
+            ITokenService tokenService)
         {
             _authClient = authClient;
             _mediator = mediator;
-            _httpClient = httpClient;
             _signinManager = signinManager;
             _principalFactory = principalFactory;
             _logger = logger;
-            _mapper = mapper;
             _cookieTokenService = cookieTokenService;
+            _tokenService = tokenService;
         }
 
         public IActionResult Index()
@@ -110,54 +103,73 @@ namespace Ecommerce.Web.Controllers
         [HttpGet("login-callback")]
         public async Task<IActionResult> ExternalLoginCallback([FromQuery] string? redirectUri, [FromQuery] string? remoteError = null)
         {
+            if (!string.IsNullOrEmpty(remoteError))
+            {
+                TempData["ErrorMessage"] = $"Lỗi từ nhà cung cấp đăng nhập: {remoteError}";
+                return RedirectToAction(nameof(Login));
+            }
+
             var info = await _signinManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
-                return Redirect("/login");
+                TempData["ErrorMessage"] = "Không thể lấy thông tin đăng nhập ngoài.";
+                return RedirectToAction(nameof(Login));
             }
 
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-
             if (string.IsNullOrEmpty(email))
             {
-                return Redirect("/login");
+                TempData["ErrorMessage"] = "Không lấy được email từ tài khoản Google.";
+                return RedirectToAction(nameof(Login));
             }
 
             var name = info.Principal.FindFirstValue(ClaimTypes.Name) ?? email;
-            var command = new ExternalLoginCommand
-            {
-                info = new ExternalUserInfo
-                {
-                    Provider = info!.LoginProvider,
-                    ProviderKey = info.ProviderKey,
-                    Email = email,
-                    Name = name
-                }
-            };
+
             try
             {
+                var command = new ExternalLoginCommand
+                {
+                    info = new ExternalUserInfo
+                    {
+                        Provider = info!.LoginProvider,
+                        ProviderKey = info.ProviderKey,
+                        Email = email,
+                        Name = name
+                    }
+                };
+
                 var result = await _mediator.Send(command);
 
-                var tokenResponse = await _httpClient.PostAsJsonAsync("https://localhost:7021/token/create-token", result.User);
+                if (!result.IsSuccess || result.User is null)
+                {
+                    TempData["ErrorMessage"] = string.IsNullOrEmpty(result.ErrorMessage)
+                        ? "Đăng nhập bằng Google thất bại."
+                        : result.ErrorMessage;
+                    return RedirectToAction(nameof(Login));
+                }
 
-                var token = await tokenResponse.Content.ReadFromJsonAsync<TokenModel>();
+                // Cap JWT truc tiep qua TokenService (da dang ky trong Web), khong qua HTTP endpoint nao
+                var token = await _tokenService.CreateToken(result.User, populateExp: true);
+                _cookieTokenService.SetTokenInsideCookie(token);
 
-                var mapped = _mapper.Map<AppUser>(result.User);
+                // Sign-in bang user that tu Identity DB, khong dung AppUser map tu DTO
+                var appUser = await _signinManager.UserManager.FindByIdAsync(result.User.Id);
+                if (appUser == null)
+                {
+                    TempData["ErrorMessage"] = "Tài khoản chưa được khởi tạo đúng cách.";
+                    return RedirectToAction(nameof(Login));
+                }
+                await _signinManager.SignInAsync(appUser, isPersistent: false);
 
-                _cookieTokenService.SetTokenInsideCookie(token!);
-
-                await _signinManager.SignInAsync(mapped, isPersistent: false);
-
-                return Redirect($"{redirectUri}#accesstoken={token.AccessToken}");
-
+                // Khong dua token vao URL (tranh lo vao browser history / server logs)
+                return Redirect(string.IsNullOrWhiteSpace(redirectUri) ? "~/Category" : redirectUri);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Mediator Send failed");
-                return StatusCode(500, ex.Message);
-
+                _logger.LogError(ex, "External login callback failed");
+                TempData["ErrorMessage"] = "Đăng nhập bằng Google thất bại. Vui lòng thử lại.";
+                return RedirectToAction(nameof(Login));
             }
-
         }
 
         [HttpGet]
