@@ -41,7 +41,7 @@ namespace Ecommerce.Web.Controllers
         }
 
         [HttpGet]
-        
+        [Authorize]
         public async Task<IActionResult> Create()
         {
             var model = new ProductViewModel();
@@ -67,6 +67,7 @@ namespace Ecommerce.Web.Controllers
             }
         }
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Create([FromForm] ProductViewModel model)
         {
 
@@ -106,6 +107,7 @@ namespace Ecommerce.Web.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Edit(int id)
         {
             try
@@ -125,7 +127,9 @@ namespace Ecommerce.Web.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
+
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Edit(int id, ProductViewModel model)
         {
             if (!ModelState.IsValid)
@@ -169,6 +173,7 @@ namespace Ecommerce.Web.Controllers
             }
         }
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Delete(int id)
         {
             try
