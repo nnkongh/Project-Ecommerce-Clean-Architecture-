@@ -102,5 +102,23 @@ namespace Ecommerce.Web.Features.Authentication
                 return ApiResponse<bool>.Fail("Failed");
             }
         }
+
+        public async Task<ApiResponse<bool>> LogoutAsync()
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync("auth/logout", content: null);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    return ApiResponse<bool>.Fail("Failed");
+                }
+                return await response.Content.ReadFromJsonAsync<ApiResponse<bool>>();
+            }
+            catch (Exception ex)
+            {
+                return ApiResponse<bool>.Fail("Failed");
+            }
+        }
     }
 }
