@@ -67,8 +67,6 @@ namespace Ecommerce.Infrastructure.Services.ExternalAuth
                 EmailConfirmed = true,
             };
             var result = await _userManager.CreateAsync(appUser);
-            var roles = await _roleManager.GetRolesAsync(appUser);
-            var role = roles.ToList();
             if (!result.Succeeded)
             {
                 throw new InvalidOperationException($"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}");
@@ -82,6 +80,15 @@ namespace Ecommerce.Infrastructure.Services.ExternalAuth
                 await _userManager.DeleteAsync(appUser);
                 throw new InvalidOperationException("Failed to create user");
             }
+
+            // Gan role truoc khi build UserModel de Role khong bi rong
+            await _roleManager.AddToRoleAsync(appUser, "User");
+            var roles = await _roleManager.GetRolesAsync(appUser);
+            if (!roles.Contains("User"))
+            {
+                throw new InvalidOperationException("Failed to add role 'User' to external user");
+            }
+
             var user = new UserModel
             {
                 Id = appUser.Id,
@@ -89,11 +96,10 @@ namespace Ecommerce.Infrastructure.Services.ExternalAuth
                 UserName = externalUserInfo.Name,
                 EmailConfirmed = true,
                 IdentityId = appUser.Id,
-                Role = role
+                Role = roles.ToList()
             };
             var mapped = _mapper.Map<User>(user);
             await _userRespository.AddAsync(mapped);
-            await _roleManager.AddToRoleAsync(appUser, "User");
             await _uow.SaveChangesAsync(cancellationToken);
             return user;
         }
