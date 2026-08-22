@@ -1,21 +1,24 @@
 using Ecommerce.Domain.Models;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Ecommerce.Test.TestDomain
 {
     public class OrderTest
     {
         [Fact]
-        public void AddItem_ShouldAddToList_WhenProductIdNull()
+        public void AddItem_ShouldAddToList_WhenCartIsEmpty()
         {
             //Arrange
-            var order = new Order();
+            var address = new Address();
+            var order = Order.CreateOrder("1", "hau", "0123456789", "hau@test.com", address);
             int productId = 1;
             int quantity = 2;
             decimal unitprice = 30;
             string name = "Product1";
+            string image = "123";
 
             //Act
-            order.AddItem(productId, quantity, unitprice, name);
+            order.AddItem(image, name, productId, unitprice, quantity);
 
             //Assert
             Assert.Single(order.Items);
@@ -31,72 +34,74 @@ namespace Ecommerce.Test.TestDomain
         public void GetTotal_ShouldReturnCorrectValue()
         {
             //Arrange
-            var order = new Order();
+            var address = new Address();
+            var order = Order.CreateOrder("1", "hau", "0123456789", "hau@test.com", address);
             int productId = 1;
             int quantity = 2;
             decimal unitprice = 30;
             string name = "Product1";
+            string image = "abc";
 
             //Act
-            order.AddItem(productId, quantity, unitprice, name);
+            order.AddItem(image, name, productId, unitprice, quantity);
             var result = order.TotalAmount;
 
             //Assert
             Assert.Equal(60, result);
         }
         [Fact]
-        public void IncreaseQuantity_WhenProductIsNotNull()
+        public void AddItem_WhenProductIsExists_ShouldIncreaseQuantity()
         {
-            var order = new Order();
+            var address = new Address();
+            var order = Order.CreateOrder("1","hau", "0123456789", "hau@test.com", address);
             int productId = 1;
             int quantityFirst = 2;
-            int quantitySecond = 3;
             decimal unitprice = 30;
             string name = "Product1";
-
-
+            string image = "abc";
 
             //Act
-            order.AddItem(productId, quantityFirst, unitprice, name);
-            order.AddItem(productId,quantitySecond, unitprice, name);
-
+            order.AddItem(image, name, productId, unitprice, quantityFirst);
+            order.AddItem(image, name, productId, unitprice, quantityFirst);
 
             //Assert
             Assert.Single(order.Items);
             var item = order.Items.First();
 
-            Assert.Equal(quantityFirst + quantitySecond, item.Quantity);
+            Assert.Equal(quantityFirst + 1, item.Quantity); // tăng thêm 1 mỗi lần gọi
         }
 
         [Fact]
         public void RemoveItem_ShouldRemoveCompletely()
         {
-            var order = new Order();
+            var address = new Address();
+            var order = Order.CreateOrder("1", "hau", "0123456789", "hau@test.com", address);
             int productId = 1;
             int quantityFirst = 2;
             decimal unitprice = 30;
             string name = "Product1";
 
-
             //Act
-            order.AddItem(productId, quantityFirst, unitprice, name);
-            order.RemoveItem(productId);
+            order.AddItem("asd",name, productId, unitprice, quantityFirst);
+            var item = order.Items.First();
+            order.RemoveItem(item);
 
             //Assert
-            
+
             Assert.Empty(order.Items);
         }
 
         [Fact]
         public void RemoveItem_ShouldRemoveOnlyThatItem_WhenMultipleItemExist()
         {
-            var order = new Order();
-            order.AddItem(1, 2, 30, "product1");
-            order.AddItem(2, 1, 20, "product2");
-
+            var address = new Address();
+            var order = Order.CreateOrder("1", "hau", "0123456789", "hau@test.com", address);
+            order.AddItem("", "product1", 1, 2, 30);
+            order.AddItem("", "product2", 2, 3, 30);
 
             //Act
-            order.RemoveItem(2);
+            var item = order.FindOrderItem(2);
+            order.RemoveItem(item!);
 
             //Assert
             Assert.DoesNotContain(order.Items, x => x.ProductId == 2);
@@ -106,14 +111,16 @@ namespace Ecommerce.Test.TestDomain
         [Fact]
         public void TotalPrice_ShouldReturnTotalMinusRemovedItem_WhenRemoveOneItem()
         {
-            var order = new Order();
-            order.AddItem(1, 2, 30, "product1");
-            order.AddItem(2, 2, 50, "product2");
+            var address = new Address();
+            var order = Order.CreateOrder("1", "hau", "0123456789", "hau@test.com", address);
+            order.AddItem("", "product1", 1, 30, 2);
+            order.AddItem("", "product2", 2, 50, 2);
             var beforeTotal = order.TotalAmount;
 
 
-            //Act   
-            order.RemoveItem(2);
+            //Act
+            var item = order.FindOrderItem(2);
+            order.RemoveItem(item!);
             var afterTotal = order.TotalAmount;
 
             //Assert

@@ -1,5 +1,5 @@
-﻿using Ecommerce.Domain.Models;
-using NuGet.Frameworks;
+﻿using Ecommerce.Domain.Exceptions;
+using Ecommerce.Domain.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,22 +10,40 @@ namespace Ecommerce.Test.TestDomain
 {
     public class ProductTest
     {
-        [Fact]
-        public void AddProduct_ShouldThrowException_WhenQuantiyLessThanZero()
+        private static Product CreateProduct(
+            string name = "ABC",
+            string imageUrl = "abc.jpg",
+            int shopId = 1,
+            decimal price = 30,
+            int stock = 30,
+            int categoryId = 1,
+            string? description = "des")
         {
-            Product product;
-            Assert.Throws<ArgumentException>(() => product = new Product("ABC", "Test", "ASDFASDFASDF", -30, 3, 2));
+            return Product.Create(name, imageUrl, shopId, price, stock, categoryId, description);
+        }
 
+        [Fact]
+        public void Create_ShouldThrowException_WhenNameIsEmpty()
+        {
+            Assert.Throws<DomainException>(() => CreateProduct(name: ""));
         }
         [Fact]
-        public void AddProduct_ShouldThrowException_WhenPriceLessThanZero()
+        public void Create_ShouldThrowException_WhenPriceLessThanZero()
         {
-            Product product;
-            Assert.Throws<ArgumentException>(() => product = new Product("ABC", "Test", "ASDFASDFASDF", 1, -30, 2));
-
+            Assert.Throws<DomainException>(() => CreateProduct(price: -30));
         }
         [Fact]
-        public void AddProduct_ShouldReturnTrueProp_WhenCreateNewProduct()
+        public void Create_ShouldThrowException_WhenStockLessThanZero()
+        {
+            Assert.Throws<DomainException>(() => CreateProduct(stock: -30));
+        }
+        [Fact]
+        public void Create_ShouldThrowException_WhenImageUrlIsEmpty()
+        {
+            Assert.Throws<DomainException>(() => CreateProduct(imageUrl: " "));
+        }
+        [Fact]
+        public void Create_ShouldReturnTrueProp_WhenCreateNewProduct()
         {
             var name = "ABC";
             var des = "des";
@@ -33,7 +51,8 @@ namespace Ecommerce.Test.TestDomain
             var stock = 30;
             var price = 30;
             var categoryId = 1;
-            var product = new Product(name, des, imageUrl, price, stock, categoryId);
+            var shopId = 2;
+            var product = CreateProduct(name, imageUrl, shopId, price, stock, categoryId, des);
 
             Assert.Equal(name, product.Name);
             Assert.Equal(des, product.Description);
@@ -41,64 +60,71 @@ namespace Ecommerce.Test.TestDomain
             Assert.Equal(imageUrl, product.ImageUrl);
             Assert.Equal(stock, product.Stock);
             Assert.Equal(categoryId, product.CategoryId);
+            Assert.Equal(shopId, product.ShopId);
+            Assert.True(product.IsActive);
         }
         [Fact]
-        public void AddProduct_ShouldNotCrash_WhenPriceIsLarge()
+        public void Create_ShouldNotCrash_WhenPriceIsLarge()
         {
             var max = int.MaxValue;
-            var exception = Record.Exception(() => new Product("Abc", "des", "bvc", max, 1, 1));
+            var exception = Record.Exception(() => CreateProduct(price: max));
 
             Assert.Null(exception);
         }
         [Fact]
-        public void AddProduct_ShouldNotCrash_WhenStockIsLarge()
+        public void Create_ShouldNotCrash_WhenStockIsLarge()
         {
             var max = int.MaxValue;
-            var exception = Record.Exception(() => new Product("Abc", "des", "bvc", 1, max, 1));
+            var exception = Record.Exception(() => CreateProduct(stock: max));
 
             Assert.Null(exception);
         }
         [Fact]
-        public void UpdatePrice_ShouldBeUpdate_WhenUpdate()
+        public void UpdateProduct_ShouldUpdatePrice_WhenPriceProvided()
         {
-            var name = "ABC";
-            var des = "des";
-            var imageUrl = "abc.jpg";
-            var stock = 30;
-            var price = 30;
-            var categoryId = 1;
-            var product = new Product(name, des, imageUrl, price, stock, categoryId);
-
-
+            var product = CreateProduct();
             var updatePrice = 40;
-            product.UpdatePrice(updatePrice);
 
-            Assert.Equal(updatePrice,product.Price);
-            Assert.NotEqual(price, product.Price);
+            product.UpdateProduct(price: updatePrice);
+
+            Assert.Equal(updatePrice, product.Price);
+            Assert.NotEqual(30, product.Price);
         }
         [Fact]
-        public void UpdatePrice_ShouldThrowException_WhenPriceIsNegative()
+        public void UpdateProduct_ShouldThrowException_WhenPriceIsNegative()
         {
-            var name = "ABC";
-            var des = "des";
-            var imageUrl = "abc.jpg";
-            var stock = 30;
-            var price = -30;
-            var categoryId = 1;
+            var product = CreateProduct();
 
-            Assert.Throws<ArgumentException>(() => new Product(name, des, imageUrl, price, stock, categoryId));
+            Assert.Throws<DomainException>(() => product.UpdateProduct(price: -1));
         }
         [Fact]
-        public void UpdateStock_ShouldThrowException_WhenStockIsNegative()
+        public void UpdateProduct_ShouldThrowException_WhenStockIsNegative()
         {
-            var name = "ABC";
-            var des = "des";
-            var imageUrl = "abc.jpg";
-            var stock = -30;
-            var price = 30;
-            var categoryId = 1;
+            var product = CreateProduct();
 
-            Assert.Throws<ArgumentException>(() => new Product(name, des, imageUrl, price, stock, categoryId));
+            Assert.Throws<DomainException>(() => product.UpdateProduct(stock: -1));
+        }
+        [Fact]
+        public void UpdateProduct_ShouldKeepOldValue_WhenParameterIsNull()
+        {
+            var product = CreateProduct();
+
+            product.UpdateProduct();
+
+            Assert.Equal("ABC", product.Name);
+            Assert.Equal(30, product.Price);
+            Assert.Equal(30, product.Stock);
+        }
+        [Fact]
+        public void AdjustStock_ShouldIncreaseOrDecreaseStock()
+        {
+            var product = CreateProduct(stock: 10);
+
+            product.AdjustStock(5);
+            Assert.Equal(15, product.Stock);
+
+            product.AdjustStock(-20);
+            Assert.Equal(-5, product.Stock);
         }
     }
 }

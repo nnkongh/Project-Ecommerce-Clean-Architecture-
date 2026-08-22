@@ -2,87 +2,92 @@
 using Ecommerce.Application.Services;
 using Ecommerce.Domain.Enum;
 using Ecommerce.Domain.Interfaces;
-using Ecommerce.Domain.Interfaces.Base;
 using Ecommerce.Domain.Interfaces.UnitOfWork;
 using Ecommerce.Domain.Models;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Repository;
-using Ecommerce.Infrastructure.Repository.Base;
 using Ecommerce.Infrastructure.Repository.UnitOfWork;
-using Ecommerce.WebApi.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Org.BouncyCastle.Crypto.Digests;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ecommerce.Test.TestDomain
 {
-    public class CartCleanupBackgroundServiceTests
+    public class CartCleanupBackgroundServiceTests : IDisposable
     {
         private readonly IServiceProvider _service;
         private readonly ApplicationDbContext _context;
+
         public CartCleanupBackgroundServiceTests()
         {
             var service = new ServiceCollection();
-            service.AddDbContext<AppIdentityDbContext>(opt =>
+            service.AddDbContext<ApplicationDbContext>(opt =>
             {
-                opt.UseInMemoryDatabase("hi");
+                opt.UseInMemoryDatabase(Guid.NewGuid().ToString());
             });
-            //service.AddScoped(typeof(IRepositoryBase<,>), typeof(GenericRepository<,>));
-            //service.AddScoped<IUserRepository, UserRepository>();
-            //service.AddScoped<IProductRepository, ProductRepository>();
             service.AddScoped<ICartRepository, CartRepository>();
-            service.AddScoped<ICategoryRepository, CategoryRepository>();
-            //service.AddScoped<IOrderRepository, OrderRepository>();
-            //service.AddScoped<IWishlistRepository, WishlistRepository>();
             service.AddScoped<IUnitOfWork, UnitOfWork>();
-
             service.AddScoped<ICartExpirationService, CartExpirationService>();
             _service = service.BuildServiceProvider();
             _context = _service.GetRequiredService<ApplicationDbContext>();
         }
+
         [Fact]
-        public async Task DeleteCart_WhenCartExpired()
+        public async Task HandleExpiredCartAsync_ShouldDeleteOnlyExpiredCarts()
         {
-            var expiredCart = new Cart
-            {
-                UserId = "abc",
-                CreatedAt = DateTime.UtcNow.AddDays(-10),
-                UpdatedAt = DateTime.UtcNow.AddDays(-10),
-                ExpiredAt = DateTime.UtcNow.AddDays(-1),  // 👈 thêm dòng này
-                Status = CartStatus.Active
-            };
-            var activeCart = new Cart
-            {
-                UserId = "user2",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            };
+            // Arrange
+            var expiredCart = Cart.CreateCart("user1");
+            var activeCart = Cart.CreateCart("user2");
+
             _context.Carts.AddRange(expiredCart, activeCart);
             await _context.SaveChangesAsync();
 
+            // CreateCart mặc định set ExpiredAt = Now (bị service coi là hết hạn),
+            // nên chủ động set ExpiredAt cho 2 cart qua EF property entry (private setter)
+            _context.Entry(expiredCart).Property(c => c.ExpiredAt).CurrentValue = DateTime.Now.AddDays(-1);
+            _context.Entry(activeCart).Property(c => c.ExpiredAt).CurrentValue = DateTime.Now.AddDays(7);
+            await _context.SaveChangesAsync();
 
-            //using var scope = _service.CreateScope();
-            //var cartService = scope.ServiceProvider.GetRequiredService<ICartExpirationService>();
-            //await cartService.HandleExpiredCartAsync(CancellationToken.None);
+            var cartExpirationService = _service.GetRequiredService<ICartExpirationService>();
 
-            //var service = new CartBackgroundService(_service);
+            // Act
+            await cartExpirationService.HandleExpiredCartAsync(CancellationToken.None);
 
-            using var cts = new CancellationTokenSource();
-
-            cts.CancelAfter(TimeSpan.FromSeconds(5));
-
-            //var task = service.StartAsync(cts.Token);
-            await Task.Delay(2000);
-            //await service.StopAsync(CancellationToken.None);
-
+            // Assert
             var remainingCarts = await _context.Carts.ToListAsync();
             Assert.Single(remainingCarts);
-            Assert.Equal(activeCart.Id, remainingCarts[0].Id); 
+            Assert.Equal(activeCart.Id, remainingCarts[0].Id);
+        }
+
+        [Fact]
+        public async Task HandleExpiredCartAsync_ShouldNotDeleteActiveCart_WhenExpiredAtInFuture()
+        {
+            // Arrange
+            var activeCart = Cart.CreateCart("user1");
+            activeCart.AddItem(1, "product1", 2, 30);
+
+            _context.Carts.Add(activeCart);
+            await _context.SaveChangesAsync();
+
+            var cartExpirationService = _service.GetRequiredService<ICartExpirationService>();
+
+            // Act
+            await cartExpirationService.HandleExpiredCartAsync(CancellationToken.None);
+
+            // Assert
+            var remainingCarts = await _context.Carts.ToListAsync();
+            Assert.Single(remainingCarts);
+            Assert.Equal(CartStatus.Active, remainingCarts[0].Status);
+        }
+
+        public void Dispose()
+        {
+            _context.Database.EnsureDeleted();
+            _context.Dispose();
         }
     }
 }
