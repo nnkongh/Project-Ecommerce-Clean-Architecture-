@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs.Models;
+using Ecommerce.Application.DTOs.ModelsRequest.Order;
 using Ecommerce.Web.Interface;
 using Ecommerce.Web.ViewModels;
 using Ecommerce.Web.ViewModels.ApiResponse;
@@ -17,18 +18,29 @@ namespace Ecommerce.Web.Services
             _httpClient = httpClient.CreateClient("ApiClient");
         }
 
-        public Task<ApiResponse<OrderViewModel>> CreatOrderAsync()
+        public async Task<ApiResponse<OrderViewModel>> CreatOrderAsync(CreateOrderRequest request)
         {
-            throw new NotImplementedException();
+            var reponse = await _httpClient.PostAsJsonAsync($"order",request);
+
+            var result = await reponse.Content.ReadFromJsonAsync<ApiResponse<OrderViewModel>>();
+
+            if (result == null || !result.IsSuccess)
+            {
+                return ApiResponse<OrderViewModel>.Fail(result?.Message ?? "Failed to retrieve orders.");
+            }
+
+            var orderViewModel = _mapper.Map<OrderViewModel>(result.Value);
+
+            return ApiResponse<OrderViewModel>.Success(orderViewModel);
         }
 
         public async Task<ApiResponse<IReadOnlyList<OrderViewModel>>> GetListOrderAsync()
         {
-            var response = await _httpClient.GetAsync("orders");
+            var response = await _httpClient.GetAsync("order");
 
             var result = await response.Content.ReadFromJsonAsync<ApiResponse<IReadOnlyList<OrderModel>>>();
 
-            if(result == null || !result.IsSuccess)
+            if (result == null || !result.IsSuccess)
             {
                 return ApiResponse<IReadOnlyList<OrderViewModel>>.Fail(result?.Message ?? "Failed to retrieve orders.");
             }
@@ -40,11 +52,11 @@ namespace Ecommerce.Web.Services
 
         public async Task<ApiResponse<OrderViewModel>> GetOrderByIdAsync(int id)
         {
-            var response = await _httpClient.GetAsync($"orders/{id}");
+            var response = await _httpClient.GetAsync($"order/{id}");
 
             var result = await response.Content.ReadFromJsonAsync<ApiResponse<OrderModel>>();
 
-            if(result == null || !result.IsSuccess)
+            if (result == null || !result.IsSuccess)
             {
                 return ApiResponse<OrderViewModel>.Fail(result?.Message ?? $"Failed to retrieve order with ID {id}.");
             }
@@ -54,5 +66,19 @@ namespace Ecommerce.Web.Services
             return ApiResponse<OrderViewModel>.Success(orderViewModel);
 
         }
+
+        public async Task<ApiResponse<bool>> UpdateOrderStatusAsync(int orderId)
+        {
+            var response = await _httpClient.PutAsync($"order/{orderId}", null);
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<OrderModel>>();
+
+            if (result == null || !result.IsSuccess)
+            {
+                return ApiResponse<bool>.Fail(result?.Message ?? $"Failed to retrieve order with ID {orderId}.");
+            }
+            return ApiResponse<bool>.Success(true);
+        }
+
     }
 }
