@@ -135,7 +135,7 @@ namespace Ecommerce.Web.Services
 
         public async Task<ApiResponse<ProductViewModel>> UpdateProductAsync(int id, ProductViewModel product)
         {
-            var response = await _httpClient.PatchAsJsonAsync($"products/{id}", product);
+            var response = await _httpClient.PatchAsJsonAsync($"products/{id}",product);
 
             var result = await response.Content.ReadFromJsonAsync<ApiResponse<ProductViewModel>>();
 
