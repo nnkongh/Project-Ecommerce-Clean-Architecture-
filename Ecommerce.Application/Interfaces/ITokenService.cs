@@ -18,6 +18,5 @@ public interface ITokenService
 
     ClaimsPrincipal GetPrincipalFromExpiredToken(string accessToken);
     ClaimsPrincipal GetPrincipalFromToken(string accessToken);
-   // string CreateRefreshToken();
-    //Task<Result> RevokeRefreshToken(string userId);
+    Task<Result> RevokeRefreshToken(string userId);
 }

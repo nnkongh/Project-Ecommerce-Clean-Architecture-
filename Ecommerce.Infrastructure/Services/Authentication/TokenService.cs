@@ -175,15 +175,26 @@ namespace Ecommerce.Infrastructure.Services.Authentication
             return principal;
         }
 
-        //public async Task<Result> RevokeRefreshToken(string userId)
-        //{
-        //    var user = await _userRepository.GetUserByIdAsync(userId);
-        //    if(user == null)
-        //    {
-        //        return Result.Failure(new Error("", "User does not exist"));
-        //    }
-        //    var mapped = _mapper.Map<AppUser>(user);
-        //    await _userRepository.UpdateAsync(userId,mapped, x => x.);
-        //}
+        public async Task<Result> RevokeRefreshToken(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return Result.Failure(new Error("User.NotFound", "User does not exist"));
+            }
+
+            user.RefreshToken = null;
+            user.RefreshTokenExpiryTime = null;
+
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                var errors = string.Join("; ", updateResult.Errors.Select(e => e.Description));
+                return Result.Failure(new Error("Token.RevokeFailed", errors));
+            }
+
+            _logger.LogInformation("Refresh token revoked for user {UserId}", userId);
+            return Result.Success();
+        }
     }
 }

@@ -13,6 +13,7 @@ namespace Ecommerce.Web.Handlers
             "auth/register",
             "auth/forgot-password",
             "auth/reset-password",
+            "auth/logout",
             "token/create-token"
         };
 

@@ -13,6 +13,7 @@ namespace Ecommerce.Web.Interface
         Task<ApiResponse<UserModel>> RegisterAsync(RegisterViewModel model);    
         Task<ApiResponse<string>> ForgotPasswordAsync(ForgotPasswordViewModel model);
         Task<ApiResponse<bool>> ResetPasswordAsync(ResetPasswordViewModel model);
+        Task<ApiResponse<bool>> LogoutAsync();
 
     }
 }
