@@ -1,4 +1,5 @@
-﻿using Ecommerce.Web.Interface;
+﻿using Ecommerce.Application.DTOs.ModelsRequest.Order;
+using Ecommerce.Web.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -29,6 +30,24 @@ namespace Ecommerce.Web.Controllers
                 return NotFound();
             }
             return View(order.Value);
+        }
+        public async Task<IActionResult> UpdateOrderStatus(int orderId)
+        {
+            var order = await _orderClient.UpdateOrderStatusAsync(orderId);
+            if (!order.IsSuccess)
+            {
+                return NoContent();
+            }
+            return RedirectToAction("Index");
+        }
+        public async Task<IActionResult> Create(CreateOrderRequest request)
+        {
+            var order = await _orderClient.CreatOrderAsync(request);
+            if(!order.IsSuccess)
+            {
+                return Content(order.Error.ToString());
+            }
+            return View(order);
         }
     }
 }
