@@ -1,4 +1,5 @@
-﻿using Ecommerce.Domain.Models;
+﻿using AutoMapper;
+using Ecommerce.Domain.Models;
 using Ecommerce.Domain.Shared;
 using Ecommerce.Web.Interface;
 using Ecommerce.Web.ViewModels;
@@ -9,16 +10,18 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 namespace Ecommerce.Web.Controllers
 {
     [Authorize]
-    
+
     public class CategoryController : Controller
     {
         private readonly ICategoryClient _categoryClient;
         private readonly IProductClient _productClient;
+        private readonly IMapper _mapper;
 
-        public CategoryController(ICategoryClient categoryClient, IProductClient productClient)
+        public CategoryController(ICategoryClient categoryClient, IProductClient productClient, IMapper mapper)
         {
             _categoryClient = categoryClient;
             _productClient = productClient;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -39,20 +42,21 @@ namespace Ecommerce.Web.Controllers
         }
         [HttpGet("detailed/{id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> ChildCategories(int id, int? selectCategoryId = null, int page = 1, int pageSize = 12)
+        public async Task<IActionResult> ChildCategories(int id, int? selectedCategoryId = null)
         {
-            var categoriesResult = await _categoryClient.GetChildCategoriesPagedAsync(id, page, pageSize);
+            var detailResult = await _categoryClient.GetCategoryDetailAsync(id, selectedCategoryId);
 
-            if (!categoriesResult.IsSuccess)
+            if (!detailResult.IsSuccess || detailResult.Value == null)
             {
                 return NotFound();
             }
 
-            var categories = categoriesResult.Value.Items.ToList();
+            var detail = detailResult.Value;
+            var categories = _mapper.Map<IReadOnlyList<CategoryViewModel>>(detail.ChildCategories);
 
             ViewBag.ParentCategoryId = id;
-            ViewBag.SelectedCategoryId = selectCategoryId;
-            ViewBag.CategoryPagedResult = categoriesResult.Value;
+            ViewBag.SelectedCategoryId = selectedCategoryId;
+            ViewBag.TotalProducts = detail.DisplayProducts?.TotalItems ?? 0;
 
             return View(categories);
         }
