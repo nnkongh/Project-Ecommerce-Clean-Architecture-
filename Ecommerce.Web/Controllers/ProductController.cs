@@ -97,7 +97,7 @@ namespace Ecommerce.Web.Controllers
                 var categoryResult = await _categoryClient.GetCategoryByIdAsync(model.CategoryId);
                 var category = categoryResult.Value;
 
-                return RedirectToAction("ChildCategories", "Category", new { id = category.ParentId, selectCategoryId = category.Id });
+                return RedirectToAction("ChildCategories", "Category", new { id = category.ParentId, selectedCategoryId = category.Id });
             }
             catch (Exception ex)
             {
@@ -163,7 +163,7 @@ namespace Ecommerce.Web.Controllers
                 var category = categoriesResult.Value;
 
                 TempData["Success"] = "Cập nhật thành công";
-                return RedirectToAction("ChildCategories", "Category", new { id = category.ParentId, selectCategoryId = category.Id });
+                return RedirectToAction("ChildCategories", "Category", new { id = category.ParentId, selectedCategoryId = category.Id });
 
             }
             catch (Exception ex)

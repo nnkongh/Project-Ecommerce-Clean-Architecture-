@@ -6,6 +6,7 @@ namespace Ecommerce.Web.Interface
     public interface ICookieTokenService
     {
         string? GetAccessToken();
+        string? GetRefreshToken();
         void RemoveTokenFromCookie();
         void SetTokenInsideCookie(TokenModel token);
     }
