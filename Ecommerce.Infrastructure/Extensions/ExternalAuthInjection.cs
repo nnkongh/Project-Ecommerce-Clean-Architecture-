@@ -25,11 +25,10 @@ namespace Ecommerce.Infrastructure.Dependency_Injection
     {
         public static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration config)
         {
-            services.AddAuthentication(opt =>
-            {
-                opt.DefaultAuthenticateScheme = IdentityConstants.ApplicationScheme;
-                opt.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
-            })
+            // Khong override DefaultAuthenticateScheme/DefaultChallengeScheme o day:
+            // AddIdentity() da set dung (challenge -> trang Login). Flow Google van hoat dong
+            // vi AuthController challenge voi scheme "Google" tuong minh qua Challenge(properties, provider).
+            services.AddAuthentication()
                 .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, opt =>
                 {
                     opt.Cookie.HttpOnly = true;
