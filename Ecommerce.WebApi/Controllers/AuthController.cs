@@ -62,6 +62,25 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(result) : BadRequest(result.Error);
         }
 
+        [HttpPost("refresh")]
+        public async Task<IActionResult> Refresh(TokenModel tokenModel)
+        {
+            if (tokenModel is null || string.IsNullOrEmpty(tokenModel.AccessToken) || string.IsNullOrEmpty(tokenModel.RefreshToken))
+            {
+                return BadRequest(new ApiResponse<TokenModel> { IsSuccess = false, Message = "Invalid token" });
+            }
+
+            try
+            {
+                var result = await _tokenService.RefreshAccessTokenAsync(tokenModel);
+                return Ok(new ApiResponse<TokenModel> { IsSuccess = true, Value = result });
+            }
+            catch (Exception)
+            {
+                return Unauthorized(new ApiResponse<TokenModel> { IsSuccess = false, Message = "Invalid token" });
+            }
+        }
+
         [Authorize]
         [HttpPost("logout")]
         public async Task<IActionResult> Logout()
