@@ -13,16 +13,27 @@ public class CookieTokenService : ICookieTokenService
         _contextAccessor = contextAccessor;
     }
 
-    public string? GetAccessToken()
-    {
-        var context = _contextAccessor.HttpContext;
-        if(context == null)
+        public string? GetAccessToken()
         {
-            return null;
+            var context = _contextAccessor.HttpContext;
+            if(context == null)
+            {
+                return null;
+            }
+            context.Request.Cookies.TryGetValue("access_token", out var token);
+            return token;
         }
-        context.Request.Cookies.TryGetValue("access_token", out var token);
-        return token;
-    }
+
+        public string? GetRefreshToken()
+        {
+            var context = _contextAccessor.HttpContext;
+            if (context == null)
+            {
+                return null;
+            }
+            context.Request.Cookies.TryGetValue("refresh_token", out var token);
+            return token;
+        }
 
     public void RemoveTokenFromCookie()
     {
@@ -59,14 +70,14 @@ public class CookieTokenService : ICookieTokenService
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,
-            Expires = DateTime.UtcNow.AddMinutes(15)
+            Expires = DateTime.UtcNow.AddDays(1)
         });
         context.Response.Cookies.Append("refresh_token", token.RefreshToken, new CookieOptions
         {
             HttpOnly = true,
             Secure = true,
             SameSite = SameSiteMode.None,
-            Expires = DateTime.UtcNow.AddDays(1)
+            Expires = DateTime.UtcNow.AddDays(7)
         });
     }
 }
