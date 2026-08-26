@@ -19,7 +19,8 @@ namespace Ecommerce.Domain.Models
         public int? ShopId { get; private set; }
         public Shop? Shop { get; private set; }
         public int Stock { get; private set; }
-        public int CategoryId { get; private set; }
+        public int ParentCategoryId { get; private set; }
+        public int ChildCategoryId { get; private set; }
         public Category Category { get; private set; } = null!;
         public IReadOnlyCollection<Comment> Comments => _comments.AsReadOnly();
         public IReadOnlyCollection<Review> Reviews => _reviews.AsReadOnly();
@@ -27,7 +28,7 @@ namespace Ecommerce.Domain.Models
         private readonly List<Comment> _comments = new List<Comment>();
 
         public Product() { }
-        public static Product Create(string name, string imageUrl, int shopId, decimal price, int stock, int categoryId, string? description = null)
+        public static Product Create(string name, string imageUrl, int shopId, decimal price, int stock, int ParentCategoryId, int ChildCategoryId, string? description = null)
         {
             if (string.IsNullOrEmpty(name)) throw new DomainException("Tên sản phẩm không được để trống");
             if (price < 0) throw new DomainException("Giá sản phẩm không được để trống");
@@ -42,7 +43,8 @@ namespace Ecommerce.Domain.Models
                 ImageUrl = imageUrl,
                 Price = price,
                 Stock = stock,
-                CategoryId = categoryId,
+                ParentCategoryId = ParentCategoryId,
+                ChildCategoryId = ChildCategoryId,
                 IsActive = true
             };
             return product;
