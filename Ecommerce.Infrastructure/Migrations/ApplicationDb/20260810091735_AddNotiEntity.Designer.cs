@@ -4,6 +4,7 @@ using Ecommerce.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260810091735_AddNotiEntity")]
+    partial class AddNotiEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -173,33 +176,6 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
                     b.ToTable("ItemWishList");
                 });
 
-            modelBuilder.Entity("Ecommerce.Domain.Models.Notification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Notifications");
-                });
-
             modelBuilder.Entity("Ecommerce.Domain.Models.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -284,9 +260,6 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ChildCategoryId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
@@ -301,15 +274,9 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("ParentCategoryId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("ShopId")
-                        .HasColumnType("int");
 
                     b.Property<int>("Stock")
                         .HasColumnType("int");
@@ -318,77 +285,7 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("ShopId");
-
                     b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("Ecommerce.Domain.Models.Review", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("ProductId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Rating")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("Reviews");
-                });
-
-            modelBuilder.Entity("Ecommerce.Domain.Models.Shop", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("Shops");
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.Models.User", b =>
@@ -418,9 +315,6 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ShopId")
-                        .HasColumnType("int");
 
                     b.Property<string>("UserName")
                         .HasColumnType("nvarchar(max)");
@@ -488,6 +382,33 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
                     b.HasIndex("UserId");
 
                     b.ToTable("Wishlist");
+                });
+
+            modelBuilder.Entity("Ecommerce.Domain.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.Models.Cart", b =>
@@ -566,17 +487,6 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("WishList");
                 });
 
-            modelBuilder.Entity("Ecommerce.Domain.Models.Notification", b =>
-                {
-                    b.HasOne("Ecommerce.Domain.Models.User", "User")
-                        .WithMany("Notifications")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("Ecommerce.Domain.Models.Order", b =>
                 {
                     b.HasOne("Ecommerce.Domain.Models.User", "User")
@@ -636,74 +546,7 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Ecommerce.Domain.Models.Shop", "Shop")
-                        .WithMany("Products")
-                        .HasForeignKey("ShopId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.Navigation("Category");
-
-                    b.Navigation("Shop");
-                });
-
-            modelBuilder.Entity("Ecommerce.Domain.Models.Review", b =>
-                {
-                    b.HasOne("Ecommerce.Domain.Models.Product", "Product")
-                        .WithMany("Reviews")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("Ecommerce.Domain.Models.User", "User")
-                        .WithMany("Reviews")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Ecommerce.Domain.Models.Shop", b =>
-                {
-                    b.HasOne("Ecommerce.Domain.Models.User", "User")
-                        .WithOne("Shop")
-                        .HasForeignKey("Ecommerce.Domain.Models.Shop", "UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.OwnsOne("Ecommerce.Domain.Models.Address", "Address", b1 =>
-                        {
-                            b1.Property<int>("ShopId")
-                                .HasColumnType("int");
-
-                            b1.Property<string>("City")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("District")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Province")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Street")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.Property<string>("Ward")
-                                .HasColumnType("nvarchar(max)");
-
-                            b1.HasKey("ShopId");
-
-                            b1.ToTable("Shops");
-
-                            b1.WithOwner()
-                                .HasForeignKey("ShopId");
-                        });
-
-                    b.Navigation("Address");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.Models.User", b =>
@@ -749,6 +592,17 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("Ecommerce.Domain.Notification", b =>
+                {
+                    b.HasOne("Ecommerce.Domain.Models.User", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Ecommerce.Domain.Models.Cart", b =>
                 {
                     b.Navigation("Items");
@@ -769,13 +623,6 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
             modelBuilder.Entity("Ecommerce.Domain.Models.Product", b =>
                 {
                     b.Navigation("Comments");
-
-                    b.Navigation("Reviews");
-                });
-
-            modelBuilder.Entity("Ecommerce.Domain.Models.Shop", b =>
-                {
-                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.Models.User", b =>
@@ -785,10 +632,6 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("Notifications");
 
                     b.Navigation("Orders");
-
-                    b.Navigation("Reviews");
-
-                    b.Navigation("Shop");
 
                     b.Navigation("Wishlist");
                 });
