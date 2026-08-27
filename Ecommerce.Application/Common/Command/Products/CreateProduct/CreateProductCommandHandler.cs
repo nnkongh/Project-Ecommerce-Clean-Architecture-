@@ -37,14 +37,15 @@ namespace Ecommerce.Application.Common.Command.Products.CreateProduct
                 return Result.Failure<ProductModel>(new Error("", "Tên sản phẩm không được để trống"));
             }
             if (productRequest.Price <= 0)
+
             {
                 return Result.Failure<ProductModel>(new Error("", "Giá sản phẩm phải lớn hơn 0"));
             }
-            if (productRequest.ImageUrl == null)
+            if (string.IsNullOrWhiteSpace(productRequest.ImageUrl))
             {
-                return Result.Failure<ProductModel>(new Error("", "Hình ảnh sản phẩm không được để trống"));
+                return Result.Failure<ProductModel>(new Error("", "Vui lòng chọn hình ảnh cho sản phẩm"));
             }
-            var existing = await _categoryRepo.GetByIdAsync(productRequest.CategoryId);
+            var existing = await _categoryRepo.GetByIdAsync(productRequest.ParentCategoryId);
             if (existing == null)
             {
                 return Result.Failure<ProductModel>(new Error("", $"Danh mục không tồn tại"));
@@ -54,7 +55,7 @@ namespace Ecommerce.Application.Common.Command.Products.CreateProduct
             {
                 return Result.Failure<ProductModel>(new Error("", $"Chỉ có cửa hàng được tạo sản phẩm"));
             }
-            var product = Product.Create(productRequest.Name, productRequest.ImageUrl,shop.Id, productRequest.Price,productRequest.Stock, productRequest.CategoryId, productRequest.Description);
+            var product = Product.Create(productRequest.Name, productRequest.ImageUrl,shop.Id, productRequest.Price,productRequest.Stock, productRequest.ParentCategoryId,productRequest.ChildCategoryId, productRequest.Description);
             var item = await _productRepo.AddAsync(product); 
             var mapped = _mapper.Map<ProductModel>(item);
             await _uow.SaveChangesAsync(cancellationToken);
