@@ -12,7 +12,7 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
         {
 
             migrationBuilder.Sql("UPDATE Products SET ParentCategoryId = CategoryId " + "WHERE ParentCategoryId = 0 AND CategoryId > 0");
-
+        
             migrationBuilder.DropForeignKey(
                 name: "FK_Products_Categories_CategoryId",
                 table: "Products");
