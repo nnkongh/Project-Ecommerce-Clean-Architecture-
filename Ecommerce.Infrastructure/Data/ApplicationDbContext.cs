@@ -44,6 +44,11 @@ namespace Ecommerce.Infrastructure.Data
                 .Property(x => x.Price)
                 .HasPrecision(18, 2);
 
+            modelBuilder.Entity<Product>()
+                .HasOne(x => x.Category)
+                .WithMany(x => x.Products)
+                .HasForeignKey(x => x.ParentCategoryId);
+
             modelBuilder.Entity<OrderItem>()
                 .Property(x => x.Price)
                 .HasPrecision(18, 2);
@@ -133,7 +138,7 @@ namespace Ecommerce.Infrastructure.Data
                 .HasForeignKey<Shop>(u => u.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            modelBuilder.Entity<Review>()
+            modelBuilder.Entity<Review>()       
                 .HasOne(r => r.Product)
                 .WithMany(p => p.Reviews)
                 .HasForeignKey(r => r.ProductId)
