@@ -1,0 +1,419 @@
+@model ShopRegisterViewModel
+
+@{
+    ViewData["Title"] = "Cửa hàng của tôi";
+}
+
+@section Styles {
+    <style>
+        .shop-hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 0;
+            margin-bottom: 2rem;
+        }
+        .shop-card {
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: transform 0.2s;
+        }
+        .shop-card:hover {
+            transform: translateY(-2px);
+        }
+        .shop-card .card-header {
+            border-bottom: none;
+            padding: 1.25rem 1.5rem;
+        }
+        .product-form-section {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+        .btn-register-shop {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 0.75rem 2rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: opacity 0.2s;
+        }
+        .btn-register-shop:hover {
+            opacity: 0.9;
+            color: white;
+        }
+        .shop-info-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 2rem 0;
+        }
+        .divider::before,
+        .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 2px solid #dee2e6;
+        }
+        .divider span {
+            padding: 0 1rem;
+            color: #6c757d;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+    </style>
+}
+
+<!-- Hero Section -->
+<div class="shop-hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h2 class="mb-2">
+                    <i class="fas fa-store me-2"></i>Cửa hàng của tôi
+                </h2>
+                <p class="mb-0 opacity-75">Quản lý cửa hàng và sản phẩm của bạn</p>
+            </div>
+            @if (Model.Shop?.HasShop == true)
+            {
+                <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                    <span class="shop-info-badge bg-success text-white">
+                        <i class="fas fa-check-circle"></i> Đang hoạt động
+                    </span>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            @if (Model.Shop?.HasShop != true)
+            {
+                <!-- ========== ĐĂNG KÝ CỬA HÀNG ========== -->
+                <div class="shop-card card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-plus-circle me-2"></i>Đăng ký cửa hàng
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="text-center mb-4">
+                            <i class="fas fa-store fa-3x text-primary opacity-50 mb-3"></i>
+                            <h5>Bạn chưa có cửa hàng</h5>
+                            <p class="text-muted">Tạo cửa hàng để bắt đầu bán sản phẩm trên nền tảng</p>
+                        </div>
+
+                        <form asp-action="Create" method="post">
+                            <div class="row justify-content-center">
+                                <div class="col-md-8">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">
+                                            <i class="fas fa-tag me-1"></i>Tên cửa hàng <span class="text-danger">*</span>
+                                        </label>
+                                        <input type="text"
+                                               name="shopName"
+                                               class="form-control form-control-lg"
+                                               placeholder="Nhập tên cửa hàng của bạn"
+                                               required />
+                                        <div class="form-text">Tên cửa hàng sẽ hiển thị công khai với khách hàng</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-register-shop btn-lg text-white">
+                                    <i class="fas fa-rocket me-2"></i>Tạo cửa hàng ngay
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <!-- ========== THÔNG TIN CỬA HÀNG ========== -->
+                <div class="shop-card card mb-4">
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-store me-2"></i>@Model.Shop!.Name
+                        </h5>
+                        <span class="badge bg-white text-success">
+                            <i class="fas fa-check me-1"></i>Đã đăng ký
+                        </span>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p class="mb-2">
+                                    <strong><i class="fas fa-calendar me-2"></i>Ngày tạo:</strong>
+                                    @Model.Shop.CreatedAt.ToString("dd/MM/yyyy")
+                                </p>
+                                <p class="mb-0">
+                                    <strong><i class="fas fa-toggle-on me-2"></i>Trạng thái:</strong>
+                                    <span class="badge bg-success">Hoạt động</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ========== NÚT THÊM / XEM SẢN PHẨM ========== -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-primary btn-lg w-100 py-3" onclick="toogleProductForm()">
+                            <i class="fas fa-plus-circle me-2"></i>Thêm sản phẩm
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <a asp-action="Products" class="btn btn-outline-primary btn-lg w-100 py-3">
+                            <i class="fas fa-box-open me-2"></i>Xem danh sách sản phẩm
+                        </a>
+                    </div>
+                </div>
+
+                <div id="productFormSection" style="display: none;">
+                    <div class="divider">
+                        <span><i class="fas fa-box me-1"></i>Thêm sản phẩm mới</span>
+                    </div>
+
+                    <!-- ========== FORM THÊM SẢN PHẨM ========== -->
+                    <div class="shop-card card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-plus-circle me-2"></i>Thêm sản phẩm vào cửa hàng
+                            </h5>
+                        </div>
+                        <div class="card-body p-4">
+                        <form asp-action="AddProduct" method="post" enctype="multipart/form-data">
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                            <!-- Upload hình ảnh -->
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label asp-for="NewProduct.Image" class="form-label fw-bold">
+                                        <i class="fas fa-image me-1"></i>Hình ảnh sản phẩm <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="NewProduct.Image"
+                                           type="file"
+                                           class="form-control"
+                                           accept="image/*"
+                                           onchange="previewImage(event)" />
+                                    <span asp-validation-for="NewProduct.Image" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6 text-center">
+                                    <img id="preview"
+                                         src="#"
+                                         alt="Preview"
+                                         class="img-thumbnail"
+                                         style="max-width: 150px; max-height: 150px; object-fit: contain; display: none;" />
+                                </div>
+                            </div>
+
+                            <!-- Thông tin sản phẩm -->
+                            <div class="row g-3 mb-3">
+                                <!-- Tên sản phẩm -->
+                                <div class="col-md-8">
+                                    <label asp-for="NewProduct.Name" class="form-label fw-bold">
+                                        <i class="fas fa-tag me-1"></i>Tên sản phẩm <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="NewProduct.Name"
+                                           class="form-control"
+                                           placeholder="Nhập tên sản phẩm" />
+                                    <span asp-validation-for="NewProduct.Name" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Giá -->
+                                <div class="col-md-4">
+                                    <label asp-for="NewProduct.Price" class="form-label fw-bold">
+                                        <i class="fas fa-dollar-sign me-1"></i>Giá (VNĐ) <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="NewProduct.Price"
+                                           type="number"
+                                           step="1000"
+                                           class="form-control"
+                                           placeholder="0" />
+                                    <span asp-validation-for="NewProduct.Price" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Mô tả -->
+                                <div class="col-md-8">
+                                    <label asp-for="NewProduct.Description" class="form-label fw-bold">
+                                        <i class="fas fa-align-left me-1"></i>Mô tả
+                                    </label>
+                                    <textarea asp-for="NewProduct.Description"
+                                              class="form-control"
+                                              rows="3"
+                                              placeholder="Nhập mô tả chi tiết"></textarea>
+                                    <span asp-validation-for="NewProduct.Description" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Tồn kho -->
+                                <div class="col-md-4">
+                                    <label asp-for="NewProduct.Stock" class="form-label fw-bold">
+                                        <i class="fas fa-boxes me-1"></i>Tồn kho <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="NewProduct.Stock"
+                                           type="number"
+                                           min="0"
+                                           class="form-control"
+                                           placeholder="0" />
+                                    <span asp-validation-for="NewProduct.Stock" class="text-danger small"></span>
+                                </div>
+
+                                <!-- Danh mục cha -->
+                                <div class="col-md-6">
+                                    <label asp-for="NewProduct.ParentCategoryId" class="form-label fw-bold">
+                                        <i class="fas fa-layer-group me-1"></i>Danh mục cha
+                                    </label>
+                                    <select asp-for="NewProduct.ParentCategoryId" id="parentCategorySelect" class="form-select">
+                                        <option value="">-- Chọn danh mục cha --</option>
+                                        @if (Model.ParentCategories != null && Model.ParentCategories.Any())
+                                        {
+                                            @foreach (var category in Model.ParentCategories)
+                                            {
+                                                <option value="@category.Value">@category.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+
+                                <!-- Danh mục con -->
+                                <div class="col-md-6" id="childCategoryGroup" style="display: none;">
+                                    <label asp-for="NewProduct.ChildCategoryId" class="form-label fw-bold">
+                                        <i class="fas fa-tags me-1"></i>Danh mục con <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="NewProduct.ChildCategoryId" id="childCategorySelect" class="form-select">
+                                        <option value="">-- Chọn danh mục con --</option>
+                                    </select>
+                                    <span asp-validation-for="NewProduct.ChildCategoryId" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <!-- Buttons -->
+                            <div class="d-flex justify-content-end mt-4 pt-3 border-top">
+                                <div>
+                                    <button type="reset" class="btn btn-outline-danger me-2" onclick="resetForm()">
+                                        <i class="fas fa-undo me-2"></i>Đặt lại
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Thêm sản phẩm
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        </div>
+                    </div>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    const allCategories = @Html.Raw(Json.Serialize(Model.AllCategories != null ? Model.AllCategories.Select(c => new {
+        id = c.Id,
+        name = c.Name,
+        parentId = c.ParentId
+    }) : new object[0]));
+
+    $(document).ready(function() {
+        const parentSelect = $('#parentCategorySelect');
+        const childGroup = $('#childCategoryGroup');
+        const childSelect = $('#childCategorySelect');
+
+        parentSelect.on('change', function() {
+            const parentId = parseInt($(this).val());
+
+            if (!parentId) {
+                childGroup.slideUp(300);
+                childSelect.val('').trigger('change');
+                return;
+            }
+
+            const childCategories = allCategories.filter(c => c.parentId === parentId);
+
+            if (childCategories.length > 0) {
+                childSelect.empty();
+                childSelect.append('<option value="">-- Chọn danh mục con --</option>');
+
+                childCategories.forEach(category => {
+                    childSelect.append(`<option value="${category.id}">${category.name}</option>`);
+                });
+
+                childGroup.slideDown(300);
+            } else {
+                childGroup.slideUp(300);
+                childSelect.val('');
+            }
+        });
+    });
+
+    function previewImage(event) {
+        const file = event.target.files[0];
+        const preview = document.getElementById('preview');
+
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Kích thước ảnh không được vượt quá 5MB');
+                event.target.value = '';
+                preview.style.display = 'none';
+                return;
+            }
+
+            const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
+            if (!validTypes.includes(file.type)) {
+                alert('Chỉ chấp nhận file ảnh định dạng JPG, PNG, GIF');
+                event.target.value = '';
+                preview.style.display = 'none';
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        } else {
+            preview.style.display = 'none';
+        }
+    }
+
+    function resetForm() {
+        document.getElementById('preview').style.display = 'none';
+        document.getElementById('childCategoryGroup').style.display = 'none';
+        document.getElementById('parentCategorySelect').value = '';
+        document.getElementById('childCategorySelect').value = '';
+    }
+
+    function toogleProductForm() {
+        const section = document.getElementById('productFormSection');
+        if (section.style.display === 'none') {
+            section.style.display = 'block';
+            section.scrollIntoView({ behavior: 'smooth' });
+        } else {
+            section.style.display = 'none';
+        }
+    }
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
