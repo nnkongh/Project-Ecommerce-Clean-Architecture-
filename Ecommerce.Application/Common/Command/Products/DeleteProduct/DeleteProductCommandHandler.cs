@@ -15,12 +15,14 @@ namespace Ecommerce.Application.Common.Command.Products.DeleteProduct
     public sealed class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand, Result>
     {
         private readonly IProductRepository _productRepo;
+        private readonly IShopRepository _shopRepository;
         private readonly IUnitOfWork _uow;
 
-        public DeleteProductCommandHandler(IProductRepository productRepo, IUnitOfWork uow)
+        public DeleteProductCommandHandler(IProductRepository productRepo, IUnitOfWork uow, IShopRepository shopRepository)
         {
             _productRepo = productRepo;
             _uow = uow;
+            _shopRepository = shopRepository;
         }
 
         public async Task<Result> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
@@ -33,6 +35,11 @@ namespace Ecommerce.Application.Common.Command.Products.DeleteProduct
             if (product == null)
             {
                 return Result.Failure(new Error("", "Item not found"));
+            }
+            var shop = await _shopRepository.GetByUserIdAsync(request.UserId);
+            if (shop == null || product.ShopId != shop.Id)
+            {
+                return Result.Failure(new Error("", "Sản phẩm này không thuộc về cửa hàng của bạn"));
             }
             await _productRepo.Delete(product);
             await _uow.SaveChangesAsync(cancellationToken);

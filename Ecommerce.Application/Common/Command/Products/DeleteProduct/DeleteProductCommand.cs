@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Command.Products.DeleteProduct
 {
-    public sealed record DeleteProductCommand(int id) : IRequest<Result>
+    public sealed record DeleteProductCommand(string UserId, int id) : IRequest<Result>
     {
     }
 }
