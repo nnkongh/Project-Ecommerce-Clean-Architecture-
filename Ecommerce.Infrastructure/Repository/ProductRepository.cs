@@ -19,9 +19,26 @@ namespace Ecommerce.Infrastructure.Repository
         {
         }
 
+        public async Task<IReadOnlyList<Product>> GetProductsByCategoryIdAsync(int categoryId)
+        {
+            return await _context.Products
+                .Include(p => p.Category)
+                .Where(p => p.ParentCategoryId == categoryId)
+                .ToListAsync();
+        }
+
         public async Task<IReadOnlyList<Product>> GetProductsByIdsAsync(IEnumerable<int> ids)
         {
             return await _context.Products.Where(p => ids.Contains(p.Id)).ToListAsync();
+        }
+
+        public async Task<IReadOnlyList<Product>> GetProductsByShopIdAsync(int shopId)
+        {
+            return await _context.Products
+                .Include(p => p.Category)
+                .OrderByDescending(p => p.Id)
+                .Where(p => p.ShopId == shopId)
+                .ToListAsync();
         }
     }
 }
