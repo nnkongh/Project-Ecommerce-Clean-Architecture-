@@ -21,7 +21,23 @@ namespace Ecommerce.Web.Services
 
         public async Task<ApiResponse<ProductViewModel>> CreateProductAsync(ProductViewModel product)
         {
-            var response = await _httpClient.PostAsJsonAsync("products", product);
+            var createRequest = _mapper.Map<CreateProductRequest>(product);
+            var response = await _httpClient.PostAsJsonAsync("products", createRequest);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorBody = await response.Content.ReadAsStringAsync();
+                try
+                {
+                    var error = System.Text.Json.JsonSerializer.Deserialize<ApiResponse<ProductModel>>(errorBody);
+                    if (error?.Error?.Message != null)
+                    {
+                        return ApiResponse<ProductViewModel>.Fail(error.Error.Message);
+                    }
+                }
+                catch { }
+                return ApiResponse<ProductViewModel>.Fail(errorBody);
+            }
 
             var result = await response.Content.ReadFromJsonAsync<ApiResponse<ProductModel>>();
 
@@ -72,6 +88,22 @@ namespace Ecommerce.Web.Services
             {
                 return ApiResponse<IReadOnlyList<ProductViewModel>>.Fail(
                 result?.Error?.Message ?? "Không thể lấy danh sách sản phẩm");
+            }
+            var mapped = _mapper.Map<IReadOnlyList<ProductViewModel>>(result.Value);
+
+            return ApiResponse<IReadOnlyList<ProductViewModel>>.Success(mapped);
+        }
+
+        public async Task<ApiResponse<IReadOnlyList<ProductViewModel>>> GetAllProductsByShopIdAsync(int shopId)
+        {
+            var response = await _httpClient.GetAsync($"products/shop/{shopId}");
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<IReadOnlyList<ProductModel>>>();
+
+            if (result == null || !result.IsSuccess)
+            {
+                return ApiResponse<IReadOnlyList<ProductViewModel>>.Fail(
+                result?.Error?.Message ?? "Không thể lấy danh sách sản phẩm của cửa hàng");
             }
             var mapped = _mapper.Map<IReadOnlyList<ProductViewModel>>(result.Value);
 
