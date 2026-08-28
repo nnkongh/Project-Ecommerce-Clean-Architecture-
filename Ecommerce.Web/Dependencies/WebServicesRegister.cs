@@ -10,6 +10,7 @@ using Ecommerce.Infrastructure.Services;
 using Ecommerce.Infrastructure.Services.Authentication;
 using Ecommerce.Web.Authorization;
 using Ecommerce.Web.Client.Strategy;
+using Ecommerce.Web.Features;
 using Ecommerce.Web.Features.Authentication;
 using Ecommerce.Web.Features.Carts;
 using Ecommerce.Web.Handlers;
@@ -45,6 +46,8 @@ namespace Ecommerce.Web.Dependencies
             services.AddPhotoService(configuration);
 
             services.AddHttpClientService(configuration);
+
+            services.AddSignalRService();
 
             services.AddCartSession();
 
@@ -99,6 +102,7 @@ namespace Ecommerce.Web.Dependencies
             services.AddScoped<IWishlistClient, WishlistClient>();
             services.AddScoped<IAddressClient, AddressClient>();
             services.AddScoped<ICheckoutCartClient,CheckoutCartClient>();
+            services.AddScoped<IShopClient, ShopClient>();
 
             services.AddScoped<CartApiClient>();
             services.AddScoped<CartSessionClient>();
@@ -116,7 +120,12 @@ namespace Ecommerce.Web.Dependencies
 
             return services;
         }
-
+        public static IServiceCollection AddSignalRService(this IServiceCollection services)
+        {
+            services.AddSignalR();
+            services.AddScoped<INotificationService,NotificationService>();
+            return services;
+        }
         //AddIdentity tự động đăng ký các scheme như ApplicationScheme, ExternalScheme, TwoFactorRememberMeScheme
         // Khi sử dụng addsigninmanager, thì asp.net identity sẽ dùng các scheme mặc định khi gọi các method như
         // getexternallogininfoasync và externalloginsigninasync
