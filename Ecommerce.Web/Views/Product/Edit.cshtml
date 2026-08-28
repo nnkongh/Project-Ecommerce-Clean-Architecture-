@@ -18,7 +18,7 @@
                 <div class="card-body p-4">
                     <form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
                         <input type="hidden" asp-for="Id" />
-                        <input type="hidden" asp-for="CategoryId" />
+                        <input type="hidden" asp-for="ParentCategoryId" />
                         <input type="hidden" asp-for="ImageUrl" />
 
                         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
