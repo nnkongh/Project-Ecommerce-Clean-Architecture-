@@ -7,6 +7,7 @@ using Ecommerce.Application.Common.Queries.Products.GetProductByCategoryId;
 using Ecommerce.Application.Common.Queries.Products.GetProductById;
 using Ecommerce.Application.Common.Queries.Products.GetProductByName;
 using Ecommerce.Application.Common.Queries.Products.GetProductByPagination;
+using Ecommerce.Application.Common.Queries.Products.GetProductsByShopId;
 using Ecommerce.Application.Common.Queries.Products.GetProductsCategory;
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.Product;
@@ -56,6 +57,15 @@ namespace Ecommerce.WebApi.Controllers
             return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = true, Value = result.Value })
                                     : BadRequest(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = false, Error = result.Error });
         }
+        [HttpGet("shop/{shopId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetProductsByShopId(int shopId)
+        {
+            var query = new GetProductsByShopIdQuery(shopId);
+            var result = await Sender.Send(query);
+            return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = true, Value = result.Value })
+                                    : BadRequest(new ApiResponse<IReadOnlyList<ProductModel>> { IsSuccess = false, Error = result.Error });
+        }
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetProductsByCategory()
@@ -99,7 +109,7 @@ namespace Ecommerce.WebApi.Controllers
             {
                 return Unauthorized();
             }
-            var command = new DeleteProductCommand(id);
+            var command = new DeleteProductCommand(userId, id);
             var result = await Sender.Send(command);
             return result.IsSuccess ? Ok(new ApiResponse<bool> { IsSuccess = true })
                                     : BadRequest(new ApiResponse<bool> { IsSuccess = false, Error = result.Error });
