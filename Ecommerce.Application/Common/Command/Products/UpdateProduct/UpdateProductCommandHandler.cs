@@ -48,7 +48,7 @@ namespace Ecommerce.Application.Common.Command.Products.UpdateProduct
                 return Result.Failure<ProductModel>(new Error("", $"Product with id {request.ProductId} is not found"));
             }
             var shop = await _shopRepository.GetByUserIdAsync(request.UserId);
-            if (shop == null)
+            if (shop == null || product.ShopId != shop.Id)
             {
                 return Result.Failure<ProductModel>(new Error("", "Sản phẩm này không thuộc về cửa hàng của bạn"));
             }
