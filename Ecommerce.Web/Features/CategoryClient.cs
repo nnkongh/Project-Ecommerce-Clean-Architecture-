@@ -99,20 +99,40 @@ namespace Ecommerce.Web.Services
             return ApiResponse<PagedResult<CategoryViewModel>>.Success(mapped);
         }
 
-        public async Task<ApiResponse<PagedResult<CategoryViewModel>>> GetChildCategoriesPagedAsync(int parentId, int page, int pageSize)
+        public async Task<ApiResponse<PagedResult<ProductViewModel>>> GetChildCategoriesPagedAsync(int parentId, int page, int pageSize)
         {
             var response = await _httpClient.GetAsync($"categories/{parentId}/children/paged?page={page}&pageSize={pageSize}");
 
-            var result = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResult<CategoryModel>>>();
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<PagedResult<ProductModel>>>();
 
             if (result == null || !result.IsSuccess)
             {
-                return ApiResponse<PagedResult<CategoryViewModel>>.Fail(result?.Error?.Message ?? "Không thể lấy danh mục con");
+                return ApiResponse<PagedResult<ProductViewModel>>.Fail(result?.Error?.Message ?? "Không thể lấy danh mục con");
             }
 
-            var mapped = _mapper.Map<PagedResult<CategoryViewModel>>(result.Value);
+            var mapped = _mapper.Map<PagedResult<ProductViewModel>>(result.Value);
 
-            return ApiResponse<PagedResult<CategoryViewModel>>.Success(mapped);
+            return ApiResponse<PagedResult<ProductViewModel>>.Success(mapped);
+        }
+
+        public async Task<ApiResponse<CategoryDetailModel>> GetCategoryDetailAsync(int parentId, int? selectedCategoryId)
+        {
+            var url = $"categories/{parentId}/details";
+            if (selectedCategoryId.HasValue)
+            {
+                url += $"?selectedCategoryId={selectedCategoryId.Value}";
+            }
+
+            var response = await _httpClient.GetAsync(url);
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<CategoryDetailModel>>();
+
+            if (result == null || !result.IsSuccess)
+            {
+                return ApiResponse<CategoryDetailModel>.Fail(result?.Error?.Message ?? "Không thể lấy chi tiết danh mục");
+            }
+
+            return ApiResponse<CategoryDetailModel>.Success(result.Value!);
         }
 
         public async Task<ApiResponse<CategoryViewModel>> GetCategoryByIdAsync(int? id)
