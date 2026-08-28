@@ -39,7 +39,7 @@ namespace Ecommerce.Web.Controllers
             var result = await _productClient.GetAllProductsByPaginationAsync(page, pageSize, sortBy, minPrice, maxPrice, categoryId, searchTerm);
             return View(result);
         }
-
+        
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> Create()
@@ -94,10 +94,10 @@ namespace Ecommerce.Web.Controllers
                 }
                 TempData["Success"] = "Tạo sản phẩm thành công";
 
-                var categoryResult = await _categoryClient.GetCategoryByIdAsync(model.CategoryId);
+                var categoryResult = await _categoryClient.GetCategoryByIdAsync(model.ParentCategoryId);
                 var category = categoryResult.Value;
 
-                return RedirectToAction("ChildCategories", "Category", new { id = category.ParentId, selectedCategoryId = category.Id });
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
@@ -159,7 +159,7 @@ namespace Ecommerce.Web.Controllers
                     ModelState.AddModelError("", "Lỗi upload ảnh: " + result.Error.Message);
                     return View(model);
                 }
-                var categoriesResult = await _categoryClient.GetCategoryByIdAsync(model.CategoryId);
+                var categoriesResult = await _categoryClient.GetCategoryByIdAsync(model.ParentCategoryId);
                 var category = categoriesResult.Value;
 
                 TempData["Success"] = "Cập nhật thành công";
