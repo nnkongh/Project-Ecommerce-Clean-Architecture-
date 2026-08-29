@@ -1,138 +1,346 @@
 ﻿@model Ecommerce.Web.ViewModels.CartViewModel
 @{
-    ViewData["Title"] = "Giỏ hàng";
+    ViewData["Title"] = "Giỏ hàng của tôi";
+    var items = Model?.Items ?? new List<Ecommerce.Web.ViewModels.CartItemViewModel>();
 }
 
-<div class="container my-5">
-    <h2 class="mb-4">Giỏ hàng của bạn</h2>
+@section Styles {
+    <style>
+        /* Cart item */
+        .cart-item {
+            background: #fff;
+            border: 1px solid #eef0f3;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(17,24,39,.04);
+            padding: 1rem 1.1rem;
+            transition: transform .2s, box-shadow .2s;
+        }
 
-    @if (Model.Items == null || Model?.Items?.Count == 0)
-    {
-        <div class="alert alert-info text-center py-5">
-            <i class="fas fa-shopping-cart fa-3x mb-3"></i>
-            <h4>Giỏ hàng của bạn đang trống</h4>
-            <p class="text-muted">Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm</p>
-            <a href="@Url.Action("Index", "Home")" class="btn btn-primary mt-3">
-                <i class="fas fa-arrow-left me-2"></i>Tiếp tục mua sắm
-            </a>
+        .cart-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(17,24,39,.1);
+        }
+
+        .cart-item-img {
+            width: 86px;
+            height: 86px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .cart-item-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .cart-item-img .placeholder {
+            color: #9ca3af;
+            font-size: 1.5rem;
+        }
+
+        .cart-item-name {
+            font-weight: 600;
+            color: #111827;
+            font-size: .95rem;
+            line-height: 1.4;
+            text-decoration: none;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .cart-item-name:hover {
+            color: #312e81;
+        }
+
+        .cart-item-price {
+            color: #6b7280;
+            font-size: .82rem;
+            font-weight: 500;
+        }
+
+        .cart-item-total {
+            font-weight: 700;
+            color: #dc2626;
+            font-size: 1rem;
+            white-space: nowrap;
+        }
+
+        /* Qty stepper */
+        .qty-stepper {
+            display: inline-flex;
+            align-items: center;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 10px;
+            overflow: hidden;
+            background: #fff;
+        }
+
+        .qty-btn {
+            border: none;
+            background: transparent;
+            width: 36px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #374151;
+            font-size: .75rem;
+            transition: background .15s;
+        }
+
+        .qty-btn:hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        .qty-btn:disabled {
+            color: #d1d5db;
+            cursor: not-allowed;
+        }
+
+        .qty-value {
+            width: 46px;
+            text-align: center;
+            border: none;
+            border-left: 1.5px solid #e5e7eb;
+            border-right: 1.5px solid #e5e7eb;
+            font-weight: 700;
+            color: #111827;
+            background: #f8fafc;
+            height: 38px;
+        }
+
+        .btn-remove {
+            border: 1.5px solid #e5e7eb;
+            background: #fff;
+            border-radius: 10px;
+            color: #6b7280;
+            width: 38px;
+            height: 38px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .2s;
+        }
+
+        .btn-remove:hover {
+            border-color: #dc2626;
+            color: #dc2626;
+            background: #fef2f2;
+        }
+
+        /* Order summary */
+        .order-summary {
+            background: #fff;
+            border: 1px solid #eef0f3;
+            border-radius: 18px;
+            box-shadow: 0 2px 10px rgba(17,24,39,.04);
+            overflow: hidden;
+            position: sticky;
+            top: 90px;
+        }
+
+        .order-summary-head {
+            background: linear-gradient(135deg, #111827, #1e1b4b);
+            color: #fff;
+            padding: 1.1rem 1.35rem;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+
+        .order-summary-body {
+            padding: 1.4rem 1.35rem;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: .5rem 0;
+            color: #6b7280;
+            font-size: .92rem;
+        }
+
+        .summary-row .value {
+            color: #111827;
+            font-weight: 600;
+        }
+
+        .summary-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #eef0f3;
+            border-radius: 12px;
+            padding: .85rem 1rem;
+            margin-top: .5rem;
+        }
+
+        .summary-total .label {
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .summary-total .amount {
+            font-weight: 800;
+            color: #dc2626;
+            font-size: 1.2rem;
+        }
+
+        .btn-checkout {
+            background: #111827;
+            color: #fff;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1rem;
+            padding: .85rem 1rem;
+            transition: all .2s;
+        }
+
+        .btn-checkout:hover {
+            background: #312e81;
+            color: #fff;
+            box-shadow: 0 8px 18px rgba(17,24,39,.3);
+        }
+    </style>
+}
+
+<div class="app-page">
+    <div class="container py-5">
+
+        <!-- Header -->
+        <div class="page-head">
+            <div class="d-flex align-items-center gap-3">
+                <span class="title-icon bg-dark"><i class="fas fa-shopping-cart"></i></span>
+                <div>
+                    <h1 class="page-title mb-1">Giỏ hàng của tôi</h1>
+                    <p class="text-muted mb-0">Xem lại các sản phẩm bạn đã chọn</p>
+                </div>
+            </div>
+            @if (items.Any())
+            {
+                <span class="result-count">
+                    <i class="fas fa-box me-2"></i>@items.Count sản phẩm
+                </span>
+            }
         </div>
-    }
-    else
-    {
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th scope="col" style="width: 50%">Sản phẩm</th>
-                                        <th scope="col" class="text-center">Đơn giá</th>
-                                        <th scope="col" class="text-center">Số lượng</th>
-                                        <th scope="col" class="text-center">Thành tiền</th>
-                                        <th scope="col" class="text-center">Thao tác</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var item in Model.Items)
-                                    {
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex align-items-center">
-                                                    <img src="@item.ImageUrl"
-                                                         alt="@item.ProductName"
-                                                         class="img-thumbnail me-3"
-                                                         style="width: 80px; height: 80px; object-fit: cover;"
-                                                         onerror="this.src='/images/no-image.png'">
-                                                    <div>
-                                                        <h6 class="mb-0">@item.ProductName</h6>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td class="text-center">
-                                                <strong>@item.TotalPrice.ToString("N0") đ</strong>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex justify-content-center align-items-center">
-                                                    <form method="post" asp-action="UpdateQuantity" asp-route-productId="@item.ProductId" class="d-inline">
-                                                        <div class="input-group" style="width: 130px;">
-                                                            <button type="submit" name="quantity" value="@(item.Quantity - 1)"
-                                                                    class="btn btn-outline-secondary btn-sm"
-                                                                    @(item.Quantity <= 1 ? "disabled" : "")>
-                                                                <i class="fas fa-minus"></i>
-                                                            </button>
-                                                            <input type="text"
-                                                                   class="form-control form-control-sm text-center"
-                                                                   value="@item.Quantity"
-                                                                   readonly>
-                                                            <button type="submit" name="quantity" value="@(item.Quantity + 1)"
-                                                                    class="btn btn-outline-secondary btn-sm">
-                                                                <i class="fas fa-plus"></i>
-                                                            </button>
-                                                        </div>  
-                                                    </form>
-                                                </div>
-                                            </td>
-                                            <td class="text-center">
-                                                <strong class="text-primary">@item.TotalPrice.ToString("N0") đ</strong>
-                                            </td>
-                                            <td class="text-center">
-                                                <form method="post" asp-controller="Cart" asp-action="RemoveFromCart" asp-route-productId="@item.ProductId" class="d-inline delete-form">
-                                                    <button type="button"
-                                                            class="btn btn-danger btn-sm btn-delete"
-                                                            data-product-name="@item.ProductName">
-                                                        <i class="fas fa-trash-alt"></i>
+
+        @if (!items.Any())
+        {
+            <div class="empty-state text-center py-5">
+                <div class="empty-icon"><i class="fas fa-shopping-cart"></i></div>
+                <h4 class="mb-1">Giỏ hàng của bạn đang trống</h4>
+                <p class="text-muted mb-3">Hãy thêm sản phẩm vào giỏ hàng để tiếp tục mua sắm</p>
+                <a href="@Url.Action("Index", "Home")" class="btn btn-dark-soft px-4">
+                    <i class="fas fa-arrow-left me-2"></i>Tiếp tục mua sắm
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="d-flex flex-column gap-3">
+                        @foreach (var item in items)
+                        {
+                            <div class="cart-item">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="cart-item-img">
+                                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                        {
+                                            <img src="@item.ImageUrl" alt="@item.ProductName" onerror="this.parentElement.innerHTML='<span class=&quot;placeholder&quot;><i class=&quot;fas fa-image&quot;></i></span>';">
+                                        }
+                                        else
+                                        {
+                                            <span class="placeholder"><i class="fas fa-image"></i></span>
+                                        }
+                                    </div>
+
+                                    <div class="flex-grow-1 min-w-0">
+                                        <a asp-controller="Product" asp-action="Detail" asp-route-id="@item.ProductId" class="cart-item-name">@item.ProductName</a>
+                                        <div class="cart-item-price">
+                                            <i class="fas fa-tag me-1"></i>Đơn giá: @item.TotalPrice.ToString("N0") đ
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex flex-column align-items-end gap-2">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <form method="post" asp-action="UpdateQuantity" asp-route-productId="@item.ProductId" class="m-0 d-inline-flex">
+                                                <div class="qty-stepper">
+                                                    <button type="submit" name="quantity" value="@(item.Quantity - 1)"
+                                                            class="qty-btn" @(item.Quantity <= 1 ? "disabled" : "")>
+                                                        <i class="fas fa-minus"></i>
                                                     </button>
-                                                </form>
-                                            </td>
-                                        </tr>
-                                    }
-                                </tbody>
-                            </table>
-                        </div>
+                                                    <input type="text" class="qty-value" value="@item.Quantity" readonly>
+                                                    <button type="submit" name="quantity" value="@(item.Quantity + 1)" class="qty-btn">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </form>
+                                            <form method="post" asp-controller="Cart" asp-action="RemoveFromCart" asp-route-productId="@item.ProductId" class="m-0 delete-form">
+                                                <button type="button" class="btn-remove btn-delete" title="Xóa" data-product-name="@item.ProductName">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                        <div class="cart-item-total">@item.TotalPrice.ToString("N0") đ</div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
-            </div>
 
-            <div class="col-lg-4">
-                <div class="card shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title mb-4">Tóm tắt đơn hàng</h5>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>Tạm tính:</span>
-                            <strong>@Model.GrandTotal.ToString("N0") đ</strong>
+                <div class="col-lg-4">
+                    <div class="order-summary">
+                        <div class="order-summary-head">
+                            <h6 class="mb-0"><i class="fas fa-file-invoice me-2"></i>Tóm tắt đơn hàng</h6>
                         </div>
-                        <div class="d-flex justify-content-between mb-3">
-                            <span>Phí vận chuyển:</span>
-                            <strong class="text-success">Miễn phí</strong>
-                        </div>
-                        <hr>
-                        <div class="d-flex justify-content-between mb-4">
-                            <h5>Tổng cộng:</h5>
-                            <h5 class="text-danger">@Model.GrandTotal.ToString("N0") đ</h5>
-                        </div>
+                        <div class="order-summary-body">
+                            <div class="summary-row">
+                                <span>Tạm tính</span>
+                                <span class="value">@Model.GrandTotal.ToString("N0") đ</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Phí vận chuyển</span>
+                                <span class="value text-success">Miễn phí</span>
+                            </div>
 
-                        <form method="post" asp-action="CheckoutCart">
-                            <button type="submit" class="btn btn-primary w-100 mb-3">
-                                <i class="fas fa-shopping-bag me-2"></i>Đặt hàng
+                            <div class="summary-total">
+                                <span class="label">Tổng cộng</span>
+                                <span class="amount">@Model.GrandTotal.ToString("N0") đ</span>
+                            </div>
+
+                            <form method="post" asp-action="CheckoutCart" class="mt-3">
+                                <button type="submit" class="btn btn-checkout w-100 mb-3">
+                                    <i class="fas fa-shopping-bag me-2"></i>Đặt hàng
+                                </button>
+                            </form>
+
+                            <button onclick="history.back()" class="btn btn-outline-dark-soft w-100">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại mua sắm
                             </button>
-                        </form>
-
-                        <button onclick="history.back()" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>Quay lại
-                        </button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    }
+        }
+    </div>
 </div>
 
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered modal-sm">
-        <div class="modal-content" style="border-radius: 16px;">
+        <div class="modal-content" style="border-radius: 16px; border: none; box-shadow: 0 20px 50px rgba(17,24,39,.25);">
             <div class="modal-body text-center py-4">
                 <div class="mb-3">
                     <div style="width: 64px; height: 64px; background: #fef2f2; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;">
@@ -144,8 +352,8 @@
                 <strong id="deleteProductName" class="d-block mb-1"></strong>
                 <p class="text-muted">khỏi giỏ hàng?</p>
                 <div class="d-flex gap-2 justify-content-center mt-3">
-                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal" style="border-radius: 10px;">Hủy</button>
-                    <button type="button" class="btn btn-danger px-4" id="confirmDeleteBtn" style="border-radius: 10px;">
+                    <button type="button" class="btn btn-outline-secondary px-4 rounded-pill" data-bs-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn btn-danger px-4 rounded-pill" id="confirmDeleteBtn">
                         <i class="fas fa-trash-alt me-1"></i>Xóa
                     </button>
                 </div>
@@ -169,10 +377,10 @@
 
         document.getElementById('confirmDeleteBtn').addEventListener('click', function () {
             if (activeDeleteForm) {
-                const row = activeDeleteForm.closest('tr');
-                if (row) {
-                    row.style.transition = 'opacity 0.3s';
-                    row.style.opacity = '0.5';
+                const card = activeDeleteForm.closest('.cart-item');
+                if (card) {
+                    card.style.transition = 'opacity 0.3s';
+                    card.style.opacity = '0.4';
                 }
                 activeDeleteForm.submit();
             }
