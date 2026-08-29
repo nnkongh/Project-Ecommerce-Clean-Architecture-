@@ -4,52 +4,168 @@
     ViewData["Title"] = "Thêm địa chỉ mới";
 }
 
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-dark text-white">
-                    <h5 class="mb-0"><i class="fas fa-plus-circle me-2"></i>Thêm địa chỉ mới</h5>
-                </div>
-                <div class="card-body">
-                    <form asp-action="Create" method="post">
-                        <div class="mb-3">
-                            <label asp-for="Street" class="form-label">Đường</label>
-                            <input asp-for="Street" class="form-control" placeholder="Nhập tên đường" />
-                            <span asp-validation-for="Street" class="text-danger"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label asp-for="Ward" class="form-label">Phường/Xã</label>
-                            <input asp-for="Ward" class="form-control" placeholder="Nhập phường/xã" />
-                            <span asp-validation-for="Ward" class="text-danger"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label asp-for="District" class="form-label">Quận/Huyện</label>
-                            <input asp-for="District" class="form-control" placeholder="Nhập quận/huyện" />
-                            <span asp-validation-for="District" class="text-danger"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label asp-for="City" class="form-label">Thành phố</label>
-                            <input asp-for="City" class="form-control" placeholder="Nhập thành phố" />
-                            <span asp-validation-for="City" class="text-danger"></span>
-                        </div>
-                        <div class="mb-3">
-                            <label asp-for="Province" class="form-label">Tỉnh</label>
-                            <input asp-for="Province" class="form-control" placeholder="Nhập tỉnh" />
-                        </div>
-                        <div class="mb-3 form-check">
-                            <input asp-for="IsDefault" class="form-check-input" />
-                            <label asp-for="IsDefault" class="form-check-label">Đặt làm địa chỉ mặc định</label>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-dark">
-                                <i class="fas fa-save me-1"></i>Lưu
-                            </button>
-                            <a asp-action="Index" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left me-1"></i>Quay lại
-                            </a>
-                        </div>
-                    </form>
+@section Styles {
+    <style>
+        .address-page {
+            background: radial-gradient(1200px 400px at 15% -50px, rgba(99,102,241,.07), transparent),
+                        radial-gradient(1000px 400px at 90% -100px, rgba(239,68,68,.05), transparent),
+                        #f6f7f9;
+            min-height: calc(100vh - 76px);
+        }
+
+        .page-head {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.75rem;
+        }
+
+        .back-btn {
+            width: 44px;
+            height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .title-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            color: #fff;
+            box-shadow: 0 6px 14px rgba(17,24,39,.25);
+        }
+
+        .ui-card {
+            background: #fff;
+            border: 1px solid #eef0f3;
+            border-radius: 18px;
+            box-shadow: 0 2px 10px rgba(17,24,39,.04);
+            overflow: hidden;
+        }
+
+        .ui-card-head {
+            background: linear-gradient(135deg, #111827, #1e1b4b);
+            color: #fff;
+            padding: 1.25rem 1.6rem;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+
+        .ui-card-body {
+            padding: 1.8rem 1.6rem;
+        }
+
+        .form-control {
+            border: 1.5px solid #e5e7eb;
+            border-radius: 10px;
+            padding: .6rem .85rem;
+        }
+
+        .form-control:focus {
+            border-color: #312e81;
+            box-shadow: 0 0 0 .2rem rgba(49,46,129,.1);
+        }
+
+        .form-label {
+            font-size: .88rem;
+        }
+
+        .form-check-input:checked {
+            background-color: #111827;
+            border-color: #111827;
+        }
+
+        .btn-dark-soft {
+            background: #111827;
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            border-radius: 20px;
+            padding: .6rem 1.6rem;
+        }
+
+        .btn-dark-soft:hover {
+            background: #312e81;
+            color: #fff;
+            box-shadow: 0 6px 14px rgba(17,24,39,.25);
+        }
+    </style>
+}
+
+<div class="address-page">
+    <div class="container py-5">
+
+        <!-- Header -->
+        <div class="page-head">
+            <a asp-action="Index" class="btn btn-outline-dark rounded-circle back-btn" title="Quay lại">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <span class="title-icon bg-dark"><i class="fas fa-plus-circle"></i></span>
+            <div>
+                <h1 class="page-title mb-1">Thêm địa chỉ mới</h1>
+                <p class="text-muted mb-0">Điền thông tin địa chỉ giao hàng của bạn</p>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="ui-card">
+                    <div class="ui-card-head">
+                        <h5 class="mb-0"><i class="fas fa-map-marker-alt me-2"></i>Thông tin địa chỉ</h5>
+                    </div>
+                    <div class="ui-card-body">
+                        <form asp-action="Create" method="post">
+                            <div class="mb-3">
+                                <label asp-for="Street" class="form-label fw-bold"><i class="fas fa-road me-1"></i>Đường</label>
+                                <input asp-for="Street" class="form-control" placeholder="Số nhà, tên đường" />
+                                <span asp-validation-for="Street" class="text-danger small"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="Ward" class="form-label fw-bold"><i class="fas fa-building me-1"></i>Phường/Xã</label>
+                                <input asp-for="Ward" class="form-control" placeholder="Nhập phường/xã" />
+                                <span asp-validation-for="Ward" class="text-danger small"></span>
+                            </div>
+                            <div class="mb-3">
+                                <label asp-for="District" class="form-label fw-bold"><i class="fas fa-city me-1"></i>Quận/Huyện</label>
+                                <input asp-for="District" class="form-control" placeholder="Nhập quận/huyện" />
+                                <span asp-validation-for="District" class="text-danger small"></span>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="City" class="form-label fw-bold"><i class="fas fa-map me-1"></i>Thành phố</label>
+                                    <input asp-for="City" class="form-control" placeholder="Nhập thành phố" />
+                                    <span asp-validation-for="City" class="text-danger small"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label asp-for="Province" class="form-label fw-bold"><i class="fas fa-globe-asia me-1"></i>Tỉnh</label>
+                                    <input asp-for="Province" class="form-control" placeholder="Nhập tỉnh" />
+                                </div>
+                            </div>
+                            <div class="form-check form-switch my-3">
+                                <input asp-for="IsDefault" class="form-check-input" />
+                                <label asp-for="IsDefault" class="form-check-label">Đặt làm địa chỉ mặc định</label>
+                            </div>
+                            <div class="d-flex justify-content-between pt-3 border-top">
+                                <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                                    <i class="fas fa-arrow-left me-2"></i>Quay lại
+                                </a>
+                                <button type="submit" class="btn btn-dark-soft rounded-pill px-5">
+                                    <i class="fas fa-save me-2"></i>Lưu địa chỉ
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
