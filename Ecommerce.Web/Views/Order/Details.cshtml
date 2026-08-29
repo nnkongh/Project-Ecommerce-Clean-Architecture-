@@ -2,130 +2,536 @@
 @model OrderViewModel
 @{
     ViewData["Title"] = $"Chi tiết đơn hàng #{Model.Id}";
+
+    var stepIndex = Model.OrderStatus switch
+    {
+        OrderStatus.Pending => 0,
+        OrderStatus.Processing => 1,
+        OrderStatus.Finished => 2,
+        _ => 0
+    };
 }
 
-<div class="container my-5">
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a asp-controller="Order" asp-action="Index">Đơn hàng</a></li>
-            <li class="breadcrumb-item active">Chi tiết đơn hàng #@Model.Id</li>
-        </ol>
-    </nav>
+<div class="order-page">
+    <div class="container py-5">
 
-    <div class="card shadow-sm mb-4">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-            <h4 class="mb-0"><i class="fas fa-receipt me-2"></i>Đơn hàng #@Model.Id</h4>
-            @switch (Model.OrderStatus)
-            {
-                case OrderStatus.Pending:
-                    <span class="badge bg-warning text-dark fs-6 px-3 py-2">
-                        <i class="fas fa-clock me-1"></i>Chờ xử lý
-                    </span>
-                    break;
-                case OrderStatus.Processing:
-                    <span class="badge bg-info fs-6 px-3 py-2">
-                        <i class="fas fa-spinner me-1"></i>Đang xử lý
-                    </span>
-                    break;
-                case OrderStatus.Finished:
-                    <span class="badge bg-success fs-6 px-3 py-2">
-                        <i class="fas fa-check-circle me-1"></i>Hoàn thành
-                    </span>
-                    break;
-            }
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a asp-controller="Order" asp-action="Index">Đơn hàng</a></li>
+                <li class="breadcrumb-item active">Chi tiết đơn hàng #@Model.Id</li>
+            </ol>
+        </nav>
+
+        <div class="order-hero mb-4">
+            <div class="d-flex align-items-center flex-wrap justify-content-between gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <span class="order-id-badge">#@Model.Id</span>
+                    <div>
+                        <h1 class="h3 mb-1 fw-bold text-dark">Đơn hàng @Model.Id</h1>
+                        <div class="small text-muted">
+                            <i class="far fa-calendar-alt me-1"></i>@Model.OrderDate.ToString("dd/MM/yyyy HH:mm:ss")
+                        </div>
+                    </div>
+                </div>
+
+                @switch (Model.OrderStatus)
+                {
+                    case OrderStatus.Pending:
+                        <span class="status-pill st-pending"><i class="fas fa-clock me-1"></i>Chờ xử lý</span>
+                        break;
+                    case OrderStatus.Processing:
+                        <span class="status-pill st-processing"><i class="fas fa-rotate me-1"></i>Đang xử lý</span>
+                        break;
+                    case OrderStatus.Finished:
+                        <span class="status-pill st-finished"><i class="fas fa-circle-check me-1"></i>Hoàn thành</span>
+                        break;
+                }
+            </div>
         </div>
-        <div class="card-body">
-            <div class="row mb-4">
-                <div class="col-md-6">
-                    <h5 class="text-primary mb-3"><i class="fas fa-user me-2"></i>Thông tin khách hàng</h5>
-                    <table class="table table-borderless">
-                        <tr>
-                            <td class="fw-bold" style="width: 120px;">Tên:</td>
-                            <td>@Model.CustomerName</td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold">Email:</td>
-                            <td>@Model.Email</td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold">SĐT:</td>
-                            <td>@Model.PhoneNumber</td>
-                        </tr>
+
+        <div class="card shadow-sm border-0 rounded-4 mb-4">
+            <div class="card-body p-4">
+                <h2 class="h6 text-uppercase fw-bold text-muted small mb-4">
+                    <i class="fas fa-timeline me-2"></i>Tiến trình đơn hàng
+                </h2>
+
+                <div class="order-stepper">
+                    <div class="step-item @(stepIndex >= 0 ? "done" : "") @(stepIndex == 0 ? "current" : "")">
+                        <div class="step-dot">
+                            <i class="fas fa-clipboard-check"></i>
+                            <i class="fas fa-check done-icon"></i>
+                        </div>
+                        <div class="step-label">Đặt hàng</div>
+                        <div class="step-desc">Đơn hàng đã được tạo</div>
+                    </div>
+                    <div class="step-line @(stepIndex >= 1 ? "active" : "")"></div>
+                    <div class="step-item @(stepIndex >= 1 ? "done" : "") @(stepIndex == 1 ? "current" : "")">
+                        <div class="step-dot">
+                            <i class="fas fa-rotate"></i>
+                            <i class="fas fa-check done-icon"></i>
+                        </div>
+                        <div class="step-label">Đang xử lý</div>
+                        <div class="step-desc">Cửa hàng đang chuẩn bị hàng</div>
+                    </div>
+                    <div class="step-line @(stepIndex >= 2 ? "active" : "")"></div>
+                    <div class="step-item @(stepIndex >= 2 ? "done" : "") @(stepIndex == 2 ? "current" : "")">
+                        <div class="step-dot">
+                            <i class="fas fa-box-open"></i>
+                            <i class="fas fa-check done-icon"></i>
+                        </div>
+                        <div class="step-label">Hoàn thành</div>
+                        <div class="step-desc">Đơn hàng đã giao</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-4">
+            <div class="col-lg-4">
+                <div class="card info-card border-0 rounded-4 h-100">
+                    <div class="card-body p-4">
+                        <div class="info-card-title">
+                            <span class="info-icon bg-dark text-white"><i class="fas fa-user"></i></span>
+                            Thông tin khách hàng
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Tên khách hàng</span>
+                            <span class="info-value">@Model.CustomerName</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Email</span>
+                            <span class="info-value">@(Model.Email ?? "-")</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Số điện thoại</span>
+                            <span class="info-value">@(Model.PhoneNumber ?? "-")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card info-card border-0 rounded-4 h-100">
+                    <div class="card-body p-4">
+                        <div class="info-card-title">
+                            <span class="info-icon bg-danger bg-gradient"><i class="fas fa-map-marker-alt"></i></span>
+                            Địa chỉ giao hàng
+                        </div>
+                        @if (Model.Address != null)
+                        {
+                            <div class="info-row">
+                                <span class="info-label">Địa chỉ</span>
+                                <span class="info-value">@Model.Address.Street</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Phường/Xã</span>
+                                <span class="info-value">@Model.Address.Ward</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Quận/Huyện</span>
+                                <span class="info-value">@Model.Address.District</span>
+                            </div>
+                            <div class="info-row mb-0">
+                                <span class="info-label">Tỉnh/Thành phố</span>
+                                <span class="info-value">@Model.Address.City</span>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-muted">Không có thông tin địa chỉ</div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="card info-card border-0 rounded-4 h-100">
+                    <div class="card-body p-4">
+                        <div class="info-card-title">
+                            <span class="info-icon bg-success bg-gradient"><i class="fas fa-receipt"></i></span>
+                            Tóm tắt đơn hàng
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Số loại sản phẩm</span>
+                            <span class="info-value">@Model.Items.Count</span>
+                        </div>
+                        <div class="info-row">
+                            <span class="info-label">Tổng số sản phẩm</span>
+                            <span class="info-value">@Model.Items.Sum(i => i.Quantity)</span>
+                        </div>
+                        <div class="info-row mb-0">
+                            <span class="info-label">Tổng tiền</span>
+                            <span class="info-value total-value">@Model.TotalAmount.ToString("N0") đ</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 rounded-4 mb-4">
+            <div class="card-header bg-white border-0 rounded-top-4 pt-4 px-4 pb-0">
+                <h2 class="h6 text-uppercase fw-bold text-muted small mb-0">
+                    <i class="fas fa-shopping-bag me-2"></i>Sản phẩm đã đặt
+                </h2>
+            </div>
+            <div class="card-body p-4">
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0 order-table">
+                        <thead>
+                            <tr>
+                                <th class="text-muted small text-uppercase" style="width: 90px">Ảnh</th>
+                                <th class="text-muted small text-uppercase">Sản phẩm</th>
+                                <th class="text-center text-muted small text-uppercase" style="width: 130px">Đơn giá</th>
+                                <th class="text-center text-muted small text-uppercase" style="width: 90px">SL</th>
+                                <th class="text-end text-muted small text-uppercase" style="width: 150px">Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Items)
+                            {
+                                <tr>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                        {
+                                            <img src="@item.ImageUrl" alt="@item.ProductName"
+                                                 onerror="this.src='/images/no-image.png'"
+                                                 class="rounded-3 border" style="width: 64px; height: 64px; object-fit: cover;" />
+                                        }
+                                        else
+                                        {
+                                            <div class="rounded-3 d-flex align-items-center justify-content-center"
+                                                 style="width: 64px; height: 64px; background: #f3f4f6; color: #9ca3af;">
+                                                <i class="fas fa-image fa-lg"></i>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="fw-semibold text-dark">@item.ProductName</span>
+                                    </td>
+                                    <td class="text-center text-muted">@item.Price.ToString("N0") đ</td>
+                                    <td class="text-center">
+                                        <span class="qty-badge">@item.Quantity</span>
+                                    </td>
+                                    <td class="text-end fw-bold" style="color: #dc2626;">
+                                        @((item.Price * item.Quantity).ToString("N0")) đ
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="4" class="text-end text-muted">
+                                    Tổng cộng
+                                    <div class="small">gồm @Model.Items.Count loại sản phẩm</div>
+                                </td>
+                                <td class="text-end total-amount">@Model.TotalAmount.ToString("N0") đ</td>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
-                <div class="col-md-6">
-                    <h5 class="text-primary mb-3"><i class="fas fa-map-marker-alt me-2"></i>Địa chỉ giao hàng</h5>
-                    @if (Model.Address != null)
-                    {
-                        <p class="mb-1">@Model.Address.Street</p>
-                        <p class="mb-1">@Model.Address.Ward, @Model.Address.District</p>
-                        <p>@Model.Address.City</p>
-                    }
-                </div>
-            </div>
 
-            <hr />
+                <div class="d-flex flex-wrap justify-content-between align-items-center mt-4 pt-3 border-top">
+                    <a asp-controller="Order" asp-action="Index" class="btn btn-outline-dark rounded-pill px-4">
+                        <i class="fas fa-arrow-left me-2"></i>Quay lại danh sách
+                    </a>
 
-            <h5 class="text-primary mb-3"><i class="fas fa-shopping-bag me-2"></i>Sản phẩm đã đặt</h5>
-            <div class="table-responsive">
-                <table class="table table-bordered">
-                    <thead class="table-light">
-                        <tr>
-                            <th style="width: 100px">Hình ảnh</th>
-                            <th>Sản phẩm</th>
-                            <th class="text-center" style="width: 120px">Đơn giá</th>
-                            <th class="text-center" style="width: 80px">SL</th>
-                            <th class="text-end" style="width: 130px">Thành tiền</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in Model.Items)
+                    <div class="d-flex gap-2 mt-2 mt-sm-0">
+                        @if (Model.OrderStatus == OrderStatus.Pending)
                         {
-                            <tr>
-                                <td class="text-center">
-                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
-                                    {
-                                        <img src="@item.ImageUrl" alt="@item.ProductName"
-                                             style="width: 80px; height: 80px; object-fit: cover;"
-                                             class="img-thumbnail" />
-                                    }
-                                    else
-                                    {
-                                        <div class="bg-light d-flex align-items-center justify-content-center"
-                                             style="width: 80px; height: 80px;">
-                                            <i class="fas fa-image fa-2x text-muted"></i>
-                                        </div>
-                                    }
-                                </td>
-                                <td class="align-middle fw-bold">@item.ProductName</td>
-                                <td class="text-center align-middle">@item.Price.ToString("N0") đ</td>
-                                <td class="text-center align-middle">
-                                    <span class="badge bg-primary fs-6">@item.Quantity</span>
-                                </td>
-                                <td class="text-end align-middle">
-                                    <strong class="text-danger">@((item.Price * item.Quantity).ToString("N0")) đ</strong>
-                                </td>
-                            </tr>
+                            <form method="post" asp-action="UpdateOrderStatus">
+                                <input type="hidden" name="orderId" value="@Model.Id" />
+                                <button type="submit" class="btn btn-ghost-confirm rounded-pill px-4">
+                                    <i class="fas fa-check me-1"></i>Xác nhận đơn
+                                </button>
+                            </form>
                         }
-                    </tbody>
-                    <tfoot class="table-light">
-                        <tr>
-                            <td colspan="4" class="text-end">
-                                <strong class="fs-5">Tổng cộng:</strong>
-                            </td>
-                            <td class="text-end">
-                                <strong class="text-danger fs-5">@Model.TotalAmount.ToString("N0") đ</strong>
-                            </td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-
-            <div class="mt-4">
-                <a asp-controller="Order" asp-action="Index" class="btn btn-secondary">
-                    <i class="fas fa-arrow-left me-1"></i>Quay lại danh sách
-                </a>
+                        @if (Model.OrderStatus == OrderStatus.Processing)
+                        {
+                            <form method="post" asp-action="UpdateOrderStatus">
+                                <input type="hidden" name="orderId" value="@Model.Id" />
+                                <button type="submit" class="btn btn-ghost-confirm rounded-pill px-4">
+                                    <i class="fas fa-check-double me-1"></i>Hoàn thành
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Styles {
+    <style>
+        .order-page {
+            background: #f6f7f9;
+            min-height: calc(100vh - 76px);
+        }
+
+        .breadcrumb {
+            font-size: .9rem;
+        }
+
+        .breadcrumb a {
+            color: #6b7280;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: #111827;
+        }
+
+        .order-hero {
+            background: radial-gradient(600px 300px at 0% 0%, rgba(99,102,241,.12), transparent),
+                        linear-gradient(135deg, #ffffff, #f7f8fa);
+            border: 1px solid #eef0f3;
+            border-radius: 20px;
+            padding: 1.4rem 1.6rem;
+            box-shadow: 0 4px 18px rgba(17,24,39,.06);
+        }
+
+        .order-id-badge {
+            background: #111827;
+            color: #fff;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: .5px;
+            border-radius: 12px;
+            padding: .6rem 1rem;
+            box-shadow: 0 6px 14px rgba(17,24,39,.25);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: .55rem 1.2rem;
+            font-size: .9rem;
+            font-weight: 600;
+        }
+
+        .st-pending { background: #fffbeb; color: #b45309; }
+        .st-processing { background: #eff6ff; color: #1d4ed8; }
+        .st-finished { background: #ecfdf5; color: #047857; }
+
+        /* Stepper */
+        .order-stepper {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+        }
+
+        .step-line {
+            flex: 1;
+            height: 3px;
+            background: #e5e7eb;
+            margin: 30px 1rem 0;
+            border-radius: 3px;
+            transition: background .3s;
+        }
+
+        .step-line.active {
+            background: linear-gradient(90deg, #10b981, #22c55e);
+        }
+
+        .step-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            min-width: 110px;
+        }
+
+        .step-dot {
+            position: relative;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            transition: all .3s;
+        }
+
+        .step-item .done-icon {
+            display: none;
+        }
+
+        .step-item:not(.done) .step-dot {
+            background: #fff;
+            border: 2px solid #e5e7eb;
+            color: #9ca3af;
+        }
+
+        .step-item.current .step-dot {
+            border-color: #6366f1;
+            color: #6366f1;
+            box-shadow: 0 0 0 8px rgba(99,102,241,.1);
+        }
+
+        .step-item.done .step-dot {
+            background: #10b981;
+            border-color: #10b981;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(16,185,129,.35);
+        }
+
+        .step-item.done .step-dot > i:first-child {
+            display: none;
+        }
+
+        .step-item.done .step-dot .done-icon {
+            display: block;
+        }
+
+        .step-label {
+            margin-top: .8rem;
+            font-weight: 700;
+            color: #111827;
+            font-size: .92rem;
+        }
+
+        .step-desc {
+            font-size: .78rem;
+            color: #9ca3af;
+            margin-top: .2rem;
+            max-width: 150px;
+        }
+
+        .step-item.current .step-label {
+            color: #6366f1;
+        }
+
+        /* Info cards */
+        .info-card {
+            background: #fff;
+            box-shadow: 0 2px 12px rgba(17,24,39,.05);
+        }
+
+        .info-card-title {
+            font-weight: 700;
+            color: #111827;
+            font-size: .95rem;
+            display: flex;
+            align-items: center;
+            gap: .65rem;
+            margin-bottom: 1rem;
+        }
+
+        .info-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 1rem;
+            padding: .55rem 0;
+            border-bottom: 1px dashed #eef0f3;
+        }
+
+        .info-row:last-of-type {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #6b7280;
+            font-size: .85rem;
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            color: #111827;
+            font-weight: 600;
+            font-size: .9rem;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .total-value {
+            color: #dc2626;
+            font-size: 1.05rem;
+        }
+
+        /* Order table */
+        .order-table thead th {
+            border-bottom: 2px solid #eef0f3;
+            padding-bottom: .8rem;
+        }
+
+        .order-table tbody tr {
+            border-bottom: 1px solid #f1f3f5;
+        }
+
+        .order-table tbody tr:hover {
+            background: #fafbfc;
+        }
+
+        .qty-badge {
+            background: #eceef1;
+            color: #374151;
+            border-radius: 8px;
+            padding: .35rem .75rem;
+            font-weight: 700;
+            font-size: .9rem;
+        }
+
+        .order-table tfoot tr {
+            background: #fafbfc;
+        }
+
+        .order-table tfoot td {
+            padding-top: 1rem;
+            border-top: 2px solid #eef0f3;
+        }
+
+        .total-amount {
+            color: #dc2626;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .btn-ghost-confirm {
+            border: 1px solid #10b981;
+            color: #047857;
+            background: #fff;
+            font-weight: 600;
+            transition: all .2s;
+        }
+
+        .btn-ghost-confirm:hover {
+            background: #10b981;
+            color: #fff;
+            border-color: #10b981;
+            box-shadow: 0 4px 12px rgba(16,185,129,.3);
+        }
+
+        @@media (max-width: 600px) {
+            .order-stepper {
+                flex-direction: column;
+                align-items: center;
+                gap: 1.2rem;
+            }
+
+            .step-line {
+                display: none;
+            }
+
+            .step-desc {
+                max-width: 100%;
+            }
+
+            .order-hero {
+                padding: 1rem;
+            }
+        }
+    </style>
+}

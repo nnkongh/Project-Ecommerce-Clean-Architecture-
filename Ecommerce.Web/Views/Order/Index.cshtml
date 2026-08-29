@@ -3,293 +3,630 @@
 
 @{
     ViewData["Title"] = "Quản lý Đơn hàng";
+
+    var total = Model?.Count ?? 0;
+    var pending = Model?.Count(o => o.OrderStatus == OrderStatus.Pending) ?? 0;
+    var processing = Model?.Count(o => o.OrderStatus == OrderStatus.Processing) ?? 0;
+    var finished = Model?.Count(o => o.OrderStatus == OrderStatus.Finished) ?? 0;
 }
 
-<div class="container my-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="fas fa-box me-2"></i>Danh sách Đơn hàng</h2>
-        <span class="badge bg-primary fs-6">Tổng: @Model?.Count() đơn hàng</span>
-    </div>
-
-    @if (Model == null || !Model.Any())
+@functions {
+    string StatusClass(OrderStatus status) => status switch
     {
-        <div class="alert alert-info text-center py-5">
-            <i class="fas fa-inbox fa-3x mb-3"></i>
-            <h4>Chưa có đơn hàng nào</h4>
-            <p class="text-muted">Các đơn hàng sẽ xuất hiện tại đây sau khi khách hàng đặt hàng</p>
-        </div>
-    }
-    else
+        OrderStatus.Pending => "st-pending",
+        OrderStatus.Processing => "st-processing",
+        OrderStatus.Finished => "st-finished",
+        _ => "st-default"
+    };
+
+    string StatusIcon(OrderStatus status) => status switch
     {
-        <div class="card shadow-sm">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-dark">
-                            <tr>
-                                <th style="width: 8%">Mã ĐH</th>
-                                <th style="width: 15%">Khách hàng</th>
-                                <th style="width: 12%">Ngày đặt</th>
-                                <th style="width: 25%">Địa chỉ</th>
-                                <th class="text-center" style="width: 8%">SL SP</th>
-                                <th class="text-end" style="width: 12%">Tổng tiền</th>
-                                <th class="text-center" style="width: 10%">Trạng thái</th>
-                                <th class="text-center" style="width: 10%">Chi tiết</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var order in Model)
-                            {
-                                <tr>
-                                    <td>
-                                        <strong class="text-primary">#@order.Id</strong>
-                                    </td>
-                                    <td>
-                                        <div>
-                                            <strong>@order.CustomerName</strong>
-                                            <br />
-                                            <small class="text-muted">
-                                                <i class="fas fa-phone me-1"></i>@order.PhoneNumber
-                                            </small>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <small>
-                                            <i class="far fa-calendar me-1"></i>@order.OrderDate.ToString("dd/MM/yyyy")
-                                            <br />
-                                            <i class="far fa-clock me-1"></i>@order.OrderDate.ToString("HH:mm")
-                                        </small>
-                                    </td>
-                                    <td>
-                                        @if (order.Address != null)
-                                        {
-                                            <small class="text-muted">
-                                                <i class="fas fa-map-marker-alt me-1"></i>
-                                                @order.Address.Street, @order.Address.Ward,<br />
-                                                @order.Address.District, @order.Address.City
-                                            </small>
-                                        }
-                                    </td>
-                                    <td class="text-center">
-                                        <span class="badge bg-secondary">@order.Items.Count</span>
-                                    </td>
-                                    <td class="text-end">
-                                        <strong class="text-danger">@order.TotalAmount.ToString("N0") đ</strong>
-                                    </td>
-                                    <td class="text-center">
-                                        @switch (order.OrderStatus)
-                                        {
-                                            case OrderStatus.Pending:
-                                                <span class="badge bg-warning text-dark px-3 py-2">
-                                                    <i class="fas fa-clock me-1"></i>Chờ xử lý
-                                                </span>
-                                                break;
-                                            case OrderStatus.Processing:
-                                                <span class="badge bg-info px-3 py-2">
-                                                    <i class="fas fa-spinner me-1"></i>Đang xử lý
-                                                </span>
-                                                break;
-                                            case OrderStatus.Finished:
-                                                <span class="badge bg-success px-3 py-2">
-                                                    <i class="fas fa-check-circle me-1"></i>Hoàn thành
-                                                </span>
-                                                break;
-                                            default:
-                                                <span class="badge bg-secondary px-3 py-2">@order.OrderStatus</span>
-                                                break;
-                                        }
-                                    </td>
-                                    <td class="text-center">
-                                        <button class="btn btn-primary btn-sm" type="button"
-                                                data-bs-toggle="collapse"
-                                                data-bs-target="#order-@order.Id"
-                                                aria-expanded="false">
-                                            <i class="fas fa-eye me-1"></i>Xem
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr class="collapse" id="order-@order.Id">
-                                    <td colspan="8" class="p-0">
-                                        <div class="bg-light p-4">
-                                            <div class="row mb-3">
-                                                <div class="col-md-6">
-                                                    <h5 class="text-primary mb-3">
-                                                        <i class="fas fa-info-circle me-2"></i>Chi tiết đơn hàng #@order.Id
-                                                    </h5>
-                                                    <div class="mb-2">
-                                                        <strong>Khách hàng:</strong> @order.CustomerName
-                                                    </div>
-                                                    <div class="mb-2">
-                                                        <strong>Email:</strong> @order.Email
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6 text-md-end">
-                                                    <div class="mb-2">
-                                                        <strong>Ngày đặt:</strong> @order.OrderDate.ToString("dd/MM/yyyy HH:mm:ss")
-                                                    </div>
-                                                    <div class="mb-2">
-                                                        <strong>Trạng thái:</strong>
-                                                        @switch (order.OrderStatus)
-                                                        {
-                                                            case OrderStatus.Pending:
-                                                                <span class="badge bg-warning text-dark">Chờ xử lý</span>
-                                                                break;
-                                                            case OrderStatus.Processing:
-                                                                <span class="badge bg-info">Đang xử lý</span>
-                                                                break;
-                                                            case OrderStatus.Finished:
-                                                                <span class="badge bg-success">Hoàn thành</span>
-                                                                break;
-                                                        }
-                                                    </div>
-                                                </div>
-                                            </div>
+        OrderStatus.Pending => "fa-clock",
+        OrderStatus.Processing => "fa-rotate",
+        OrderStatus.Finished => "fa-circle-check",
+        _ => "fa-circle"
+    };
+}
 
-                                            <hr />
+<div class="orders-page">
+    <div class="container py-5">
 
-                                            <h6 class="mb-3"><i class="fas fa-shopping-bag me-2"></i>Sản phẩm đã đặt</h6>
-                                            <div class="table-responsive">
-                                                <table class="table table-bordered bg-white">
-                                                    <thead class="table-light">
-                                                        <tr>
-                                                            <th style="width: 120px">Hình ảnh</th>
-                                                            <th>Sản phẩm</th>
-                                                            <th class="text-center" style="width: 150px">Đơn giá</th>
-                                                            <th class="text-center" style="width: 100px">Số lượng</th>
-                                                            <th class="text-end" style="width: 150px">Thành tiền</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody>
-                                                        @foreach (var item in order.Items)
-                                                        {
-                                                            <tr>
-                                                                <td class="text-center">
-                                                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
-                                                                    {
-                                                                        <img src="@item.ImageUrl"
-                                                                             alt="@item.ProductName"
-                                                                             class="img-thumbnail"
-                                                                             style="width: 100px; height: 100px; object-fit: cover;"
-                                                                             onerror="this.src='/images/no-image.png'" />
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <div class="bg-secondary d-flex align-items-center justify-content-center"
-                                                                             style="width: 100px; height: 100px;">
-                                                                            <i class="fas fa-image fa-2x text-white"></i>
-                                                                        </div>
-                                                                    }
-                                                                </td>
-                                                                <td class="align-middle">
-                                                                    <strong>@item.ProductName</strong>
-                                                                </td>
-                                                                <td class="text-center align-middle">
-                                                                    @item.Price.ToString("N0") đ
-                                                                </td>
-                                                                <td class="text-center align-middle">
-                                                                    <span class="badge bg-primary fs-6">@item.Quantity</span>
-                                                                </td>
-                                                                <td class="text-end align-middle">
-                                                                    <strong class="text-danger">
-                                                                        @((item.Price * item.Quantity).ToString("N0")) đ
-                                                                    </strong>
-                                                                </td>
-                                                            </tr>
-                                                        }
-                                                    </tbody>
-                                                    <tfoot class="table-light">
-                                                        <tr>
-                                                            <td colspan="4" class="text-end">
-                                                                <strong class="fs-5">Tổng cộng:</strong>
-                                                            </td>
-                                                            <td class="text-end">
-                                                                <strong class="text-danger fs-5">
-                                                                    @order.TotalAmount.ToString("N0") đ
-                                                                </strong>
-                                                            </td>
-                                                        </tr>
-                                                    </tfoot>
-                                                </table>
-                                            </div>
-
-                                            <div class="mt-3 text-end">
-                                                <button class="btn btn-secondary" type="button"
-                                                        data-bs-toggle="collapse"
-                                                        data-bs-target="#order-@order.Id">
-                                                    <i class="fas fa-times me-1"></i>Đóng
-                                                </button>
-                                                <a href="@Url.Action("PrintOrder", new { id = order.Id })"
-                                                   class="btn btn-info" target="_blank">
-                                                    <i class="fas fa-print me-1"></i>In đơn hàng
-                                                </a>
-                                                @if (order.OrderStatus == OrderStatus.Pending)
-                                                {
-                                                    <form method="post" asp-action="UpdateOrderStatus" class="d-inline">
-                                                        <input type="hidden" name="orderId" value="@order.Id" />
-                                                        <input type="hidden" name="status" value="@((int)OrderStatus.Processing)" />
-                                                        <button type="submit" class="btn btn-primary">
-                                                            <i class="fas fa-check me-1"></i>Xác nhận đơn
-                                                        </button>
-                                                    </form>
-                                                }
-                                                @if (order.OrderStatus == OrderStatus.Processing)
-                                                {
-                                                    <form method="post" asp-action="UpdateOrderStatus" class="d-inline">
-                                                        <input type="hidden" name="orderId" value="@order.Id" />
-                                                        <input type="hidden" name="status" value="@((int)OrderStatus.Finished)" />
-                                                        <button type="submit" class="btn btn-success">
-                                                            <i class="fas fa-check-double me-1"></i>Hoàn thành
-                                                        </button>
-                                                    </form>
-                                                }
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
+        <div class="page-head mb-4">
+            <div>
+                <h1 class="page-title mb-1"><span class="head-icon"><i class="fas fa-box-open"></i></span>Quản lý đơn hàng</h1>
+                <p class="text-muted mb-0">Theo dõi và xử lý tất cả các đơn hàng của cửa hàng</p>
             </div>
         </div>
-    }
+
+        @if (Model != null && Model.Any())
+        {
+            <div class="stats-row row g-3 mb-4" id="orderStats">
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card stat-total">
+                        <div class="stat-icon"><i class="fas fa-clipboard-list"></i></div>
+                        <div>
+                            <div class="stat-value">@total</div>
+                            <div class="stat-label">Tổng đơn hàng</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card stat-pending">
+                        <div class="stat-icon"><i class="fas fa-clock"></i></div>
+                        <div>
+                            <div class="stat-value">@pending</div>
+                            <div class="stat-label">Chờ xử lý</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card stat-processing">
+                        <div class="stat-icon"><i class="fas fa-rotate"></i></div>
+                        <div>
+                            <div class="stat-value">@processing</div>
+                            <div class="stat-label">Đang xử lý</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-6 col-lg-3">
+                    <div class="stat-card stat-finished">
+                        <div class="stat-icon"><i class="fas fa-circle-check"></i></div>
+                        <div>
+                            <div class="stat-value">@finished</div>
+                            <div class="stat-label">Hoàn thành</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-bar mb-4">
+                <button type="button" class="status-tab active" data-filter="all">
+                    <i class="fas fa-border-all me-1"></i>Tất cả <span class="tab-count">@total</span>
+                </button>
+                <button type="button" class="status-tab" data-filter="pending">
+                    <i class="fas fa-clock me-1"></i>Chờ xử lý <span class="tab-count">@pending</span>
+                </button>
+                <button type="button" class="status-tab" data-filter="processing">
+                    <i class="fas fa-rotate me-1"></i>Đang xử lý <span class="tab-count">@processing</span>
+                </button>
+                <button type="button" class="status-tab" data-filter="finished">
+                    <i class="fas fa-circle-check me-1"></i>Hoàn thành <span class="tab-count">@finished</span>
+                </button>
+            </div>
+        }
+
+        @if (Model == null || !Model.Any())
+        {
+            <div class="empty-state text-center py-5">
+                <div class="empty-icon"><i class="fas fa-inbox"></i></div>
+                <h4 class="mb-2">Chưa có đơn hàng nào</h4>
+                <p class="text-muted mb-0">Các đơn hàng sẽ xuất hiện tại đây sau khi khách hàng đặt hàng</p>
+            </div>
+        }
+        else
+        {
+            <div class="orders-list">
+                @foreach (var order in Model)
+                {
+                    var statusKey = order.OrderStatus.ToString().ToLowerInvariant();
+
+                    <div class="order-card mb-3" data-status="@statusKey">
+                        <div class="order-card-head">
+                            <div class="d-flex align-items-center flex-wrap gap-3">
+                                <span class="order-id-badge">#@order.Id</span>
+                                <div class="order-meta">
+                                    <div class="order-customer"><i class="fas fa-user me-1"></i>@order.CustomerName</div>
+                                    <div class="order-date small text-muted">
+                                        <i class="far fa-calendar-alt me-1"></i>@order.OrderDate.ToString("dd/MM/yyyy HH:mm")
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                @if (order.OrderStatus == OrderStatus.Pending)
+                                {
+                                    <form method="post" asp-action="UpdateOrderStatus" class="d-inline">
+                                        <input type="hidden" name="orderId" value="@order.Id" />
+                                        <button type="submit" class="btn btn-ghost-confirm btn-sm">
+                                            <i class="fas fa-check me-1"></i>Xác nhận đơn
+                                        </button>
+                                    </form>
+                                }
+                                @if (order.OrderStatus == OrderStatus.Processing)
+                                {
+                                    <form method="post" asp-action="UpdateOrderStatus" class="d-inline">
+                                        <input type="hidden" name="orderId" value="@order.Id" />
+                                        <button type="submit" class="btn btn-ghost-confirm btn-sm">
+                                            <i class="fas fa-check-double me-1"></i>Hoàn thành
+                                        </button>
+                                    </form>
+                                }
+                                <span class="status-pill @StatusClass(order.OrderStatus)">
+                                    <i class="fas @StatusIcon(order.OrderStatus)"></i>
+                                    @switch (order.OrderStatus)
+                                    {
+                                        case OrderStatus.Pending:
+                                            <span class="ms-1">Chờ xử lý</span>
+                                            break;
+                                        case OrderStatus.Processing:
+                                            <span class="ms-1">Đang xử lý</span>
+                                            break;
+                                        case OrderStatus.Finished:
+                                            <span class="ms-1">Hoàn thành</span>
+                                            break;
+                                        default:
+                                            <span class="ms-1">@order.OrderStatus</span>
+                                            break;
+                                    }
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="order-card-body">
+                            <div class="row g-3">
+                                <div class="col-lg-5">
+                                    <div class="info-box">
+                                        <div class="info-label"><i class="fas fa-user-circle me-1"></i>Khách hàng</div>
+                                        <div class="fw-semibold text-dark">@order.CustomerName</div>
+                                        <div class="small text-muted"><i class="fas fa-phone me-1"></i>@order.PhoneNumber</div>
+                                        <div class="small text-muted"><i class="fas fa-envelope me-1"></i>@(order.Email ?? "-")</div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-7">
+                                    <div class="info-box">
+                                        <div class="info-label"><i class="fas fa-map-marker-alt me-1"></i>Địa chỉ giao hàng</div>
+                                        @if (order.Address != null)
+                                        {
+                                            <div class="small text-muted mb-0">
+                                                @order.Address.Street, @order.Address.Ward
+                                            </div>
+                                            <div class="small text-muted mb-0">
+                                                @order.Address.District, @order.Address.City
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="small text-muted">Không có thông tin địa chỉ</div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="order-items mt-3">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div class="info-label mb-0"><i class="fas fa-shopping-bag me-1"></i>Sản phẩm đặt mua</div>
+                                    <span class="item-count-badge">@order.Items.Count sản phẩm</span>
+                                </div>
+
+                                <div class="collapse" id="orderItems-@order.Id">
+                                    <div class="items-table">
+                                        @foreach (var item in order.Items)
+                                        {
+                                            <div class="item-row">
+                                                <div class="item-thumb">
+                                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                                    {
+                                                        <img src="@item.ImageUrl" alt="@item.ProductName"
+                                                             onerror="this.src='/images/no-image.png'" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="no-img"><i class="fas fa-image"></i></div>
+                                                    }
+                                                </div>
+                                                <div class="item-name flex-grow-1">
+                                                    <span class="fw-semibold text-dark">@item.ProductName</span>
+                                                </div>
+                                                <div class="item-qty">x@item.Quantity</div>
+                                                <div class="item-price">@item.Price.ToString("N0") đ</div>
+                                                <div class="item-subtotal">@((item.Price * item.Quantity).ToString("N0")) đ</div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="total-bar d-flex justify-content-between align-items-center mt-3 pt-3">
+                                <button class="btn btn-sm btn-toggle" type="button"
+                                        data-bs-toggle="collapse"
+                                        data-bs-target="#orderItems-@order.Id"
+                                        aria-expanded="false">
+                                    <i class="fas fa-chevron-down me-1"></i><span>Xem sản phẩm</span>
+                                </button>
+                                <div class="total-block">
+                                    <span class="text-muted me-2">Tổng cộng:</span>
+                                    <span class="total-amount">@order.TotalAmount.ToString("N0") đ</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="order-card-foot">
+                            <a asp-controller="Order" asp-action="Details" asp-route-id="@order.Id" class="btn btn-sm btn-link">
+                                <i class="fas fa-eye me-1"></i>Xem chi tiết đơn hàng
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
 </div>
 
 @section Styles {
     <style>
-        .table tbody tr:hover {
-            background-color: #f8f9fa;
+        .orders-page {
+            background: radial-gradient(1200px 400px at 15% -50px, rgba(99,102,241,.08), transparent),
+                        radial-gradient(1000px 400px at 90% -100px, rgba(239,68,68,.06), transparent),
+                        #f6f7f9;
+            min-height: calc(100vh - 76px);
         }
 
-        .collapse.show + tr {
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+        .page-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #111827;
+            display: flex;
+            align-items: center;
         }
 
-        .badge {
-            font-weight: 500;
+        .head-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: #111827;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.9rem;
+            font-size: 1.05rem;
+            box-shadow: 0 6px 14px rgba(17,24,39,.25);
         }
 
-        .img-thumbnail {
-            border: 2px solid #dee2e6;
-            transition: transform 0.2s;
+        /* Stats */
+        .stat-card {
+            background: #fff;
+            border: 1px solid #eef0f3;
+            border-radius: 16px;
+            padding: 1.1rem 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.9rem;
+            height: 100%;
+            box-shadow: 0 2px 10px rgba(17,24,39,.04);
+            transition: transform .2s, box-shadow .2s;
         }
 
-            .img-thumbnail:hover {
-                transform: scale(1.05);
-                box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(17,24,39,.08);
+        }
+
+        .stat-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            flex-shrink: 0;
+        }
+
+        .stat-total .stat-icon { background: #eef0f3; color: #111827; }
+        .stat-value { font-size: 1.35rem; font-weight: 700; color: #111827; line-height: 1.1; }
+        .stat-label { font-size: .82rem; color: #6b7280; }
+
+        .stat-pending .stat-icon { background: #fffbeb; color: #b45309; }
+        .stat-pending .stat-value { color: #b45309; }
+
+        .stat-processing .stat-icon { background: #eff6ff; color: #1d4ed8; }
+        .stat-processing .stat-value { color: #1d4ed8; }
+
+        .stat-finished .stat-icon { background: #ecfdf5; color: #047857; }
+        .stat-finished .stat-value { color: #047857; }
+
+        /* Filter bar */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .5rem;
+        }
+
+        .status-tab {
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            color: #4b5563;
+            border-radius: 999px;
+            padding: .45rem 1rem;
+            font-size: .875rem;
+            font-weight: 600;
+            transition: all .2s;
+        }
+
+        .status-tab:hover {
+            border-color: #c7cbd1;
+            color: #111827;
+        }
+
+        .status-tab.active {
+            background: #111827;
+            border-color: #111827;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(17,24,39,.25);
+        }
+
+        .tab-count {
+            background: rgba(17,24,39,.08);
+            border-radius: 999px;
+            padding: .1rem .55rem;
+            font-size: .75rem;
+            margin-left: .25rem;
+        }
+
+        .status-tab.active .tab-count {
+            background: rgba(255,255,255,.18);
+        }
+
+        /* Order card */
+        .order-card {
+            background: #fff;
+            border: 1px solid #eef0f3;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(17,24,39,.05);
+            transition: box-shadow .25s, transform .25s;
+        }
+
+        .order-card:hover {
+            box-shadow: 0 10px 28px rgba(17,24,39,.10);
+            transform: translateY(-2px);
+        }
+
+        .order-card-head {
+            background: linear-gradient(135deg, #fbfbfc, #f4f5f7);
+            border-bottom: 1px solid #eceef1;
+            padding: 1.1rem 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .order-id-badge {
+            background: #111827;
+            color: #fff;
+            font-weight: 700;
+            font-size: .95rem;
+            letter-spacing: .5px;
+            border-radius: 10px;
+            padding: .4rem .8rem;
+            box-shadow: 0 4px 10px rgba(17,24,39,.22);
+        }
+
+        .order-customer {
+            font-weight: 600;
+            color: #111827;
+            font-size: .95rem;
+        }
+
+        .order-date { color: #6b7280; }
+
+        /* Status pills */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: .4rem .95rem;
+            font-size: .82rem;
+            font-weight: 600;
+        }
+
+        .st-pending { background: #fffbeb; color: #b45309; }
+        .st-processing { background: #eff6ff; color: #1d4ed8; }
+        .st-finished { background: #ecfdf5; color: #047857; }
+        .st-default { background: #eef0f3; color: #4b5563; }
+
+        .btn-ghost-confirm {
+            border: 1px solid #10b981;
+            color: #047857;
+            background: #fff;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all .2s;
+        }
+
+        .btn-ghost-confirm:hover {
+            background: #10b981;
+            color: #fff;
+            border-color: #10b981;
+            box-shadow: 0 4px 12px rgba(16,185,129,.3);
+        }
+
+        .order-card-body {
+            padding: 1.25rem 1.4rem;
+        }
+
+        .info-label {
+            font-size: .78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: #6b7280;
+            margin-bottom: .45rem;
+        }
+
+        .item-count-badge {
+            background: #eef0f3;
+            color: #374151;
+            border-radius: 999px;
+            padding: .3rem .8rem;
+            font-size: .78rem;
+            font-weight: 600;
+        }
+
+        /* Items */
+        .items-table {
+            border: 1px solid #eef0f3;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #fafbfc;
+        }
+
+        .item-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: .65rem 1rem;
+            border-bottom: 1px solid #eef0f3;
+            background: #fff;
+        }
+
+        .item-row:last-child { border-bottom: none; }
+
+        .item-thumb {
+            width: 52px;
+            height: 52px;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+            flex-shrink: 0;
+            background: #fff;
+        }
+
+        .item-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .item-thumb .no-img {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            background: #f3f4f6;
+        }
+
+        .item-name { min-width: 0; font-size: .92rem; }
+        .item-qty { color: #6b7280; font-size: .85rem; flex-shrink: 0; }
+        .item-price { color: #6b7280; font-size: .85rem; width: 110px; text-align: right; flex-shrink: 0; }
+        .item-subtotal { color: #dc2626; font-weight: 700; width: 120px; text-align: right; flex-shrink: 0; }
+
+        .total-bar {
+            border-top: 1px dashed #e5e7eb;
+        }
+
+        .btn-toggle {
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            color: #4b5563;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all .2s;
+        }
+
+        .btn-toggle:hover {
+            border-color: #111827;
+            color: #111827;
+        }
+
+        .total-amount {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #dc2626;
+        }
+
+        .order-card-foot {
+            background: #fafbfc;
+            border-top: 1px solid #eceef1;
+            padding: .6rem 1.4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .order-card-foot .btn-link {
+            color: #111827;
+            font-weight: 600;
+            text-decoration: none;
+            padding: .35rem .5rem;
+        }
+
+        .order-card-foot .btn-link:hover {
+            color: #4f46e5;
+        }
+
+        /* Empty state */
+        .empty-state {
+            background: #fff;
+            border: 1px dashed #d1d5db;
+            border-radius: 20px;
+        }
+
+        .empty-icon {
+            width: 84px;
+            height: 84px;
+            margin: 0 auto 1.25rem;
+            border-radius: 50%;
+            background: #f3f4f6;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        @@media (max-width: 768px) {
+            .order-card-head { padding: 1rem; }
+            .order-card-body { padding: 1rem; }
+            .item-price { display: none; }
+            .item-subtotal { text-align: left; }
+        }
     </style>
 }
 
 @section Scripts {
     <script>
-        // Auto collapse other orders when opening a new one
-        document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(button => {
-            button.addEventListener('click', function() {
-                const targetId = this.getAttribute('data-bs-target');
-                document.querySelectorAll('.collapse.show').forEach(collapse => {
-                    if ('#' + collapse.id !== targetId) {
-                        bootstrap.Collapse.getInstance(collapse)?.hide();
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // Filter orders by status
+            document.querySelectorAll('.status-tab').forEach(function (tab) {
+                tab.addEventListener('click', function () {
+                    document.querySelectorAll('.status-tab').forEach(function (t) {
+                        t.classList.remove('active');
+                    });
+                    tab.classList.add('active');
+                    var filter = tab.dataset.filter;
+                    document.querySelectorAll('.order-card').forEach(function (card) {
+                        var show = filter === 'all' || card.dataset.status === filter;
+                        card.style.display = show ? '' : 'none';
+                    });
+                });
+            });
+
+            // Toggle "view products" chevron + close other expanded cards
+            document.querySelectorAll('.collapse').forEach(function (collapseEl) {
+                collapseEl.addEventListener('show.bs.collapse', function () {
+                    var btn = document.querySelector('[data-bs-toggle="collapse"][data-bs-target="#' + collapseEl.id + '"]');
+                    if (btn) {
+                        btn.querySelector('i').className = 'fas fa-chevron-up me-1';
+                        btn.querySelector('span').textContent = 'Ẩn sản phẩm';
+                    }
+                    document.querySelectorAll('.collapse.show').forEach(function (other) {
+                        if (other !== collapseEl) {
+                            bootstrap.Collapse.getInstance(other)?.hide();
+                        }
+                    });
+                });
+                collapseEl.addEventListener('hide.bs.collapse', function () {
+                    var btn = document.querySelector('[data-bs-toggle="collapse"][data-bs-target="#' + collapseEl.id + '"]');
+                    if (btn) {
+                        btn.querySelector('i').className = 'fas fa-chevron-down me-1';
+                        btn.querySelector('span').textContent = 'Xem sản phẩm';
                     }
                 });
             });
