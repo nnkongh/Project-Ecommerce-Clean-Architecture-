@@ -1,178 +1,178 @@
-﻿@using Ecommerce.Application.DTOs.ModelsRequest.Users
+@using Ecommerce.Application.DTOs.ModelsRequest.Users
 @model UpdateProfileRequest
 
 @{
     ViewData["Title"] = "Chỉnh sửa hồ sơ";
+    var currentAvatar = !string.IsNullOrEmpty(Model.AvatarUrl)
+        ? Model.AvatarUrl
+        : "https://ui-avatars.com/api/?name=" + Uri.EscapeDataString(Model.UserName ?? "U") + "&size=200&background=111827&color=fff&bold=true";
 }
 
-<div class="container my-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-10 col-xl-11">
-            <div class="card shadow-sm">
-                <div class="card-header bg-dark text-white py-3">
-                    <h5 class="mb-0">
-                        <i class="fas fa-user-edit me-2"></i>Chỉnh sửa hồ sơ cá nhân
-                    </h5>
-                </div>
+<div class="profile-page">
+    <div class="container py-5">
 
-                <div class="card-body p-3">
-                    <form asp-action="EditProfile" method="post" enctype="multipart/form-data">
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a asp-action="Index">Hồ sơ</a></li>
+                <li class="breadcrumb-item active">Chỉnh sửa hồ sơ</li>
+            </ol>
+        </nav>
 
-                        <div class="row">
-                            <!-- Cột trái: Avatar + Bảo mật -->
-                            <div class="col-md-4 mb-3">
-                                <!-- Avatar Preview -->
-                                <div class="text-center mb-3">
-                                    <div id="imagePreview" style="display: none;">
-                                        <img id="preview"
-                                             src="#"
-                                             alt="Avatar Preview"
-                                             class="rounded-circle border border-3 border-primary mb-2"
-                                             style="width: 120px; height: 120px; object-fit: cover;">
-                                    </div>
-                                    <div>
-                                        <label class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-upload me-2"></i>Chọn ảnh đại diện
-                                            <input asp-for="Avatar"
-                                                   type="file"
-                                                   class="d-none"
-                                                   accept="image/*"
-                                                   onchange="previewImage(event)" />
-                                        </label>
-                                        <p class="text-muted small mt-2 mb-0">
-                                            <i class="fas fa-info-circle me-1"></i>JPG, PNG. Max: 5MB
-                                        </p>
-                                        <span asp-validation-for="Avatar" class="text-danger small"></span>
-                                    </div>
-                                </div>
-
-                                <hr class="my-3">
-
-                                <!-- Bảo mật -->
-                                <div>
-                                    <h6 class="mb-2">
-                                        <i class="fas fa-lock me-2 text-dark"></i>Bảo mật
-                                    </h6>
-                                    <a asp-controller="Auth"
-                                       asp-action="ResetPassword"
-                                       class="btn btn-outline-warning btn-sm w-100">
-                                        <i class="fas fa-key me-2"></i>Đổi mật khẩu
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Cột phải: Thông tin -->
-                            <div class="col-md-8">
-                                <!-- Thông tin cá nhân -->
-                                <h6 class="mb-2">
-                                    <i class="fas fa-user me-2 text-dark"></i>Thông tin cá nhân
-                                </h6>
-
-                                <div class="row g-2 mb-3">
-                                    <div class="col-md-6">
-                                        <label asp-for="UserName" class="form-label small">
-                                            <i class="fas fa-signature me-1"></i>Tên đăng nhập
-                                        </label>
-                                        <input asp-for="UserName"
-                                               class="form-control form-control-sm"
-                                               placeholder="Nhập tên đăng nhập" />
-                                        <span asp-validation-for="UserName" class="text-danger small"></span>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label asp-for="PhoneNumber" class="form-label small">
-                                            <i class="fas fa-phone me-1"></i>Số điện thoại
-                                        </label>
-                                        <input asp-for="PhoneNumber"
-                                               class="form-control form-control-sm"
-                                               placeholder="Nhập số điện thoại" />
-                                        <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
-                                    </div>
-                                </div>
-
-                                <hr class="my-2">
-
-                                <!-- Địa chỉ -->
-                                <h6 class="mb-2">
-                                    <i class="fas fa-map-marker-alt me-2 text-dark"></i>Địa chỉ giao hàng
-                                </h6>
-
-                                <div class="row g-2 mb-2">
-                                    <div class="col-md-6">
-                                        <label asp-for="Address.City" class="form-label small">
-                                            <i class="fas fa-city me-1"></i>Tỉnh/Thành phố
-                                        </label>
-                                        <input asp-for="Address.City"
-                                               class="form-control form-control-sm"
-                                               placeholder="VD: Hồ Chí Minh, Hà Nội" />
-                                        <span asp-validation-for="Address.City" class="text-danger small"></span>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label asp-for="Address.Province" class="form-label small">
-                                            <i class="fas fa-flag me-1"></i>Tỉnh
-                                        </label>
-                                        <input asp-for="Address.Province"
-                                               class="form-control form-control-sm"
-                                               placeholder="Nhập tỉnh" />
-                                        <span asp-validation-for="Address.Province" class="text-danger small"></span>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label asp-for="Address.District" class="form-label small">
-                                            <i class="fas fa-map me-1"></i>Quận/Huyện
-                                        </label>
-                                        <input asp-for="Address.District"
-                                               class="form-control form-control-sm"
-                                               placeholder="VD: Quận 1, Quận Tân Bình" />
-                                        <span asp-validation-for="Address.District" class="text-danger small"></span>
-                                    </div>
-
-                                    <div class="col-md-6">
-                                        <label asp-for="Address.Ward" class="form-label small">
-                                            <i class="fas fa-building me-1"></i>Phường/Xã
-                                        </label>
-                                        <input asp-for="Address.Ward"
-                                               class="form-control form-control-sm"
-                                               placeholder="VD: Phường Bến Nghé" />
-                                        <span asp-validation-for="Address.Ward" class="text-danger small"></span>
-                                    </div>
-
-                                    <div class="col-12">
-                                        <label asp-for="Address.Street" class="form-label small">
-                                            <i class="fas fa-road me-1"></i>Đường/Số nhà
-                                        </label>
-                                        <input asp-for="Address.Street"
-                                               class="form-control form-control-sm"
-                                               placeholder="VD: 123 Nguyễn Huệ" />
-                                        <span asp-validation-for="Address.Street" class="text-danger small"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="d-flex justify-content-between mt-3 pt-2 border-top">
-                            <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
-                                <i class="fas fa-arrow-left me-2"></i>Quay lại
-                            </a>
-                            <div>
-                                <button type="reset" class="btn btn-outline-danger btn-sm me-2">
-                                    <i class="fas fa-undo me-2"></i>Đặt lại
-                                </button>
-                                <button type="submit" class="btn btn-dark btn-sm">
-                                    <i class="fas fa-save me-2"></i>Lưu thay đổi
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+        <div class="card border-0 rounded-4 shadow-sm edit-card">
+            <div class="edit-header">
+                <h1 class="h4 fw-bold mb-0"><i class="fas fa-user-pen me-2"></i>Chỉnh sửa hồ sơ cá nhân</h1>
+                <p class="mb-0 small text-white-50 mt-1">Cập nhật thông tin của bạn để dịch vụ tốt hơn</p>
             </div>
 
-            <!-- Thông tin hỗ trợ -->
-            <div class="alert alert-info mt-3 py-2">
-                <i class="fas fa-info-circle me-2"></i>
+            <div class="card-body p-4 p-lg-5">
+                <form asp-action="EditProfile" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="row g-4 g-lg-5">
+                        <!-- Cột trái: Avatar + bảo mật -->
+                        <div class="col-lg-4">
+                            <h6 class="section-title mb-3"><i class="fas fa-camera me-2"></i>Ảnh đại diện</h6>
+
+                            <div class="avatar-editor text-center">
+                                <div class="avatar-frame">
+                                    <img id="preview" src="@currentAvatar"
+                                         alt="Avatar"
+                                         onerror="this.src='https://ui-avatars.com/api/?name=U&size=200&background=111827&color=fff&bold=true'"
+                                         class="avatar-preview-img" />
+                                    <span class="avatar-overlay"><i class="fas fa-camera"></i></span>
+                                </div>
+
+                                <label class="btn btn-upload mt-3">
+                                    <i class="fas fa-upload me-2"></i>Chọn ảnh đại diện
+                                    <input asp-for="Avatar"
+                                           type="file"
+                                           class="d-none"
+                                           accept="image/jpeg,image/png,image/jpg"
+                                           onchange="previewImage(event)" />
+                                </label>
+
+                                <p class="text-muted small mt-2 mb-0">
+                                    <i class="fas fa-info-circle me-1"></i>JPG, PNG. Tối đa 5MB
+                                </p>
+                                <span asp-validation-for="Avatar" class="text-danger small"></span>
+                            </div>
+
+                            <hr class="my-4">
+
+                            <h6 class="section-title mb-3"><i class="fas fa-shield-halved me-2"></i>Bảo mật</h6>
+                            <a asp-controller="Auth"
+                               asp-action="ResetPassword"
+                               class="btn btn-outline-dark rounded-pill w-100 fw-semibold">
+                                <i class="fas fa-key me-2"></i>Đổi mật khẩu
+                            </a>
+                        </div>
+
+                        <!-- Cột phải: Thông tin -->
+                        <div class="col-lg-8">
+                            <h6 class="section-title mb-3"><i class="fas fa-user me-2"></i>Thông tin cá nhân</h6>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label asp-for="UserName" class="form-label fw-semibold small text-muted">
+                                        <i class="fas fa-signature me-1"></i>Tên đăng nhập
+                                    </label>
+                                    <input asp-for="UserName"
+                                           class="form-control form-control-lg modern-input"
+                                           placeholder="Nhập tên đăng nhập" />
+                                    <span asp-validation-for="UserName" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="PhoneNumber" class="form-label fw-semibold small text-muted">
+                                        <i class="fas fa-phone me-1"></i>Số điện thoại
+                                    </label>
+                                    <input asp-for="PhoneNumber"
+                                           class="form-control form-control-lg modern-input"
+                                           placeholder="Nhập số điện thoại" />
+                                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <h6 class="section-title mb-3 mt-4">
+                                <i class="fas fa-map-marker-alt me-2"></i>Địa chỉ giao hàng
+                            </h6>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label asp-for="Address.City" class="form-label fw-semibold small text-muted">
+                                        <i class="fas fa-city me-1"></i>Tỉnh / Thành phố
+                                    </label>
+                                    <input asp-for="Address.City"
+                                           class="form-control modern-input"
+                                           placeholder="VD: Hồ Chí Minh, Hà Nội" />
+                                    <span asp-validation-for="Address.City" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="Address.Province" class="form-label fw-semibold small text-muted">
+                                        <i class="fas fa-flag me-1"></i>Tỉnh
+                                    </label>
+                                    <input asp-for="Address.Province"
+                                           class="form-control modern-input"
+                                           placeholder="Nhập tỉnh" />
+                                    <span asp-validation-for="Address.Province" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="Address.District" class="form-label fw-semibold small text-muted">
+                                        <i class="fas fa-map me-1"></i>Quận / Huyện
+                                    </label>
+                                    <input asp-for="Address.District"
+                                           class="form-control modern-input"
+                                           placeholder="VD: Quận 1, Quận Tân Bình" />
+                                    <span asp-validation-for="Address.District" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="Address.Ward" class="form-label fw-semibold small text-muted">
+                                        <i class="fas fa-building me-1"></i>Phường / Xã
+                                    </label>
+                                    <input asp-for="Address.Ward"
+                                           class="form-control modern-input"
+                                           placeholder="VD: Phường Bến Nghé" />
+                                    <span asp-validation-for="Address.Ward" class="text-danger small"></span>
+                                </div>
+
+                                <div class="col-12">
+                                    <label asp-for="Address.Street" class="form-label fw-semibold small text-muted">
+                                        <i class="fas fa-road me-1"></i>Đường / Số nhà
+                                    </label>
+                                    <input asp-for="Address.Street"
+                                           class="form-control modern-input"
+                                           placeholder="VD: 123 Nguyễn Huệ" />
+                                    <span asp-validation-for="Address.Street" class="text-danger small"></span>
+                                </div>
+                            </div>
+
+                            <div class="form-actions d-flex flex-wrap justify-content-between align-items-center mt-5 pt-4 border-top gap-2">
+                                <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">
+                                    <i class="fas fa-arrow-left me-2"></i>Quay lại
+                                </a>
+                                <div class="d-flex gap-2 flex-wrap">
+                                    <button type="reset" class="btn btn-outline-danger rounded-pill px-4">
+                                        <i class="fas fa-undo me-2"></i>Đặt lại
+                                    </button>
+                                    <button type="submit" class="btn btn-dark-soft rounded-pill px-4">
+                                        <i class="fas fa-check me-2"></i>Lưu thay đổi
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="alert alert-info notice rounded-4 border-0 mt-3 d-flex align-items-center gap-3 mb-0">
+            <i class="fas fa-circle-info fs-5"></i>
+            <div>
                 <strong>Lưu ý:</strong> Thông tin địa chỉ sẽ được sử dụng để giao hàng.
                 Vui lòng cập nhật chính xác để đảm bảo đơn hàng được giao đúng địa chỉ.
             </div>
@@ -180,45 +180,165 @@
     </div>
 </div>
 
+@section Styles {
+    <style>
+        .profile-page {
+            background: radial-gradient(1200px 400px at 10% -50px, rgba(99,102,241,.07), transparent),
+                        radial-gradient(1000px 400px at 90% -80px, rgba(236,72,153,.05), transparent),
+                        #f6f7f9;
+            min-height: calc(100vh - 76px);
+        }
+
+        .breadcrumb {
+            font-size: .9rem;
+        }
+
+        .breadcrumb a {
+            color: #6b7280;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: #111827;
+        }
+
+        .edit-card {
+            overflow: hidden;
+            border: 1px solid #eef0f3;
+        }
+
+        .edit-header {
+            background: linear-gradient(135deg, #111827 0%, #1f2937 60%, #312e81 100%);
+            padding: 1.6rem 2rem;
+            color: #fff;
+        }
+
+        .section-title {
+            font-weight: 700;
+            color: #111827;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Avatar editor */
+        .avatar-frame {
+            position: relative;
+            width: 160px;
+            height: 160px;
+            margin: 0 auto;
+        }
+
+        .avatar-preview-img {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #fff;
+            box-shadow: 0 6px 20px rgba(17,24,39,.16);
+            background: #f3f4f6;
+        }
+
+        .avatar-overlay {
+            position: absolute;
+            right: 4px;
+            bottom: 4px;
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: #111827;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .9rem;
+            border: 3px solid #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,.25);
+        }
+
+        .btn-upload {
+            background: #111827;
+            color: #fff;
+            border: none;
+            border-radius: 999px;
+            padding: .6rem 1.4rem;
+            font-weight: 600;
+            transition: all .2s;
+        }
+
+        .btn-upload:hover {
+            background: #1f2937;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(17,24,39,.28);
+        }
+
+        .btn-dark-soft {
+            background: #111827;
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            transition: all .2s;
+        }
+
+        .btn-dark-soft:hover {
+            background: #1f2937;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(17,24,39,.28);
+        }
+
+        /* Inputs */
+        .modern-input {
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: .65rem 1rem;
+            transition: all .2s;
+        }
+
+        .modern-input:focus {
+            border-color: #111827;
+            box-shadow: 0 0 0 3px rgba(17,24,39,.08);
+        }
+
+        .notice {
+            background: #eff6ff;
+            color: #1e40af;
+        }
+
+        @@media (max-width: 992px) {
+            .edit-header {
+                padding: 1.4rem 1.5rem;
+            }
+        }
+    </style>
+}
+
 <script>
     function previewImage(event) {
         const file = event.target.files[0];
         const preview = document.getElementById('preview');
-        const previewContainer = document.getElementById('imagePreview');
 
-        if (file) {
-            // Kiểm tra kích thước file (5MB)
-            if (file.size > 5 * 1024 * 1024) {
-                alert('Kích thước ảnh không được vượt quá 5MB');
-                event.target.value = '';
-                previewContainer.style.display = 'none';
-                return;
-            }
+        if (!file) return;
 
-            // Kiểm tra định dạng
-            const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-            if (!validTypes.includes(file.type)) {
-                alert('Chỉ chấp nhận file ảnh định dạng JPG, PNG');
-                event.target.value = '';
-                previewContainer.style.display = 'none';
-                return;
-            }
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                preview.src = e.target.result;
-                previewContainer.style.display = 'block';
-            }
-            reader.readAsDataURL(file);
-        } else {
-            previewContainer.style.display = 'none';
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Kích thước ảnh không được vượt quá 5MB');
+            event.target.value = '';
+            return;
         }
-    }
 
-    // Reset preview khi reset form
-    document.querySelector('button[type="reset"]')?.addEventListener('click', function() {
-        document.getElementById('imagePreview').style.display = 'none';
-    });
+        const validTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        if (!validTypes.includes(file.type)) {
+            alert('Chỉ chấp nhận file ảnh định dạng JPG, PNG');
+            event.target.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
 </script>
 
 @section Scripts {

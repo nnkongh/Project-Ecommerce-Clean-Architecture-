@@ -4,190 +4,511 @@
 
 @{
     ViewData["Title"] = "Hồ sơ cá nhân";
+    var daysActive = (int)((DateTime.Now - Model.CreateAt).TotalDays);
+    var avatarUrl = !string.IsNullOrEmpty(Model.ImageUrl)
+        ? Model.ImageUrl
+        : $"https://ui-avatars.com/api/?name={Uri.EscapeDataString(Model.UserName)}&size=200&background=111827&color=fff&bold=true";
+    var fullAddress = Model.Address != null
+        ? string.Join(", ", new[] { Model.Address.Street, Model.Address.Ward, Model.Address.District, Model.Address.Province, Model.Address.City }
+            .Where(p => !string.IsNullOrWhiteSpace(p)))
+        : null;
 }
 
-<div class="container my-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-10 col-xl-11">
-            <!-- Profile Card -->
-            <div class="card shadow-sm">
-                <!-- Header với Avatar -->
-                <div class="card-header bg-dark text-white py-3">
-                    <div class="d-flex align-items-center">
-                        <div class="me-3">
-                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
-                            {
-                                <img src="@Model.ImageUrl"
-                                     alt="Avatar"
-                                     class="rounded-circle border border-3 border-white"
-                                     style="width: 80px; height: 80px; object-fit: cover;">
-                            }
-                            else
-                            {
-                                <img src="https://ui-avatars.com/api/?name=@Model.UserName&size=80&background=random&color=fff&bold=true"
-                                     alt="Avatar"
-                                     class="rounded-circle border border-3 border-white"
-                                     style="width: 80px; height: 80px; object-fit: cover;">
-                            }
-                        </div>
-                        <div>
-                            <h4 class="mb-1">@Model.UserName</h4>
-                            <p class="mb-0 opacity-75 small">
-                                <i class="fas fa-envelope me-2"></i>@Model.Email
-                                <span class="ms-3">
-                                    <i class="fas fa-calendar-alt me-2"></i>
-                                    Tham gia: @Model.CreateAt.ToString("dd/MM/yyyy", CultureInfo.CurrentCulture)
-                                </span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
+<div class="profile-page">
+    <div class="container py-5">
 
-                <!-- Body -->
-                <div class="card-body p-3">
-                    <div class="row">
-                        <!-- Thông tin cá nhân & tài khoản -->
-                        <div class="col-md-4 mb-3">
-                            <h6 class="border-bottom pb-2 mb-2">
-                                <i class="fas fa-user me-2 text-dark"></i>Thông tin cá nhân
-                            </h6>
-                            <div class="mb-2">
-                                <label class="text-muted small mb-1">Tên đăng nhập</label>
-                                <p class="mb-0 fw-bold small">@Model.UserName</p>
-                            </div>
-                            <div class="mb-3">
-                                <label class="text-muted small mb-1">Email</label>
-                                <p class="mb-0 fw-bold small">@Model.Email</p>
-                            </div>
+        <div class="page-head mb-4">
+            <div>
+                <h1 class="page-title mb-1">
+                    <span class="head-icon"><i class="fas fa-user-circle"></i></span>Hồ sơ cá nhân
+                </h1>
+                <p class="text-muted mb-0">Quản lý thông tin cá nhân và địa chỉ giao hàng của bạn</p>
+            </div>
+            <a asp-action="EditProfile" class="btn btn-dark-soft rounded-pill px-4">
+                <i class="fas fa-pen me-2"></i>Chỉnh sửa hồ sơ
+            </a>
+        </div>
 
-                            <h6 class="border-bottom pb-2 mb-2">
-                                <i class="fas fa-info-circle me-2 text-dark"></i>Thông tin tài khoản
-                            </h6>
-                            <div class="mb-2">
-                                <label class="text-muted small mb-1">Ngày tạo tài khoản</label>
-                                <p class="mb-0 small">
-                                    <i class="far fa-calendar-check me-1"></i>
-                                    @Model.CreateAt.ToString("dd/MM/yyyy HH:mm", CultureInfo.CurrentCulture)
-                                </p>
+        <div class="row g-4">
+            <!-- Profile summary -->
+            <div class="col-lg-4">
+                <div class="card border-0 rounded-4 shadow-sm profile-summary">
+                    <div class="cover-banner"></div>
+                    <div class="text-center px-4 pb-4">
+                        <img src="@avatarUrl" alt="Avatar" class="profile-avatar" />
+
+                        <h2 class="h4 fw-bold text-dark mb-1">@Model.UserName</h2>
+                        <p class="text-muted mb-2">
+                            <i class="fas fa-envelope me-1"></i>@Model.Email
+                        </p>
+
+                        @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                        {
+                            <span class="badge chip-chip bg-light text-dark border">
+                                <i class="fas fa-phone me-1"></i>@Model.PhoneNumber
+                            </span>
+                        }
+
+                        <hr class="my-3">
+
+                        <div class="member-meta">
+                            <div class="member-item">
+                                <i class="far fa-calendar-check me-1"></i>
+                                <span>Tham gia ngày @Model.CreateAt.ToString("dd/MM/yyyy", CultureInfo.CurrentCulture)</span>
                             </div>
-                            <div>
-                                <label class="text-muted small mb-1">Thời gian hoạt động</label>
-                                <p class="mb-0 small">
-                                    <i class="fas fa-clock me-1"></i>
-                                    @((DateTime.Now - Model.CreateAt).Days) ngày
-                                </p>
+                            <div class="member-item">
+                                <i class="fas fa-clock me-1"></i>
+                                <span>@daysActive ngày hoạt động</span>
                             </div>
                         </div>
 
-                        <!-- Địa chỉ -->
-                        <div class="col-md-8 mb-3">
-                            <h6 class="border-bottom pb-2 mb-2">
-                                <i class="fas fa-map-marker-alt me-2 text-dark"></i>Địa chỉ
-                            </h6>
-                            @if (Model.Address != null)
-                            {
-                                <div class="bg-light p-3 rounded">
-                                    <div class="row g-2">
-                                        <div class="col-md-4 col-6">
-                                            <label class="text-muted small mb-1">
-                                                <i class="fas fa-road me-1"></i>Đường
-                                            </label>
-                                            <p class="mb-0 small">@Model.Address.Street</p>
-                                        </div>
-                                        <div class="col-md-4 col-6">
-                                            <label class="text-muted small mb-1">
-                                                <i class="fas fa-building me-1"></i>Phường/Xã
-                                            </label>
-                                            <p class="mb-0 small">@Model.Address.Ward</p>
-                                        </div>
-                                        <div class="col-md-4 col-6">
-                                            <label class="text-muted small mb-1">
-                                                <i class="fas fa-map me-1"></i>Quận/Huyện
-                                            </label>
-                                            <p class="mb-0 small">@Model.Address.District</p>
-                                        </div>
-                                        <div class="col-md-4 col-6">
-                                            <label class="text-muted small mb-1">
-                                                <i class="fas fa-city me-1"></i>Tỉnh/Thành phố
-                                            </label>
-                                            <p class="mb-0 small">@Model.Address.Province</p>
-                                        </div>
-                                        <div class="col-md-8 col-12">
-                                            <label class="text-muted small mb-1">
-                                                <i class="fas fa-flag me-1"></i>Thành phố
-                                            </label>
-                                            <p class="mb-0 small">@Model.Address.City</p>
-                                        </div>
-                                    </div>
-                                    <div class="mt-2 pt-2 border-top">
-                                        <p class="mb-0 text-muted small">
-                                            <i class="fas fa-info-circle me-1"></i>
-                                            Địa chỉ đầy đủ:
-                                            <strong>
-                                                @Model.Address.Street, @Model.Address.Ward,
-                                                @Model.Address.District, @Model.Address.Province,
-                                                @Model.Address.City
-                                            </strong>
-                                        </p>
-                                    </div>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="alert alert-warning mb-0 py-2">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                    Bạn chưa cập nhật thông tin địa chỉ. Vui lòng cập nhật để thuận tiện cho việc giao hàng.
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Footer -->
-                <div class="card-footer bg-light py-2">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary btn-sm">
-                            <i class="fas fa-arrow-left me-2"></i>Trang chủ
+                        <a asp-controller="Auth" asp-action="ResetPassword" class="btn btn-outline-dark rounded-pill w-100 mt-3">
+                            <i class="fas fa-key me-2"></i>Đổi mật khẩu
                         </a>
-                        <div>
-                            <a href="@Url.Action("EditProfile", "Profile")" class="btn btn-dark btn-sm">
-                                <i class="fas fa-edit me-2"></i>Chỉnh sửa
-                            </a>
-                        </div>
+                    </div>
+                </div>
+
+                <div class="card border-0 rounded-4 shadow-sm quick-links mt-4">
+                    <div class="card-body py-3">
+                        <a asp-action="EditProfile" class="quick-link">
+                            <span class="ql-icon"><i class="fas fa-user-pen"></i></span>
+                            <span>Chỉnh sửa thông tin</span>
+                            <i class="fas fa-chevron-right ms-auto"></i>
+                        </a>
+                        <a asp-controller="Address" asp-action="Index" class="quick-link">
+                            <span class="ql-icon"><i class="fas fa-map-marker-alt"></i></span>
+                            <span>Quản lý địa chỉ</span>
+                            <i class="fas fa-chevron-right ms-auto"></i>
+                        </a>
+                        <a asp-controller="Order" asp-action="Index" class="quick-link">
+                            <span class="ql-icon"><i class="fas fa-box"></i></span>
+                            <span>Đơn hàng của tôi</span>
+                            <i class="fas fa-chevron-right ms-auto"></i>
+                        </a>
+                        <a asp-controller="Wishlist" asp-action="Index" class="quick-link">
+                            <span class="ql-icon"><i class="fas fa-heart"></i></span>
+                            <span>Danh sách yêu thích</span>
+                            <i class="fas fa-chevron-right ms-auto"></i>
+                        </a>
+                        <a asp-controller="Shop" asp-action="Create" class="quick-link">
+                            <span class="ql-icon"><i class="fas fa-store"></i></span>
+                            <span>Cửa hàng của tôi</span>
+                            <i class="fas fa-chevron-right ms-auto"></i>
+                        </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Stats Cards (Optional) -->
-            <div class="row mt-3 g-2">
-                <div class="col-md-4">
-                    <div class="card text-center shadow-sm">
-                        <div class="card-body py-3">
-                            <i class="fas fa-box fa-2x text-dark mb-2"></i>
-                            <h5 class="mb-0">0</h5>
-                            <small class="text-muted">Đơn hàng</small>
+            <!-- Main content -->
+            <div class="col-lg-8">
+                <div class="row g-3 mb-4">
+                    <div class="col-6 col-md-4">
+                        <a asp-controller="Order" asp-action="Index" class="stat-card stat-orders text-decoration-none">
+                            <div class="stat-icon"><i class="fas fa-box-open"></i></div>
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Đơn hàng</div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <a asp-controller="Wishlist" asp-action="Index" class="stat-card stat-hearts text-decoration-none">
+                            <div class="stat-icon"><i class="fas fa-heart"></i></div>
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Yêu thích</div>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4">
+                        <a asp-controller="Cart" asp-action="Index" class="stat-card stat-cart text-decoration-none">
+                            <div class="stat-icon"><i class="fas fa-shopping-cart"></i></div>
+                            <div class="stat-value">0</div>
+                            <div class="stat-label">Giỏ hàng</div>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="card border-0 rounded-4 shadow-sm info-card mb-4">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                        <h3 class="h6 d-flex align-items-center gap-2 fw-bold text-dark mb-0">
+                            <span class="section-icon bg-dark text-white"><i class="fas fa-user"></i></span>
+                            Thông tin cá nhân
+                        </h3>
+                    </div>
+                    <div class="card-body px-4 pb-4 pt-3">
+                        <div class="info-grid">
+                            <div class="info-field">
+                                <span class="field-label">Tên đăng nhập</span>
+                                <span class="field-value">@Model.UserName</span>
+                            </div>
+                            <div class="info-field">
+                                <span class="field-label">Email</span>
+                                <span class="field-value">@Model.Email</span>
+                            </div>
+                            <div class="info-field">
+                                <span class="field-label">Số điện thoại</span>
+                                <span class="field-value">@(Model.PhoneNumber ?? "Chưa cập nhật")</span>
+                            </div>
+                            <div class="info-field">
+                                <span class="field-label">Ngày tạo tài khoản</span>
+                                <span class="field-value">@Model.CreateAt.ToString("dd/MM/yyyy HH:mm", CultureInfo.CurrentCulture)</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-md-4">
-                    <div class="card text-center shadow-sm">
-                        <div class="card-body py-3">
-                            <i class="fas fa-heart fa-2x text-danger mb-2"></i>
-                            <h5 class="mb-0">0</h5>
-                            <small class="text-muted">Yêu thích</small>
-                        </div>
+
+                <div class="card border-0 rounded-4 shadow-sm info-card">
+                    <div class="card-header bg-transparent border-0 pt-4 px-4 pb-0">
+                        <h3 class="h6 d-flex align-items-center gap-2 fw-bold text-dark mb-0">
+                            <span class="section-icon bg-danger bg-gradient"><i class="fas fa-map-marker-alt"></i></span>
+                            Địa chỉ giao hàng
+                        </h3>
                     </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="card text-center shadow-sm">
-                        <div class="card-body py-3">
-                            <i class="fas fa-shopping-cart fa-2x text-success mb-2"></i>
-                            <h5 class="mb-0">0</h5>
-                            <small class="text-muted">Giỏ hàng</small>
-                        </div>
+                    <div class="card-body px-4 pb-4 pt-3">
+                        @if (!string.IsNullOrEmpty(fullAddress))
+                        {
+                            <div class="address-box">
+                                <div class="address-badge">
+                                    <i class="fas fa-home"></i>
+                                    <span>Địa chỉ mặc định</span>
+                                </div>
+                                <div class="info-grid mt-3">
+                                    <div class="info-field">
+                                        <span class="field-label">Đường / Số nhà</span>
+                                        <span class="field-value">@Model.Address!.Street</span>
+                                    </div>
+                                    <div class="info-field">
+                                        <span class="field-label">Phường / Xã</span>
+                                        <span class="field-value">@Model.Address.Ward</span>
+                                    </div>
+                                    <div class="info-field">
+                                        <span class="field-label">Quận / Huyện</span>
+                                        <span class="field-value">@Model.Address.District</span>
+                                    </div>
+                                    <div class="info-field">
+                                        <span class="field-label">Tỉnh / Thành phố</span>
+                                        <span class="field-value">@Model.Address.City</span>
+                                    </div>
+                                </div>
+                                <div class="address-full mt-3 pt-3 border-top">
+                                    <i class="fas fa-truck me-2 text-muted"></i>
+                                    <span>@fullAddress</span>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="empty-address text-center py-4">
+                                <div class="empty-icon"><i class="fas fa-map-marker-alt"></i></div>
+                                <h4 class="h6 fw-bold text-dark mb-1">Chưa có địa chỉ giao hàng</h4>
+                                <p class="text-muted small mb-3">Cập nhật địa chỉ để thuận tiện cho việc giao hàng</p>
+                                <a asp-action="EditProfile" class="btn btn-dark-soft rounded-pill px-4">
+                                    <i class="fas fa-plus me-2"></i>Thêm địa chỉ
+                                </a>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+@section Styles {
+    <style>
+        .profile-page {
+            background: radial-gradient(1200px 400px at 10% -50px, rgba(99,102,241,.07), transparent),
+                        radial-gradient(1000px 400px at 90% -80px, rgba(236,72,153,.05), transparent),
+                        #f6f7f9;
+            min-height: calc(100vh - 76px);
+        }
+
+        .page-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .page-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #111827;
+            display: flex;
+            align-items: center;
+        }
+
+        .head-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: #111827;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.9rem;
+            font-size: 1.05rem;
+            box-shadow: 0 6px 14px rgba(17,24,39,.25);
+        }
+
+        .btn-dark-soft {
+            background: #111827;
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            transition: all .2s;
+        }
+
+        .btn-dark-soft:hover {
+            background: #1f2937;
+            color: #fff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(17,24,39,.28);
+        }
+
+        /* Summary card */
+        .profile-summary {
+            overflow: hidden;
+        }
+
+        .cover-banner {
+            height: 110px;
+            background: linear-gradient(135deg, #111827 0%, #1f2937 55%, #312e81 100%);
+            position: relative;
+        }
+
+        .cover-banner::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(200px 80px at 90% 20%, rgba(99,102,241,.35), transparent),
+                radial-gradient(150px 70px at 15% 60%, rgba(236,72,153,.25), transparent);
+        }
+
+        .profile-avatar {
+            width: 128px;
+            height: 128px;
+            border-radius: 50%;
+            border: 5px solid #fff;
+            object-fit: cover;
+            margin-top: -64px;
+            margin-bottom: 0.9rem;
+            background: #fff;
+            box-shadow: 0 4px 16px rgba(17,24,39,.18);
+            position: relative;
+            z-index: 1;
+        }
+
+        .chip-chip {
+            border-radius: 999px;
+            padding: .35rem .9rem;
+            font-size: .82rem;
+            font-weight: 600;
+        }
+
+        .member-meta {
+            text-align: left;
+            background: #f8f9fa;
+            border: 1px solid #f1f3f5;
+            border-radius: 12px;
+            padding: .8rem 1rem;
+            font-size: .85rem;
+            color: #4b5563;
+        }
+
+        .member-item {
+            padding: .2rem 0;
+        }
+
+        .member-item i {
+            color: #6b7280;
+            width: 20px;
+        }
+
+        /* Quick links */
+        .quick-links .card-body {
+            padding: .5rem 1rem !important;
+        }
+
+        .quick-link {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            padding: .7rem .4rem;
+            color: #374151;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: .9rem;
+            border-bottom: 1px solid #f1f3f5;
+            transition: all .15s;
+        }
+
+        .quick-link:last-child {
+            border-bottom: none;
+        }
+
+        .quick-link:hover {
+            color: #111827;
+            transform: translateX(3px);
+        }
+
+        .ql-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: #f3f4f6;
+            color: #111827;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .85rem;
+            flex-shrink: 0;
+        }
+
+        .quick-link:hover .ql-icon {
+            background: #111827;
+            color: #fff;
+        }
+
+        /* Stats */
+        .stat-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #fff;
+            border: 1px solid #eef0f3;
+            border-radius: 16px;
+            padding: 1.25rem 0.5rem;
+            height: 100%;
+            box-shadow: 0 2px 10px rgba(17,24,39,.04);
+            transition: transform .2s, box-shadow .2s;
+            color: #111827;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 24px rgba(17,24,39,.10);
+            color: #111827;
+        }
+
+        .stat-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            margin-bottom: .6rem;
+        }
+
+        .stat-orders .stat-icon { background: #eef0f3; color: #111827; }
+        .stat-hearts .stat-icon { background: #fef2f2; color: #dc2626; }
+        .stat-cart .stat-icon { background: #eff6ff; color: #1d4ed8; }
+
+        .stat-value { font-size: 1.4rem; font-weight: 700; line-height: 1.1; }
+        .stat-label { font-size: .82rem; color: #6b7280; }
+
+        /* Info cards */
+        .section-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .85rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .9rem 2rem;
+        }
+
+        .info-field {
+            background: #f8f9fa;
+            border: 1px solid #f1f3f5;
+            border-radius: 12px;
+            padding: .75rem 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: .25rem;
+        }
+
+        .field-label {
+            font-size: .76rem;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            font-weight: 600;
+        }
+
+        .field-value {
+            font-weight: 600;
+            color: #111827;
+            word-break: break-word;
+        }
+
+        .address-box {
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            padding: 1rem 1.25rem;
+        }
+
+        .address-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: .5rem;
+            background: #10b981;
+            color: #fff;
+            border-radius: 999px;
+            font-size: .78rem;
+            font-weight: 600;
+            padding: .3rem .9rem;
+        }
+
+        .address-full {
+            font-size: .9rem;
+            color: #374151;
+            display: flex;
+            align-items: flex-start;
+            gap: .5rem;
+        }
+
+        .address-full i {
+            margin-top: .2rem;
+        }
+
+        .empty-address {
+            background: #fff;
+            border: 1px dashed #d1d5db;
+            border-radius: 14px;
+        }
+
+        .empty-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto .9rem;
+            border-radius: 50%;
+            background: #f3f4f6;
+            color: #9ca3af;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        @@media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .page-head {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+        }
+    </style>
+}
