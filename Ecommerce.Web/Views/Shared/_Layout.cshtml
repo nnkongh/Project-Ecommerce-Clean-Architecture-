@@ -1,5 +1,6 @@
 ﻿<!DOCTYPE html>
-<html lang="vi" class="h-100">
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
+<html lang="vi">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -10,7 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
     @await RenderSectionAsync("Styles", required: false)
 </head>
-<body class="d-flex flex-column h-100">
+<body class="d-flex flex-column">
     @{
         var hideAuthHeader = ViewData["HideAuthHeader"] as bool? ?? false;
     }
@@ -18,32 +19,34 @@
     @if (!hideAuthHeader)
     {
         <!-- Header -->
-        <nav class="navbar navbar-expand-lg navbar-dark bg-black">
+        <nav class="navbar navbar-expand-lg navbar-dark app-navbar sticky-top">
             <div class="container-fluid px-4">
                 <!-- Logo/Brand -->
-                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
-                    <i class="fas fa-store me-2"></i>Ecommerce
+                <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+                    <span class="brand-icon"><i class="fas fa-store"></i></span>
+                    <span class="brand-text">Ecommerce</span>
                 </a>
 
                 <!-- Mobile Toggle -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain" aria-controls="navbarMain">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarMain">
                     <!-- Search Form - Center -->
-                    <form asp-controller="Product" asp-action="Search" method="get" class="d-flex mx-auto" style="max-width: 500px; width: 100%;">
-                        <input class="form-control me-2" type="search" name="name" placeholder="Tìm kiếm sản phẩm..." />
-                        <button class="btn btn-outline-light" type="submit">
-                            <i class="fas fa-search"></i>
+                    <form asp-controller="Product" asp-action="Search" method="get" class="d-flex search-form mx-lg-auto mt-3 mt-lg-0">
+                        <i class="fas fa-search search-icon"></i>
+                        <input class="form-control" type="search" name="name" placeholder="Tìm kiếm sản phẩm..." aria-label="Tìm kiếm" />
+                        <button class="btn" type="submit" aria-label="Tìm kiếm">
+                            <i class="fas fa-arrow-right"></i>
                         </button>
                     </form>
 
                     <!-- Right Menu -->
-                    <ul class="navbar-nav ms-auto">
+                    <ul class="navbar-nav ms-auto align-items-lg-center mt-3 mt-lg-0">
                         <!-- Danh mục -->
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Category" asp-action="Index">
+                            <a class="nav-link nav-link-custom" asp-controller="Category" asp-action="Index">
                                 <i class="fas fa-th-large me-1"></i>Danh mục
                             </a>
                         </li>
@@ -51,18 +54,39 @@
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <!-- Giỏ hàng -->
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Cart" asp-action="Index">
+                            <li class="nav-item me-lg-1">
+                                <a class="nav-link nav-link-custom" asp-controller="Cart" asp-action="Index">
                                     <i class="fas fa-shopping-cart me-1"></i>Giỏ hàng
                                 </a>
                             </li>
 
-                            <!-- User Dropdown -->
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                                    <i class="fas fa-user-circle me-1"></i>@User.Identity.Name
+                            <!-- Thông báo -->
+                            <li class="nav-item dropdown ms-lg-1 me-lg-1" id="notification-nav">
+                                <a class="nav-link nav-link-custom position-relative" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" title="Thông báo">
+                                    <i class="fas fa-bell"></i>
+                                    <span class="notification-badge" id="notification-badge" style="display:none;">0</span>
                                 </a>
-                                <ul class="dropdown-menu dropdown-menu-end">
+                                <div class="dropdown-menu dropdown-menu-end dropdown-menu-glass notification-dropdown shadow-lg" aria-labelledby="notificationDropdown">
+                                    <div class="notification-dropdown-head">
+                                        <span>Thông báo</span>
+                                        <a asp-controller="Notification" asp-action="Index" class="notification-view-all">Xem tất cả</a>
+                                    </div>
+                                    <div class="notification-dropdown-list" id="notification-dropdown-list">
+                                        <div class="notification-dropdown-empty">
+                                            <i class="fas fa-bell-slash"></i>
+                                            <span>Chưa có thông báo</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+
+                            <!-- User Dropdown -->
+                            <li class="nav-item dropdown ms-lg-2">
+                                <a class="nav-link dropdown-toggle user-dropdown" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="user-avatar"><i class="fas fa-user"></i></span>
+                                    <span class="d-none d-lg-inline">@User.Identity.Name</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end dropdown-menu-glass shadow-lg" aria-labelledby="userDropdown">
                                     <li>
                                         <a class="dropdown-item" asp-controller="Profile" asp-action="Index">
                                             <i class="fas fa-user me-2"></i>Hồ sơ
@@ -84,8 +108,8 @@
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" asp-controller="Product" asp-action="Create">
-                                            <i class="fas fa-plus-circle me-2"></i>Tạo sản phẩm
+                                        <a class="dropdown-item" asp-controller="Shop" asp-action="Create">
+                                            <i class="fas fa-store me-2"></i>Cửa hàng
                                         </a>
                                     </li>
                                     <li><hr class="dropdown-divider"></li>
@@ -101,13 +125,13 @@
                         }
                         else
                         {
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Auth" asp-action="Login">
+                            <li class="nav-item me-lg-1">
+                                <a class="nav-link nav-link-custom" asp-controller="Auth" asp-action="Login">
                                     <i class="fas fa-sign-in-alt me-1"></i>Đăng nhập
                                 </a>
                             </li>
-                            <li class="nav-item">
-                                <a class="nav-link" asp-controller="Auth" asp-action="Register">
+                            <li class="nav-item ms-lg-2">
+                                <a class="nav-link nav-register" asp-controller="Auth" asp-action="Register">
                                     <i class="fas fa-user-plus me-1"></i>Đăng ký
                                 </a>
                             </li>
@@ -130,22 +154,87 @@
     @if (!hideFooter)
     {
         <!-- Footer -->
-        <footer class="bg-black text-white mt-auto py-3">
-            <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-md-4 text-center text-md-start mb-2 mb-md-0">
-                        <span class="fw-bold"><i class="fas fa-store me-1"></i>Ecommerce</span>
+        <footer class="app-footer text-white">
+            <div class="container py-3">
+                <div class="row g-3">
+                    <!-- Brand -->
+                    <div class="col-lg-4">
+                        <a class="navbar-brand d-flex align-items-center mb-2" asp-controller="Home" asp-action="Index">
+                            <span class="brand-icon"><i class="fas fa-store"></i></span>
+                            <span class="brand-text">Ecommerce</span>
+                        </a>
+                        <p class="footer-desc mb-2">
+                            Nền tảng mua sắm công nghệ trực tuyến. Đa dạng sản phẩm, giao nhanh và uy tín.
+                        </p>
+                        <div class="d-flex gap-2">
+                            <a href="#" class="social-btn" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-btn" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-btn" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
+                            <a href="#" class="social-btn" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+                        </div>
                     </div>
-                    <div class="col-md-4 text-center mb-2 mb-md-0">
-                        <small class="text-muted">
-                            <a href="#" class="text-muted text-decoration-none me-3">Về chúng tôi</a>
-                            <a href="#" class="text-muted text-decoration-none me-3">Chính sách</a>
-                            <a href="#" class="text-muted text-decoration-none">Hỗ trợ</a>
-                        </small>
+
+                    <!-- Liên kết nhanh -->
+                    <div class="col-6 col-lg-2">
+                        <h6 class="footer-title">Danh mục</h6>
+                        <a class="footer-link" asp-controller="Category" asp-action="Index">
+                            <i class="fas fa-chevron-right"></i>Danh mục sản phẩm
+                        </a>
+                        <a class="footer-link" asp-controller="Product" asp-action="Index">
+                            <i class="fas fa-chevron-right"></i>Tất cả sản phẩm
+                        </a>
+                        <a class="footer-link" asp-controller="Cart" asp-action="Index">
+                            <i class="fas fa-chevron-right"></i>Giỏ hàng
+                        </a>
+                        <a class="footer-link" asp-controller="Order" asp-action="Index">
+                            <i class="fas fa-chevron-right"></i>Đơn hàng
+                        </a>
                     </div>
-                    <div class="col-md-4 text-center text-md-end">
-                        <small class="text-muted">© 2026 Simple Ecommerce</small>
+
+                    <!-- Hỗ trợ -->
+                    <div class="col-6 col-lg-2">
+                        <h6 class="footer-title">Hỗ trợ</h6>
+                        <a class="footer-link" href="#">
+                            <i class="fas fa-chevron-right"></i>Về chúng tôi
+                        </a>
+                        <a class="footer-link" href="#">
+                            <i class="fas fa-chevron-right"></i>Chính sách đổi trả
+                        </a>
+                        <a class="footer-link" href="#">
+                            <i class="fas fa-chevron-right"></i>Chính sách bảo mật
+                        </a>
+                        <a class="footer-link" href="#">
+                            <i class="fas fa-chevron-right"></i>Hỗ trợ khách hàng
+                        </a>
                     </div>
+
+                    <!-- Liên hệ -->
+                    <div class="col-lg-4">
+                        <h6 class="footer-title">Liên hệ</h6>
+                        <div class="contact-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>123 Đường Công Nghệ, Quận Hoàn Kiếm, Hà Nội</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-phone-alt"></i>
+                            <span>1900 1234 (8:00 - 22:00 hàng ngày)</span>
+                        </div>
+                        <div class="contact-item">
+                            <i class="fas fa-envelope"></i>
+                            <span>support@ecommerce.vn</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom bar -->
+            <div class="footer-bottom py-2">
+                <div class="container d-flex flex-wrap justify-content-between align-items-center gap-2">
+                    <span>© 2026 Simple Ecommerce. Đã đăng ký bản quyền.</span>
+                    <span>
+                        <a href="#" class="me-3">Điều khoản sử dụng</a>
+                        <a href="#">Chính sách bảo mật</a>
+                    </span>
                 </div>
             </div>
         </footer>
@@ -164,6 +253,10 @@
     </script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+    <script>
+        window.__API_BASE_URL__ = '@(Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7021")';
+    </script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
