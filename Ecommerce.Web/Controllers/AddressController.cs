@@ -1,3 +1,4 @@
+using AutoMapper;
 using Ecommerce.Application.DTOs.ModelsRequest.Address;
 using Ecommerce.Web.Interface;
 using Ecommerce.Web.Models;
@@ -10,10 +11,12 @@ namespace Ecommerce.Web.Controllers
     public class AddressController : Controller
     {
         private readonly IAddressClient _addressClient;
+        private readonly IMapper _mapper;
 
-        public AddressController(IAddressClient addressClient)
+        public AddressController(IAddressClient addressClient, IMapper mapper)
         {
             _addressClient = addressClient;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -106,7 +109,7 @@ namespace Ecommerce.Web.Controllers
                 TempData["Error"] = "Không tìm thấy địa chỉ";
                 return RedirectToAction(nameof(Index));
             }
-            return View(address);
+            return View(_mapper.Map<UserAddressViewModel>(address));
         }
 
         [HttpPost("address/delete/{id}")]
