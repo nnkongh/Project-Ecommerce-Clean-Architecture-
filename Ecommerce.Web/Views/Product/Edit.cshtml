@@ -4,125 +4,270 @@
     ViewData["Title"] = Model.Id > 0 ? "Chỉnh sửa sản phẩm" : "Tạo sản phẩm mới";
 }
 
-<div class="container my-5">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">
-                        <i class="fas fa-box me-2"></i>
-                        @(Model.Id > 0 ? "Chỉnh sửa sản phẩm" : "Tạo sản phẩm mới")
-                    </h4>
-                </div>
+@section Styles {
+    <style>
+        .product-page {
+            background: radial-gradient(1200px 400px at 15% -50px, rgba(99,102,241,.07), transparent),
+                        radial-gradient(1000px 400px at 90% -100px, rgba(239,68,68,.05), transparent),
+                        #f6f7f9;
+            min-height: calc(100vh - 76px);
+        }
 
-                <div class="card-body p-4">
-                    <form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
-                        <input type="hidden" asp-for="Id" />
-                        <input type="hidden" asp-for="ParentCategoryId" />
-                        <input type="hidden" asp-for="ImageUrl" />
+        .page-head {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.75rem;
+        }
 
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+        .back-btn {
+            width: 44px;
+            height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
 
-                        <!-- Hình ảnh sản phẩm - Compact -->
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label asp-for="Image" class="form-label">
-                                    <i class="fas fa-image me-1"></i>
-                                    @(Model.Id > 0 ? "Thay đổi hình ảnh" : "Hình ảnh sản phẩm")
-                                </label>
-                                <input asp-for="Image"
-                                       type="file"
-                                       class="form-control"
-                                       accept="image/*"
-                                       onchange="previewImage(event)" />
-                                <span asp-validation-for="Image" class="text-danger small"></span>
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .title-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 14px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.15rem;
+            color: #fff;
+            box-shadow: 0 6px 14px rgba(17,24,39,.25);
+        }
+
+        .ui-card {
+            background: #fff;
+            border: 1px solid #eef0f3;
+            border-radius: 18px;
+            box-shadow: 0 2px 10px rgba(17,24,39,.04);
+            overflow: hidden;
+        }
+
+        .ui-card-head {
+            background: linear-gradient(135deg, #111827, #1e1b4b);
+            color: #fff;
+            padding: 1.25rem 1.6rem;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+
+        .ui-card-body {
+            padding: 1.8rem 1.6rem;
+        }
+
+        .form-section {
+            background: #f8fafc;
+            border: 1px solid #eef0f3;
+            border-radius: 14px;
+            padding: 1.1rem 1.2rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .form-section-title {
+            font-size: .8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: #6b7280;
+            margin-bottom: .9rem;
+        }
+
+        .form-control {
+            border: 1.5px solid #e5e7eb;
+            border-radius: 10px;
+            padding: .6rem .85rem;
+        }
+
+        .form-control:focus {
+            border-color: #312e81;
+            box-shadow: 0 0 0 .2rem rgba(49,46,129,.1);
+        }
+
+        .form-label {
+            font-size: .88rem;
+        }
+
+        .preview-box {
+            width: 100%;
+            max-width: 220px;
+            height: 150px;
+            margin: 0 auto;
+            border-radius: 14px;
+            background: #f8fafc;
+            border: 1.5px dashed #d1d5db;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #9ca3af;
+            overflow: hidden;
+        }
+
+        .preview-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .btn-dark-soft {
+            background: #111827;
+            color: #fff;
+            font-weight: 600;
+            border: none;
+            border-radius: 10px;
+        }
+
+        .btn-dark-soft:hover {
+            background: #312e81;
+            color: #fff;
+            box-shadow: 0 6px 14px rgba(17,24,39,.25);
+        }
+    </style>
+}
+
+<div class="product-page">
+    <div class="container py-5">
+
+        <!-- Header -->
+        <div class="page-head">
+            <button type="button" onclick="history.back()" class="btn btn-outline-dark rounded-circle back-btn" title="Quay lại">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <span class="title-icon bg-dark"><i class="fas fa-edit"></i></span>
+            <div>
+                <h1 class="page-title mb-1">@(Model.Id > 0 ? "Chỉnh sửa sản phẩm" : "Tạo sản phẩm mới")</h1>
+                <p class="text-muted mb-0">Cập nhật thông tin sản phẩm của bạn</p>
+            </div>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+                <div class="ui-card">
+                    <div class="ui-card-head">
+                        <h5 class="mb-0">
+                            <i class="fas fa-tag me-2"></i>@(Model.Id > 0 ? "Thông tin sản phẩm" : "Thông tin sản phẩm mới")
+                        </h5>
+                    </div>
+                    <div class="ui-card-body">
+                        <form asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data">
+                            <input type="hidden" asp-for="Id" />
+                            <input type="hidden" asp-for="ParentCategoryId" />
+                            <input type="hidden" asp-for="ImageUrl" />
+
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                            <!-- Hình ảnh sản phẩm -->
+                            <div class="form-section">
+                                <div class="form-section-title"><i class="fas fa-image me-1"></i>Hình ảnh sản phẩm</div>
+                                <div class="row align-items-center g-3">
+                                    <div class="col-md-6">
+                                        <label asp-for="Image" class="form-label fw-bold">
+                                            @(Model.Id > 0 ? "Thay đổi hình ảnh" : "Hình ảnh sản phẩm") <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="Image"
+                                               type="file"
+                                               class="form-control"
+                                               accept="image/*"
+                                               onchange="previewImage(event)" />
+                                        <span asp-validation-for="Image" class="text-danger small"></span>
+                                        <div class="form-text">Chấp nhận JPG, PNG, GIF. Kích thước tối đa 5MB.</div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="preview-box" id="previewWrap">
+                                            @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                                            {
+                                                <img id="currentImage" src="@Model.ImageUrl" alt="Product Image" style="display:block;" />
+                                            }
+                                            else
+                                            {
+                                                <span id="previewPlaceholder"><i class="fas fa-image me-1"></i>Chưa có ảnh</span>
+                                            }
+                                            <img id="preview" src="#" alt="Preview" style="display: none;" />
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="col-md-6 text-center">
-                                <!-- Ảnh hiện tại hoặc preview -->
-                                @if (!string.IsNullOrEmpty(Model.ImageUrl))
-                                {
-                                    <img id="currentImage"
-                                         src="@Model.ImageUrl"
-                                         alt="Product Image"
-                                         class="img-thumbnail"
-                                         style="max-width: 150px; max-height: 150px; object-fit: contain;">
-                                }
-                                <img id="preview"
-                                     src="#"
-                                     alt="Preview"
-                                     class="img-thumbnail"
-                                     style="max-width: 150px; max-height: 150px; object-fit: contain; display: none;" />
-                            </div>
-                        </div>
 
-                        <!-- Thông tin sản phẩm -->
-                        <div class="row g-3 mb-3">
-                            <!-- Tên sản phẩm -->
-                            <div class="col-md-8">
-                                <label asp-for="Name" class="form-label">
-                                    <i class="fas fa-tag me-1"></i>Tên sản phẩm <span class="text-danger">*</span>
-                                </label>
-                                <input asp-for="Name"
-                                       class="form-control"
-                                       placeholder="Nhập tên sản phẩm" />
-                                <span asp-validation-for="Name" class="text-danger small"></span>
+                            <!-- Thông tin cơ bản -->
+                            <div class="form-section">
+                                <div class="form-section-title"><i class="fas fa-tag me-1"></i>Thông tin cơ bản</div>
+                                <div class="row g-3">
+                                    <div class="col-md-8">
+                                        <label asp-for="Name" class="form-label fw-bold">
+                                            Tên sản phẩm <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="Name"
+                                               class="form-control"
+                                               placeholder="Nhập tên sản phẩm" />
+                                        <span asp-validation-for="Name" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label asp-for="Price" class="form-label fw-bold">
+                                            Giá (VNĐ) <span class="text-danger">*</span>
+                                        </label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-white"><i class="fas fa-dollar-sign"></i></span>
+                                            <input asp-for="Price"
+                                                   type="number"
+                                                   step="1000"
+                                                   class="form-control"
+                                                   placeholder="0" />
+                                        </div>
+                                        <span asp-validation-for="Price" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="col-md-8">
+                                        <label asp-for="Description" class="form-label fw-bold">
+                                            Mô tả
+                                        </label>
+                                        <textarea asp-for="Description"
+                                                  class="form-control"
+                                                  rows="3"
+                                                  placeholder="Nhập mô tả chi tiết"></textarea>
+                                        <span asp-validation-for="Description" class="text-danger small"></span>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                        <label asp-for="Stock" class="form-label fw-bold">
+                                            Tồn kho <span class="text-danger">*</span>
+                                        </label>
+                                        <input asp-for="Stock"
+                                               type="number"
+                                               min="0"
+                                               class="form-control"
+                                               placeholder="0" />
+                                        <span asp-validation-for="Stock" class="text-danger small"></span>
+                                    </div>
+                                </div>
                             </div>
 
-                            <!-- Giá -->
-                            <div class="col-md-4">
-                                <label asp-for="Price" class="form-label">
-                                    <i class="fas fa-dollar-sign me-1"></i>Giá (VNĐ) <span class="text-danger">*</span>
-                                </label>
-                                <input asp-for="Price"
-                                       type="number"
-                                       step="1000"
-                                       class="form-control"
-                                       placeholder="0" />
-                                <span asp-validation-for="Price" class="text-danger small"></span>
-                            </div>
-
-                            <!-- Mô tả -->
-                            <div class="col-md-8">
-                                <label asp-for="Description" class="form-label">
-                                    <i class="fas fa-align-left me-1"></i>Mô tả
-                                </label>
-                                <textarea asp-for="Description"
-                                          class="form-control"
-                                          rows="3"
-                                          placeholder="Nhập mô tả chi tiết"></textarea>
-                                <span asp-validation-for="Description" class="text-danger small"></span>
-                            </div>
-
-                            <!-- Tồn kho -->
-                            <div class="col-md-4">
-                                <label asp-for="Stock" class="form-label">
-                                    <i class="fas fa-boxes me-1"></i>Tồn kho <span class="text-danger">*</span>
-                                </label>
-                                <input asp-for="Stock"
-                                       type="number"
-                                       min="0"
-                                       class="form-control"
-                                       placeholder="0" />
-                                <span asp-validation-for="Stock" class="text-danger small"></span>
-                            </div>
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="d-flex justify-content-between">
-                            <button onclick="history.back()" class="btn btn-outline-secondary">
-                                <i class="fas fa-arrow-left me-2"></i>Quay lại
-                            </button>
-                            <div>
-                                <button type="reset" class="btn btn-outline-danger me-2" onclick="resetPreview()">
-                                    <i class="fas fa-undo me-2"></i>Đặt lại
+                            <!-- Buttons -->
+                            <div class="d-flex justify-content-between mt-4 pt-3 border-top">
+                                <button type="button" onclick="history.back()" class="btn btn-outline-secondary rounded-pill px-4">
+                                    <i class="fas fa-arrow-left me-2"></i>Quay lại
                                 </button>
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save me-2"></i>
-                                    @(Model.Id > 0 ? "Cập nhật" : "Tạo mới")
-                                </button>
+                                <div>
+                                    <button type="reset" class="btn btn-outline-danger rounded-pill px-4 me-2" onclick="resetPreview()">
+                                        <i class="fas fa-undo me-2"></i>Đặt lại
+                                    </button>
+                                    <button type="submit" class="btn btn-dark-soft rounded-pill px-4">
+                                        <i class="fas fa-save me-2"></i>@(Model.Id > 0 ? "Cập nhật" : "Tạo mới")
+                                    </button>
+                                </div>
                             </div>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
@@ -133,17 +278,16 @@
     function previewImage(event) {
         const file = event.target.files[0];
         const preview = document.getElementById('preview');
+        const placeholder = document.getElementById('previewPlaceholder');
         const currentImage = document.getElementById('currentImage');
 
         if (file) {
-            // Kiểm tra kích thước file (5MB)
             if (file.size > 5 * 1024 * 1024) {
                 alert('Kích thước ảnh không được vượt quá 5MB');
                 event.target.value = '';
                 return;
             }
 
-            // Kiểm tra định dạng
             const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/jpg'];
             if (!validTypes.includes(file.type)) {
                 alert('Chỉ chấp nhận file ảnh định dạng JPG, PNG, GIF');
@@ -156,19 +300,23 @@
                 preview.src = e.target.result;
                 preview.style.display = 'block';
                 if (currentImage) currentImage.style.display = 'none';
+                if (placeholder) placeholder.style.display = 'none';
             }
             reader.readAsDataURL(file);
         } else {
             preview.style.display = 'none';
             if (currentImage) currentImage.style.display = 'block';
+            if (placeholder) placeholder.style.display = 'block';
         }
     }
 
     function resetPreview() {
         const preview = document.getElementById('preview');
+        const placeholder = document.getElementById('previewPlaceholder');
         const currentImage = document.getElementById('currentImage');
         preview.style.display = 'none';
         if (currentImage) currentImage.style.display = 'block';
+        if (placeholder) placeholder.style.display = 'block';
     }
 </script>
 

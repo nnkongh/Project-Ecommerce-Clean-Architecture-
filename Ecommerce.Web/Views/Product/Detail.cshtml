@@ -1,222 +1,763 @@
 ﻿@model ProductViewModel
 
 @{
-    ViewData["Title"] = "Chi tiết sản phẩm";
+    ViewData["Title"] = Model.Name ?? "Chi tiết sản phẩm";
+    var inStock = Model.Stock > 0;
 }
 
-<div class="container my-5">
-    <div class="row">
-        <div class="col-lg-10 mx-auto">
-            <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb" class="mb-4">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="@Url.Action("Index", "Home")">Trang chủ</a>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a href="@Url.Action("Index", "Product")">Sản phẩm</a>
-                    </li>
-                    <li class="breadcrumb-item active">@Model.Name</li>
-                </ol>
-            </nav>
+<div class="product-detail-page">
+    <div class="container py-5">
 
-            <div class="card shadow-sm">
-                <div class="card-body p-4">
-                    <div class="row">
-                        <!-- Hình ảnh sản phẩm -->
-                        <div class="col-md-5 mb-4 mb-md-0">
-                            <div class="text-center">
-                                @if (!string.IsNullOrEmpty(Model.ImageUrl))
-                                {
-                                    <img src="@Model.ImageUrl"
-                                         alt="@Model.Name"
-                                         class="img-fluid rounded border"
-                                         style="max-height: 400px; object-fit: contain;">
-                                }
-                                else
-                                {
-                                    <div class="bg-light d-flex align-items-center justify-content-center rounded border"
-                                         style="height: 400px;">
-                                        <i class="fas fa-image fa-5x text-muted"></i>
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item">
+                    <a href="@Url.Action("Index", "Home")">Trang chủ</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="@Url.Action("Index", "Product")">Sản phẩm</a>
+                </li>
+                <li class="breadcrumb-item active">@Model.Name</li>
+            </ol>
+        </nav>
+
+        <div class="row g-4">
+            <div class="col-xl-10 mx-auto">
+
+                <!-- ====== Sản phẩm ====== -->
+                <div class="card border-0 rounded-4 shadow-sm product-card">
+                    <div class="card-body p-4 p-lg-5">
+                        <div class="row g-4 g-lg-5">
+                            <!-- Hình ảnh sản phẩm -->
+                            <div class="col-md-5">
+                                <div class="product-image-wrap">
+                                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                                    {
+                                        <img src="@Model.ImageUrl"
+                                             alt="@Model.Name"
+                                             class="product-image"
+                                             onerror="this.parentElement.innerHTML='<div class=&quot;product-image-placeholder&quot;><i class=&quot;fas fa-image&quot;></i></div>'" />
+                                    }
+                                    else
+                                    {
+                                        <div class="product-image-placeholder">
+                                            <i class="fas fa-image"></i>
+                                            <span>Chưa có ảnh</span>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+
+                            <!-- Thông tin sản phẩm -->
+                            <div class="col-md-7">
+                                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                                    @if (inStock)
+                                    {
+                                        <span class="stock-pill stock-in">
+                                            <i class="fas fa-circle me-1"></i>Còn hàng (@Model.Stock sản phẩm)
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="stock-pill stock-out">
+                                            <i class="fas fa-circle me-1"></i>Hết hàng
+                                        </span>
+                                    }
+                                    <span class="id-chip">Mã SP: @Model.Id</span>
+                                </div>
+
+                                <h1 class="product-name mb-2">@Model.Name</h1>
+
+                                <div class="price-block mb-4">
+                                    @if (Model.Price > 0)
+                                    {
+                                        <span class="price-value">@Model.Price.ToString("N0")</span>
+                                        <span class="price-unit">đ</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="price-none">Chưa có giá</span>
+                                    }
+                                </div>
+
+                                <div class="desc-block mb-4">
+                                    <div class="desc-label">
+                                        <i class="fas fa-align-left me-1"></i>Mô tả sản phẩm
                                     </div>
-                                }
-                            </div>
-                        </div>
-
-                        <!-- Thông tin sản phẩm -->
-                        <div class="col-md-7">
-                            <h2 class="mb-3">@Model.Name</h2>
-
-                            <!-- Giá -->
-                            <div class="mb-4">
-                                @if (Model.Price > 0)
-                                {
-                                    <h3 class="text-danger mb-0">
-                                        @Model.Price.ToString("N0") đ
-                                    </h3>
-                                }
-                                else
-                                {
-                                    <h4 class="text-muted">Chưa có giá</h4>
-                                }
-                            </div>
-
-                            <!-- Mô tả -->
-                            <div class="mb-4">
-                                <h5 class="mb-2">
-                                    <i class="fas fa-info-circle me-2 text-primary"></i>Mô tả sản phẩm
-                                </h5>
-                                <p class="text-muted">
                                     @if (!string.IsNullOrEmpty(Model.Description))
                                     {
-                                        @Model.Description
+                                        <p class="desc-text">@Model.Description</p>
                                     }
                                     else
                                     {
-                                        <em>Chưa có mô tả</em>
+                                        <p class="desc-text text-muted">
+                                            <em>Chưa có mô tả cho sản phẩm này.</em>
+                                        </p>
                                     }
-                                </p>
-                            </div>
+                                </div>
 
-                            <!-- Tồn kho -->
-                            <div class="mb-4">
-                                <h6>
-                                    <i class="fas fa-box me-2"></i>Tình trạng:
-                                    @if (Model.Stock > 0)
-                                    {
-                                        <span class="badge bg-success">Còn hàng (@Model.Stock sản phẩm)</span>
-                                    }
-                                    else
-                                    {
-                                        <span class="badge bg-danger">Hết hàng</span>
-                                    }
-                                </h6>
-                            </div>
+                                <hr class="my-4">
 
-                            <hr>
+                                @if (inStock)
+                                {
+                                    <div class="purchase-row">
+                                        <form asp-controller="Cart"
+                                              asp-action="AddToCart"
+                                              method="post"
+                                              class="d-flex flex-wrap align-items-end gap-3 mb-3">
+                                            <input type="hidden" name="Id" value="@Model.Id" />
 
-                            <!-- Thêm vào giỏ hàng -->
-                            @if (Model.Stock > 0)
-                            {
-                                <form asp-controller="Cart"
-                                      asp-action="AddToCart"
-                                      method="post"
-                                      class="mb-4">
-                                    <input type="hidden" name="Id" value="@Model.Id" />
+                                            <div>
+                                                <label for="prodQty" class="form-label small fw-semibold text-muted mb-1">Số lượng</label>
+                                                <div class="qty-stepper">
+                                                    <button type="button" class="qty-btn" data-dir="-1" aria-label="Giảm">
+                                                        <i class="fas fa-minus"></i>
+                                                    </button>
+                                                    <input type="number" id="prodQty" name="quantity"
+                                                           value="1" min="1" max="@Model.Stock" class="qty-input" />
+                                                    <button type="button" class="qty-btn" data-dir="1" aria-label="Tăng">
+                                                        <i class="fas fa-plus"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
 
-                                    <div class="d-flex align-items-center gap-3">
-                                        <div>
-                                            <label class="form-label mb-1 small">Số lượng:</label>
-                                            <input type="number"
-                                                   name="quantity"
-                                                   value="1"
-                                                   min="1"
-                                                   max="@Model.Stock"
-                                                   class="form-control"
-                                                   style="width: 100px;" />
-                                        </div>
-                                        <div class="mt-auto">
-                                            <button type="submit" class="btn btn-primary btn-lg">
-                                                <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ hàng
+                                            <div>
+                                                <button type="submit" class="btn btn-add-cart btn-lg px-5">
+                                                    <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ hàng
+                                                </button>
+                                            </div>
+                                        </form>
+
+                                        <form asp-controller="Wishlist" asp-action="AddToWishlist" method="post">
+                                            <input type="hidden" name="productId" value="@Model.Id" />
+                                            <button type="submit" class="btn btn-outline-danger rounded-pill px-4">
+                                                <i class="far fa-heart me-2"></i>Yêu thích
                                             </button>
+                                        </form>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="alert alert-danger rounded-3 d-flex align-items-center gap-2 mb-0">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <div>
+                                            <strong>Sản phẩm đã hết hàng!</strong> Vui lòng quay lại sau.
                                         </div>
                                     </div>
-                                </form>
+                                }
 
-                                <div class="d-flex gap-2">
-                                    <form asp-controller="Wishlist" asp-action="AddToWishlist" method="post">
-                                        <input type="hidden" name="productId" value="@Model.Id" />
-                                        <button type="submit" class="btn btn-outline-danger">
-                                            <i class="fas fa-heart me-2"></i>Yêu thích
-                                        </button>
-                                    </form>
+                                <!-- Tin cậy -->
+                                <div class="trust-row mt-4">
+                                    <div class="trust-item">
+                                        <i class="fas fa-truck-fast trust-icon"></i>
+                                        <div class="trust-text">
+                                            <strong>Giao hàng nhanh</strong>
+                                            <span>Toàn quốc</span>
+                                        </div>
+                                    </div>
+                                    <div class="trust-item">
+                                        <i class="fas fa-rotate-left trust-icon"></i>
+                                        <div class="trust-text">
+                                            <strong>Đổi trả dễ dàng</strong>
+                                            <span>Trong 7 ngày</span>
+                                        </div>
+                                    </div>
+                                    <div class="trust-item">
+                                        <i class="fas fa-shield-halved trust-icon"></i>
+                                        <div class="trust-text">
+                                            <strong>Hàng chính hãng</strong>
+                                            <span>100% đảm bảo</span>
+                                        </div>
+                                    </div>
                                 </div>
-                            }
-                            else
-                            {
-                                <div class="alert alert-danger">
-                                    <i class="fas fa-exclamation-triangle me-2"></i>
-                                    <strong>Sản phẩm đã hết hàng!</strong> Vui lòng quay lại sau.
-                                </div>
-                            }
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Actions (Chỉnh sửa/Xóa) -->
-                <div class="card-footer bg-light">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <button onclick="history.back()" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left me-2"></i>Quay lại
-                        </button>
-
-                        <div class="d-flex gap-2">
-                            <a href="@Url.Action("Edit", new { id = Model.Id })"
-                               class="btn btn-warning">
-                                <i class="fas fa-edit me-2"></i>Chỉnh sửa
-                            </a>
-
-                            <button type="button"
-                                    class="btn btn-danger"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#deleteModal">
-                                <i class="fas fa-trash-alt me-2"></i>Xóa
+                    <!-- Actions -->
+                    <div class="card-footer bg-transparent border-0 px-4 pb-4 pt-0">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                            <button onclick="history.back()" class="btn btn-outline-dark rounded-pill px-4">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại
                             </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 
-<div class="row mt-4">
-    <div class="col-lg-10 mx-auto">
-        <div class="card shadow-sm">
-            <div class="card-header bg-white d-flex align-items-center gap-2 py-3">
-                <i class="fas fa-comments text-primary"></i>
-                <h5 class="mb-0">Bình luận</h5>
-                <span class="badge bg-primary rounded-pill ms-auto" id="commentCount">0</span>
-            </div>
-            <div class="card-body">
-                <div id="comments-list">
-                    <div class="text-center py-5 text-muted" id="loadingComments">
-                        <div class="spinner-border spinner-border-sm mb-2" role="status"></div>
-                        <p class="mb-0 small">Đang tải bình luận...</p>
-                    </div>
-                </div>
-
-                <hr class="my-4">
-
-                <form id="commentForm">
-                    <input type="hidden" id="productId" value="@Model.Id" />
-                    <div class="d-flex gap-3">
-                        <div class="flex-shrink-0">
-                            <div class="comment-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="mb-2">
-                                <textarea id="commentContent" class="form-control" rows="2" placeholder="Chia sẻ suy nghĩ của bạn về sản phẩm này..."></textarea>
-                            </div>
-                            <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-primary btn-sm" id="submitComment">
-                                    <i class="fas fa-paper-plane me-1"></i>Gửi bình luận
+                            <div class="d-flex gap-2 flex-wrap">
+                                <a href="@Url.Action("Edit", new { id = Model.Id })"
+                                   class="btn btn-warning rounded-pill px-4">
+                                    <i class="fas fa-edit me-2"></i>Chỉnh sửa
+                                </a>
+                                <button type="button"
+                                        class="btn btn-outline-danger rounded-pill px-4"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteModal">
+                                    <i class="fas fa-trash-alt me-2"></i>Xóa
                                 </button>
                             </div>
                         </div>
                     </div>
-                </form>
+                </div>
+
+                <!-- ====== Bình luận ====== -->
+                <div class="card border-0 rounded-4 shadow-sm comments-card mt-4">
+                    <div class="comments-head">
+                        <div class="d-flex align-items-center gap-3">
+                            <span class="comments-icon"><i class="fas fa-comments"></i></span>
+                            <div>
+                                <h2 class="h6 fw-bold text-dark mb-0">Bình luận sản phẩm</h2>
+                                <span class="text-muted small">Chia sẻ cảm nhận của bạn về sản phẩm</span>
+                            </div>
+                            <span class="comment-count-badge ms-auto" id="commentCount">0</span>
+                            <button type="button" id="toggleComments" class="btn btn-view-comments">
+                                <i id="toggleCommentsIcon" class="fas fa-chevron-down me-1"></i>
+                                <span id="toggleCommentsText">Xem bình luận</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4 p-lg-5 pt-3">
+                        <!-- Form bình luận -->
+                        <form id="commentForm" class="composer-form mt-3">
+                            <input type="hidden" id="productId" value="@Model.Id" />
+                            <div class="d-flex gap-3">
+                                <div class="composer-avatar">
+                                    @if (User.Identity?.IsAuthenticated == true)
+                                    {
+                                        <i class="fas fa-user"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="far fa-user"></i>
+                                    }
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="composer-box">
+                                        <textarea id="commentContent" class="form-control composer-textarea" rows="2"
+                                                  placeholder="Bạn nghĩ gì về sản phẩm này? Hãy viết bình luận..." maxlength="500"></textarea>
+                                        <div class="composer-footer">
+                                            <span class="char-count text-muted small" id="charCount">0 / 500</span>
+                                            <button type="submit" class="btn btn-send-comment btn-sm rounded-pill px-4" id="submitComment" disabled>
+                                                <i class="fas fa-paper-plane me-1"></i>Gửi bình luận
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div id="commentFeedback" class="small d-none mt-2"></div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Danh sách bình luận (ẩn, hiện khi bấm) -->
+                        <div id="commentsListWrap" class="d-none">
+                            <hr class="my-4 comment-hr">
+                            <div id="comments-list">
+                                <div class="text-center py-5 text-muted">
+                                    <div class="spinner-border spinner-border-sm mb-2" role="status"></div>
+                                    <p class="mb-0 small">Đang tải bình luận...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+@section Styles {
+    <style>
+        .product-detail-page {
+            background: radial-gradient(1200px 420px at 15% -50px, rgba(99,102,241,.06), transparent),
+                        radial-gradient(1000px 380px at 90% -100px, rgba(239,68,68,.05), transparent),
+                        #f6f7f9;
+            min-height: calc(100vh - 76px);
+        }
+
+        .breadcrumb {
+            font-size: .9rem;
+        }
+
+        .breadcrumb a {
+            color: #6b7280;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: #111827;
+        }
+
+        /* Hình ảnh */
+        .product-image-wrap {
+            border-radius: 20px;
+            background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+            border: 1px solid #eef0f3;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 360px;
+            height: 100%;
+            position: relative;
+        }
+
+        .product-image {
+            max-height: 440px;
+            width: 100%;
+            object-fit: contain;
+            padding: 1rem;
+        }
+
+        .product-image-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: .5rem;
+            color: #9ca3af;
+            font-size: 3rem;
+        }
+
+        .product-image-placeholder span {
+            font-size: .9rem;
+            font-weight: 500;
+        }
+
+        /* Trạng thái & tên */
+        .stock-pill {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: .35rem .9rem;
+            font-size: .8rem;
+            font-weight: 600;
+        }
+
+        .stock-in {
+            background: #ecfdf5;
+            color: #047857;
+        }
+
+        .stock-in .fa-circle {
+            font-size: .5rem;
+        }
+
+        .stock-out {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+
+        .stock-out .fa-circle {
+            font-size: .5rem;
+        }
+
+        .id-chip {
+            background: #eef0f3;
+            color: #4b5563;
+            border-radius: 999px;
+            padding: .35rem .9rem;
+            font-size: .78rem;
+            font-weight: 600;
+        }
+
+        .product-name {
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1.3;
+        }
+
+        /* Giá */
+        .price-block {
+            display: flex;
+            align-items: baseline;
+            gap: .25rem;
+        }
+
+        .price-value {
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: #dc2626;
+        }
+
+        .price-unit {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #dc2626;
+        }
+
+        .price-none {
+            font-size: 1.3rem;
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        /* Mô tả */
+        .desc-label {
+            font-size: .82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            color: #6b7280;
+            margin-bottom: .6rem;
+        }
+
+        .desc-text {
+            color: #4b5563;
+            line-height: 1.7;
+            white-space: pre-wrap;
+        }
+
+        /* Bộ đếm số lượng */
+        .qty-stepper {
+            display: inline-flex;
+            align-items: center;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #fff;
+            transition: border-color .2s;
+        }
+
+        .qty-stepper:focus-within {
+            border-color: #111827;
+        }
+
+        .qty-btn {
+            width: 40px;
+            height: 46px;
+            border: none;
+            background: #f8f9fa;
+            color: #374151;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: .8rem;
+            transition: all .2s;
+        }
+
+        .qty-btn:hover {
+            background: #111827;
+            color: #fff;
+        }
+
+        .qty-input {
+            width: 56px;
+            height: 46px;
+            border: none;
+            text-align: center;
+            font-weight: 700;
+            font-size: 1rem;
+            color: #111827;
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        .qty-input::-webkit-outer-spin-button,
+        .qty-input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .qty-input:focus {
+            outline: none;
+        }
+
+        /* Nút thêm giỏ hàng */
+        .btn-add-cart {
+            background: #111827;
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            transition: all .25s;
+        }
+
+        .btn-add-cart:hover {
+            background: #312e81;
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 22px rgba(49,46,129,.35);
+        }
+
+        /* Tin cậy */
+        .trust-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            background: #f8fafc;
+            border: 1px dashed #d1d5db;
+            border-radius: 16px;
+            padding: 1rem 1.25rem;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+        }
+
+        .trust-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #fff;
+            border: 1px solid #eef0f3;
+            color: #111827;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(17,24,39,.05);
+        }
+
+        .trust-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.25;
+        }
+
+        .trust-text strong {
+            font-size: .85rem;
+            color: #111827;
+        }
+
+        .trust-text span {
+            font-size: .76rem;
+            color: #6b7280;
+        }
+
+        /* Comments */
+        .comments-card {
+            overflow: hidden;
+            border: 1px solid #eef0f3;
+        }
+
+        .comments-head {
+            background: linear-gradient(135deg, #fbfbfc, #f4f5f7);
+            border-bottom: 1px solid #eceef1;
+            padding: 1.1rem 1.5rem;
+        }
+
+        .comments-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 13px;
+            background: #111827;
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            box-shadow: 0 5px 12px rgba(17,24,39,.25);
+            flex-shrink: 0;
+        }
+
+        .comment-count-badge {
+            background: #111827;
+            color: #fff;
+            border-radius: 999px;
+            padding: .35rem 1rem;
+            font-size: .85rem;
+            font-weight: 700;
+        }
+
+        .btn-view-comments {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            color: #374151;
+            border-radius: 999px;
+            padding: .5rem 1.2rem;
+            font-size: .85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            transition: all .2s;
+        }
+
+        .btn-view-comments:hover {
+            background: #111827;
+            border-color: #111827;
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(17,24,39,.25);
+        }
+
+        .composer-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #eef0f3;
+            color: #6b7280;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .composer-box {
+            border: 2px solid #e5e7eb;
+            border-radius: 14px;
+            background: #fff;
+            transition: border-color .2s, box-shadow .2s;
+            overflow: hidden;
+        }
+
+        .composer-box:focus-within {
+            border-color: #111827;
+            box-shadow: 0 0 0 4px rgba(17,24,39,.06);
+        }
+
+        .composer-textarea {
+            border: none;
+            border-radius: 0;
+            resize: none;
+            padding: .75rem 1rem;
+            font-size: .92rem;
+        }
+
+        .composer-textarea:focus {
+            box-shadow: none;
+        }
+
+        .composer-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: .5rem;
+            padding: .45rem .75rem;
+            background: #fafbfc;
+            border-top: 1px solid #eef0f3;
+        }
+
+        .char-count {
+            font-size: .76rem;
+        }
+
+        .btn-send-comment {
+            background: #111827;
+            color: #fff;
+            border: none;
+            font-weight: 600;
+            transition: all .2s;
+        }
+
+        .btn-send-comment:hover:not(:disabled) {
+            background: #312e81;
+            color: #fff;
+            box-shadow: 0 6px 14px rgba(17,24,39,.25);
+        }
+
+        .btn-send-comment:disabled {
+            background: #d1d5db;
+            color: #f9fafb;
+            cursor: not-allowed;
+        }
+
+        .comment-hr {
+            opacity: .6;
+        }
+
+        /* Comment items */
+        #comments-list .comment-item {
+            padding: 1rem 0;
+        }
+
+        #comments-list .comment-avatar {
+            width: 44px;
+            height: 44px;
+            font-size: 1rem;
+        }
+
+        #comments-list .comment-avatar-img {
+            width: 44px;
+            height: 44px;
+        }
+
+        #comments-list .comment-author {
+            font-size: .95rem;
+        }
+
+        #comments-list .comment-content {
+            background: #f8f9fa;
+            border-radius: 12px 12px 12px 4px;
+            padding: .8rem 1rem;
+            margin-bottom: 0;
+        }
+
+        #comments-list .delete-comment {
+            opacity: 0;
+            transition: opacity .2s;
+            padding: .2rem .45rem;
+            border-radius: 8px;
+        }
+
+        #comments-list .comment-item:hover .delete-comment {
+            opacity: 1;
+        }
+
+        @@media (max-width: 768px) {
+            .trust-row {
+                grid-template-columns: 1fr;
+            }
+
+            .product-name {
+                font-size: 1.35rem;
+            }
+
+            .price-value {
+                font-size: 1.7rem;
+            }
+        }
+    </style>
+}
+
 @section Scripts {
     <script>
         $(document).ready(function () {
-            loadComments();
+            loadCommentCount();
+
+            // Toggle hiện/ẩn danh sách bình luận
+            var commentsLoaded = false;
+            $('#toggleComments').on('click', function () {
+                var wrap = $('#commentsListWrap');
+                var isHidden = wrap.hasClass('d-none');
+
+                if (isHidden) {
+                    if (!commentsLoaded) {
+                        loadComments();
+                        commentsLoaded = true;
+                    }
+                    wrap.removeClass('d-none');
+                    $('#toggleCommentsIcon').attr('class', 'fas fa-chevron-up me-1');
+                    $('#toggleCommentsText').text('Ẩn bình luận');
+                } else {
+                    wrap.addClass('d-none');
+                    $('#toggleCommentsIcon').attr('class', 'fas fa-chevron-down me-1');
+                    $('#toggleCommentsText').text('Xem bình luận (' + ($('#commentCount').text() || '0') + ')');
+                }
+            });
+
+            // Quantity stepper
+            function clampQty(input) {
+                var min = parseInt(input.min) || 1;
+                var max = parseInt(input.max) || 99;
+                var v = parseInt(input.value) || 1;
+                input.value = Math.min(max, Math.max(min, v));
+            }
+
+            $('#prodQty').on('change', function () {
+                clampQty(this);
+            });
+
+            $('.qty-btn').on('click', function () {
+                var input = $('#prodQty')[0];
+                var v = parseInt(input.value) || 1;
+                v += parseInt($(this).data('dir'));
+                input.value = v;
+                clampQty(input);
+            });
+
+            // Character counter + enable/disable submit
+            $('#commentContent').on('input', function () {
+                var len = $(this).val().length;
+                $('#charCount').text(len + ' / 500');
+                $('#submitComment').prop('disabled', $(this).val().trim().length === 0);
+            });
 
             $('#commentForm').submit(function (e) {
                 e.preventDefault();
@@ -224,6 +765,7 @@
                 if (!content) return;
 
                 $('#submitComment').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Đang gửi...');
+                showFeedback(null);
 
                 $.ajax({
                     url: '/comments/create',
@@ -233,20 +775,53 @@
                     success: function (response) {
                         if (response.isSuccess) {
                             $('#commentContent').val('');
+                            $('#charCount').text('0 / 500');
+                            showFeedback('<i class="fas fa-check-circle me-1"></i>Bình luận đã được đăng thành công!', true);
                             loadComments();
                         } else {
+                            $('#submitComment').prop('disabled', false).html('<i class="fas fa-paper-plane me-1"></i>Gửi bình luận');
                             alert(response.error?.message || 'Không thể thêm bình luận');
                         }
                     },
                     error: function () {
+                        $('#submitComment').prop('disabled', false).html('<i class="fas fa-paper-plane me-1"></i>Gửi bình luận');
                         alert('Có lỗi xảy ra khi gửi bình luận');
                     },
                     complete: function () {
-                        $('#submitComment').prop('disabled', false).html('<i class="fas fa-paper-plane me-1"></i>Gửi bình luận');
+                        if ($('#commentContent').val().trim()) {
+                            $('#submitComment').prop('disabled', false).html('<i class="fas fa-paper-plane me-1"></i>Gửi bình luận');
+                        }
                     }
                 });
             });
         });
+
+        function showFeedback(html, isSuccess) {
+            var box = $('#commentFeedback');
+            if (!html) {
+                box.addClass('d-none').removeClass('text-success').removeClass('text-danger');
+                return;
+            }
+            box.removeClass('d-none')
+               .toggleClass('text-success', !!isSuccess)
+               .toggleClass('text-danger', !isSuccess)
+               .html(html);
+            if (isSuccess) {
+                setTimeout(function () {
+                    box.addClass('d-none');
+                }, 3500);
+            }
+        }
+
+        function loadCommentCount() {
+            $.get('/comments/product/' + @Model.Id, function (response) {
+                if (response.isSuccess && response.value) {
+                    var count = response.value.length;
+                    $('#commentCount').text(count);
+                    $('#toggleCommentsText').text('Xem bình luận (' + count + ')');
+                }
+            });
+        }
 
         function loadComments() {
             $.get('/comments/product/' + @Model.Id, function (response) {
@@ -257,14 +832,15 @@
 
                     if (count === 0) {
                         html = '<div class="text-center py-5 text-muted">' +
-                            '    <i class="far fa-comment-dots fa-3x mb-3 d-block"></i>' +
-                            '    <p class="mb-0">Chưa có bình luận nào. Hãy là người đầu tiên!</p>' +
+                            '    <div class="empty-comments-icon mx-auto mb-3"><i class="far fa-comment-dots"></i></div>' +
+                            '    <h6 class="fw-bold text-dark mb-1">Chưa có bình luận nào</h6>' +
+                            '    <p class="mb-0">Hãy là người đầu tiên chia sẻ cảm nhận về sản phẩm này!</p>' +
                             '</div>';
                     } else {
                         $.each(response.value, function (i, comment) {
                             var initials = (comment.userName || '?').charAt(0).toUpperCase();
                             var date = new Date(comment.createdAt);
-                            var dateStr = date.toLocaleDateString('vi-VN', { year: 'numeric', month: 'short', day: 'numeric' });
+                            var dateStr = date.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short', year: 'numeric' });
                             var timeStr = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
 
                             var avatarHtml = comment.avatarUrl
@@ -272,14 +848,12 @@
                                 : '<div class="comment-avatar">' + initials + '</div>';
 
                             html += '<div class="comment-item d-flex gap-3">' +
-                                '    <div class="flex-shrink-0">' +
-                                        avatarHtml +
-                                '    </div>' +
+                                '    <div class="flex-shrink-0">' + avatarHtml + '</div>' +
                                 '    <div class="flex-grow-1">' +
-                                '        <div class="d-flex align-items-center gap-2 mb-1">' +
-                                '            <strong class="comment-author">' + (comment.userName || 'Người dùng') + '</strong>' +
-                                '            <span class="text-muted small">' + dateStr + ' lúc ' + timeStr + '</span>' +
-                                '            <button class="btn btn-sm btn-link text-danger p-0 ms-auto delete-comment" data-id="' + comment.id + '" title="Xóa bình luận">' +
+                                '        <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">' +
+                                '            <strong class="comment-author">' + escapeHtml(comment.userName || 'Người dùng') + '</strong>' +
+                                '            <span class="text-muted small"><i class="far fa-clock me-1"></i>' + dateStr + ' lúc ' + timeStr + '</span>' +
+                                '            <button class="btn btn-link text-danger p-0 ms-auto delete-comment" data-id="' + comment.id + '" title="Xóa bình luận">' +
                                 '                <i class="fas fa-trash-alt"></i>' +
                                 '            </button>' +
                                 '        </div>' +
@@ -328,7 +902,7 @@
 <!-- Modal xác nhận xóa -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 rounded-4 overflow-hidden">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title">
                     <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa
@@ -341,12 +915,12 @@
                     <i class="fas fa-info-circle me-1"></i>Hành động này không thể hoàn tác!
                 </p>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
                     <i class="fas fa-times me-2"></i>Hủy
                 </button>
                 <form asp-action="Delete" asp-route-id="@Model.Id" method="post" class="d-inline">
-                    <button type="submit" class="btn btn-danger">
+                    <button type="submit" class="btn btn-danger rounded-pill px-4">
                         <i class="fas fa-trash-alt me-2"></i>Xóa sản phẩm
                     </button>
                 </form>
