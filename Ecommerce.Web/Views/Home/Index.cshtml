@@ -5,129 +5,329 @@
     var latestProducts = ViewBag.LatestProducts as List<ProductViewModel> ?? new();
 }
 
-<!-- Hero Section -->
-<div class="bg-black text-white py-5">
-    <div class="container text-center">
-        <div class="row justify-content-center">
-            <div class="col-lg-8">
-                <h1 class="display-4 fw-bold mb-4">
-                    <i class="fas fa-store me-3"></i>Simple Ecommerce
-                </h1>
-                <p class="lead mb-4">
-                    Nền tảng mua sắm trực tuyến đơn giản và tiện lợi
-                </p>
-                <div class="d-flex gap-3 justify-content-center">
-                    <a href="@Url.Action("Index", "Category")" class="btn btn-outline-light btn-lg">
-                        <i class="fas fa-th-large me-2"></i>Xem danh mục
-                    </a>
-                    <a href="@Url.Action("Index", "Product")" class="btn btn-outline-light btn-lg">
-                        <i class="fas fa-shopping-bag me-2"></i>Sản phẩm
-                    </a>
-                </div>
+@functions {
+    string GetCategoryIcon(string name)
+    {
+        return name.ToLower() switch
+        {
+            "iphone" => "fab fa-apple",
+            "apple" => "fab fa-apple",
+            "samsung" => "fas fa-mobile-alt",
+            "xiaomi" => "fas fa-mobile-alt",
+            "oppo" => "fas fa-mobile-alt",
+            "vivo" => "fas fa-mobile-alt",
+            "realme" => "fas fa-mobile-alt",
+            "laptop" => "fas fa-laptop",
+            "máy tính" => "fas fa-desktop",
+            "điện thoại" => "fas fa-mobile-alt",
+            "smartphone" => "fas fa-mobile-alt",
+            "tablet" => "fas fa-tablet-alt",
+            "tai nghe" => "fas fa-headphones",
+            "headphone" => "fas fa-headphones",
+            "bàn phím" => "fas fa-keyboard",
+            "keyboard" => "fas fa-keyboard",
+            "chuột" => "fas fa-mouse",
+            _ => "fas fa-box"
+        };
+    }
+}
+
+@section Styles {
+    <style>
+        /* Hero */
+        .home-hero {
+            background: linear-gradient(135deg, #0b0f19 0%, #111827 55%, #1e1b4b 100%);
+            color: #fff;
+            padding: 4.5rem 0 5.5rem;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .home-hero::before,
+        .home-hero::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.35;
+            pointer-events: none;
+        }
+
+        .home-hero::before {
+            width: 420px;
+            height: 420px;
+            background: #4f46e5;
+            top: -180px;
+            right: 8%;
+        }
+
+        .home-hero::after {
+            width: 360px;
+            height: 360px;
+            background: #dc2626;
+            bottom: -200px;
+            left: 5%;
+        }
+
+        .hero-store-icon {
+            width: 86px;
+            height: 86px;
+            border-radius: 24px;
+            background: #fff;
+            color: #111827;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35);
+            margin-bottom: 1.4rem;
+        }
+
+        .hero-title {
+            font-size: 2.6rem;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.9rem;
+        }
+
+        .hero-title .grad {
+            background: linear-gradient(90deg, #818cf8, #f472b6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-sub {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.05rem;
+            max-width: 560px;
+            margin: 0 auto 2rem;
+            line-height: 1.8;
+        }
+
+        .hero-cta {
+            border-radius: 999px;
+            padding: 0.75rem 1.9rem;
+            font-weight: 600;
+        }
+
+        .hero-cta.primary {
+            background: #fff;
+            color: #111827;
+            border: none;
+        }
+
+        .hero-cta.primary:hover {
+            background: #e0e7ff;
+            color: #111827;
+        }
+
+        .hero-cta.ghost {
+            border: 1.5px solid rgba(255, 255, 255, 0.3);
+            color: #fff;
+            background: transparent;
+        }
+
+        .hero-cta.ghost:hover {
+            border-color: #fff;
+            background: rgba(255, 255, 255, 0.08);
+            color: #fff;
+        }
+
+        /* Features */
+        .feature-card {
+            background: #fff;
+            border: 1px solid #eef0f3;
+            border-radius: 18px;
+            box-shadow: 0 2px 10px rgba(17, 24, 39, 0.04);
+            padding: 2rem 1.5rem;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.25s, box-shadow 0.25s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 14px 30px rgba(17, 24, 39, 0.12);
+        }
+
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 1.1rem;
+        }
+
+        .feature-card h5 {
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            color: #6b7280;
+            margin: 0;
+            line-height: 1.7;
+            font-size: 0.92rem;
+        }
+    </style>
+}
+
+<!-- Hero -->
+<div class="home-hero">
+    <div class="container position-relative">
+        <div class="text-center">
+            <div class="hero-store-icon"><i class="fas fa-store"></i></div>
+            <h1 class="hero-title">Mua sắm công nghệ, <span class="grad">dễ dàng</span></h1>
+            <p class="hero-sub">
+                Khám phá đa dạng sản phẩm công nghệ chính hãng với giá tốt nhất.
+                Giao hàng nhanh, thanh toán an toàn và hỗ trợ tận tình 24/7.
+            </p>
+            <div class="d-flex gap-3 justify-content-center flex-wrap">
+                <a href="@Url.Action("Index", "Category")" class="btn hero-cta primary">
+                    <i class="fas fa-th-large me-2"></i>Xem danh mục
+                </a>
+                <a href="@Url.Action("Index", "Product")" class="btn hero-cta ghost">
+                    <i class="fas fa-shopping-bag me-2"></i>Sản phẩm mới
+                </a>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Danh mục nổi bật -->
-@if (categories.Any())
-{
-    <div class="container my-5">
-        <h3 class="mb-4 text-center">
-            <i class="fas fa-th-large me-2 text-primary"></i>Danh mục sản phẩm
-        </h3>
-        <div class="row g-3 justify-content-center">
-            @foreach (var cat in categories.Take(6))
-            {
-                <div class="col-md-4 col-lg-2">
-                    <a href="@Url.Action("ChildCategories", "Category", new { id = cat.Id })"
-                       class="text-decoration-none">
-                        <div class="card text-center border-0 shadow-sm h-100">
-                            <div class="card-body">
-                                <i class="fas fa-folder-open fa-3x text-primary mb-3"></i>
-                                <h6 class="card-title text-dark">@cat.Name</h6>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            }
-        </div>
-    </div>
-}
+<div class="app-page">
+    <div class="container py-5">
 
-<!-- Sản phẩm mới nhất -->
-@if (latestProducts.Any())
-{
-    <div class="container my-5">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3>
-                <i class="fas fa-clock me-2 text-success"></i>Sản phẩm mới nhất
-            </h3>
-            <a href="@Url.Action("Index", "Product")" class="btn btn-outline-primary btn-sm">
-                Xem tất cả <i class="fas fa-arrow-right ms-1"></i>
-            </a>
+        <!-- Features -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <span class="feature-icon" style="background:#eef2ff;color:#3730a3;"><i class="fas fa-shipping-fast"></i></span>
+                    <h5>Giao hàng nhanh</h5>
+                    <p>Miễn phí vận chuyển cho đơn từ 500.000đ, giao trong 24h tại nội thành.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <span class="feature-icon" style="background:#ecfdf5;color:#047857;"><i class="fas fa-shield-alt"></i></span>
+                    <h5>Thanh toán an toàn</h5>
+                    <p>Bảo mật thông tin khách hàng 100%, đa dạng hình thức thanh toán.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <span class="feature-icon" style="background:#eff6ff;color:#1d4ed8;"><i class="fas fa-headset"></i></span>
+                    <h5>Hỗ trợ 24/7</h5>
+                    <p>Tư vấn nhiệt tình, giải đáp mọi thắc mắc bất cứ lúc nào.</p>
+                </div>
+            </div>
         </div>
-        <div class="row row-cols-2 row-cols-md-4 g-3">
-            @foreach (var product in latestProducts)
-            {
-                <div class="col">
-                    <div class="card h-100 shadow-sm product-card">
-                        <a href="@Url.Action("Detail", "Product", new { id = product.Id })" class="text-decoration-none">
-                            @if (!string.IsNullOrEmpty(product.ImageUrl))
-                            {
-                                <img src="@product.ImageUrl" class="card-img-top" alt="@product.Name"
-                                     style="height: 180px; object-fit: cover;">
-                            }
-                            else
-                            {
-                                <div class="bg-light d-flex align-items-center justify-content-center" style="height: 180px;">
-                                    <i class="fas fa-image fa-3x text-muted"></i>
-                                </div>
-                            }
-                            <div class="card-body">
-                                <h6 class="card-title text-dark text-truncate">@product.Name</h6>
-                                <p class="card-text text-danger fw-bold mb-0">@product.Price.ToString("N0") đ</p>
-                            </div>
+
+        <!-- Danh mục nổi bật -->
+        @if (categories.Any())
+        {
+            <div class="section-head">
+                <div>
+                    <h2 class="section-title mb-0">
+                        <span class="title-icon bg-dark"><i class="fas fa-th-large"></i></span>
+                        Danh mục nổi bật
+                    </h2>
+                </div>
+                <a href="@Url.Action("Index", "Category")" class="btn btn-outline-dark-soft rounded-pill px-4 py-2">
+                    Xem tất cả <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+
+            <div class="row g-3 g-md-4 mb-5">
+                @foreach (var category in categories.Take(6))
+                {
+                    <div class="col-6 col-sm-4 col-md-3 col-lg-2">
+                        <a href="@Url.Action("ChildCategories", "Category", new { id = category.Id })" class="cat-card">
+                            <span class="cat-icon"><i class="@GetCategoryIcon(category.Name!)"></i></span>
+                            <span class="cat-name">@category.Name</span>
+                            <span class="cat-go"><i class="fas fa-arrow-right"></i></span>
                         </a>
-                        <div class="card-footer bg-transparent border-0 pt-0">
-                            <form asp-controller="Cart" asp-action="AddToCart" method="post">
-                                <input type="hidden" name="Id" value="@product.Id" />
-                                <input type="hidden" name="quantity" value="1" />
-                                <button type="submit" class="btn btn-outline-dark btn-sm w-100">
-                                    <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
-                                </button>
-                            </form>
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- Sản phẩm mới nhất -->
+        @if (latestProducts.Any())
+        {
+            <div class="section-head">
+                <div>
+                    <h2 class="section-title mb-0">
+                        <span class="title-icon" style="background:linear-gradient(135deg,#dc2626,#f87171);"><i class="fas fa-clock"></i></span>
+                        Sản phẩm mới nhất
+                    </h2>
+                </div>
+                <a href="@Url.Action("Index", "Product")" class="btn btn-outline-dark-soft rounded-pill px-4 py-2">
+                    Xem tất cả <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                @foreach (var product in latestProducts)
+                {
+                    <div class="col">
+                        <div class="product-card">
+                            <a href="@Url.Action("Detail", "Product", new { id = product.Id })" class="product-link">
+                                <div class="product-img">
+                                    @if (product.Stock <= 0)
+                                    {
+                                        <span class="stock-badge stock-out"><i class="fas fa-times me-1"></i>Hết hàng</span>
+                                    }
+                                    @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                    {
+                                        <img src="@product.ImageUrl" alt="@product.Name">
+                                    }
+                                    else
+                                    {
+                                        <div class="product-img-placeholder">
+                                            <i class="fas fa-image"></i>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="product-info">
+                                    <h6 class="product-title">@product.Name</h6>
+                                    @if (product.Price > 0)
+                                    {
+                                        <div class="product-price">@product.Price.ToString("N0") đ</div>
+                                    }
+                                    else
+                                    {
+                                        <div class="product-price price-none">Liên hệ</div>
+                                    }
+                                </div>
+                            </a>
+                            <div class="product-actions">
+                                @if (product.Stock > 0)
+                                {
+                                    <form asp-controller="Cart" asp-action="AddToCart" method="post" class="m-0">
+                                        <input type="hidden" name="Id" value="@product.Id" />
+                                        <input type="hidden" name="quantity" value="1" />
+                                        <button type="submit" class="btn btn-add-cart w-100">
+                                            <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
+                                        </button>
+                                    </form>
+                                }
+                                else
+                                {
+                                    <button class="btn btn-add-cart w-100" disabled>
+                                        <i class="fas fa-times me-2"></i>Hết hàng
+                                    </button>
+                                }
+                            </div>
                         </div>
                     </div>
-                </div>
-            }
-        </div>
-    </div>
-}
-
-<!-- Features -->
-<div class="container my-5">
-    <div class="row g-4 text-center">
-        <div class="col-md-4">
-            <div class="p-4">
-                <i class="fas fa-shipping-fast fa-3x text-primary mb-3"></i>
-                <h5>Giao hàng nhanh</h5>
-                <p class="text-muted">Miễn phí vận chuyển cho đơn từ 500.000đ</p>
+                }
             </div>
-        </div>
-        <div class="col-md-4">
-            <div class="p-4">
-                <i class="fas fa-shield-alt fa-3x text-success mb-3"></i>
-                <h5>Thanh toán an toàn</h5>
-                <p class="text-muted">Bảo mật thông tin khách hàng 100%</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <div class="p-4">
-                <i class="fas fa-headset fa-3x text-info mb-3"></i>
-                <h5>Hỗ trợ 24/7</h5>
-                <p class="text-muted">Tư vấn nhiệt tình, giải đáp mọi thắc mắc</p>
-            </div>
-        </div>
+        }
     </div>
 </div>
