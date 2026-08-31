@@ -1,6 +1,7 @@
 using Ecommerce.Application.Common.Command.Reviews.CreateReview;
 using Ecommerce.Application.Common.Command.Reviews.DeleteReview;
 using Ecommerce.Application.Common.Command.Reviews.UpdateReview;
+using Ecommerce.Application.Common.Queries.Review.GetReviewsByProductId;
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.WebApi.Controllers.BaseController;
@@ -16,6 +17,17 @@ namespace Ecommerce.WebApi.Controllers
     {
         public ReviewController(ISender sender) : base(sender)
         {
+        }
+
+        [HttpGet("product/{productId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetReviewsByProductId(int productId)
+        {
+            var query = new GetReviewsByProductIdQuery(productId);
+            var result = await Sender.Send(query);
+            return result.IsSuccess
+                ? Ok(new ApiResponse<IReadOnlyList<ReviewModel>> { IsSuccess = true, Value = result.Value })
+                : BadRequest(new ApiResponse<IReadOnlyList<ReviewModel>> { IsSuccess = false, Error = result.Error });
         }
 
         [HttpPost]
