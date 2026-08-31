@@ -48,6 +48,7 @@ namespace Ecommerce.Web.Mapping
             CreateMap<ItemWishlistModel, ItemWishlistViewModel>();
 
             CreateMap<CommentModel, CommentViewModel>();
+            CreateMap<ReviewModel, ReviewViewModel>();
 
             CreateMap<NotificationModel, NotificationViewModel>();
 
