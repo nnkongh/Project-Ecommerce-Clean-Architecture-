@@ -27,6 +27,7 @@ namespace Ecommerce.Application.Mappers
             CreateMap<Address, AddressModel>().ReverseMap();
             CreateMap<UserAddress, UserAddressModel>();
             CreateMap<Wishlist, WishlistModel>();
+            CreateMap<Notification, NotificationModel>();
 
             // Mapping for specific models
             CreateMap<CreateCategoryRequest, Category>();
