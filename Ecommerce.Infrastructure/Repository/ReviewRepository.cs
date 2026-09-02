@@ -17,5 +17,13 @@ namespace Ecommerce.Infrastructure.Repository
             return await _context.Reviews.Include(r => r.User)
                                  .FirstOrDefaultAsync(r => r.Id == id);
         }
+
+        public async Task<IEnumerable<Review>> GetAllReviewsByProductIdAsync(int productId)
+        {
+            return await _context.Reviews.Where(r => r.ProductId == productId)
+                                 .Include(r => r.User)
+                                 .OrderByDescending(r => r.CreatedAt)
+                                 .ToListAsync();
+        }
     }
 }
