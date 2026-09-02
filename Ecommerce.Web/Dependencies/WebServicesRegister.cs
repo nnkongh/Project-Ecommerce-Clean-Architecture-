@@ -99,10 +99,12 @@ namespace Ecommerce.Web.Dependencies
             services.AddScoped<IOrderClient, OrderClient>();
             services.AddScoped<ICategoryClient, CategoryClient>();
             services.AddScoped<ICommentClient, CommentClient>();
+            services.AddScoped<IReviewClient, ReviewClient>();
             services.AddScoped<IWishlistClient, WishlistClient>();
             services.AddScoped<IAddressClient, AddressClient>();
             services.AddScoped<ICheckoutCartClient,CheckoutCartClient>();
             services.AddScoped<IShopClient, ShopClient>();
+            services.AddScoped<INotificationClient, NotificationClient>();
 
             services.AddScoped<CartApiClient>();
             services.AddScoped<CartSessionClient>();
