@@ -18,6 +18,7 @@ namespace Ecommerce.Domain.Models
         public User User { get; private set; } 
         public Address? Address { get; private set; }
         public IReadOnlyCollection<Product> Products => _products;
+       
         private readonly List<Product> _products = new List<Product>();
 
         private Shop() { }
@@ -74,5 +75,11 @@ namespace Ecommerce.Domain.Models
 
             _products.Remove(product);
         }
+        public int CountTotalProducts()
+        {
+            return _products.Count;
+        }
     }
+
+   
 }
