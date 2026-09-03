@@ -13,13 +13,15 @@ namespace Ecommerce.Web.Controllers
         private readonly IShopClient _shopClient;
         private readonly IProductClient _productClient;
         private readonly ICategoryClient _categoryClient;
+        private readonly IOrderClient _orderClient;
         private readonly IPhotoService _photoService;
 
-        public ShopController(IShopClient shopClient, IProductClient productClient, ICategoryClient categoryClient, IPhotoService photoService)
+        public ShopController(IShopClient shopClient, IProductClient productClient, ICategoryClient categoryClient, IOrderClient orderClient, IPhotoService photoService)
         {
             _shopClient = shopClient;
             _productClient = productClient;
             _categoryClient = categoryClient;
+            _orderClient = orderClient;
             _photoService = photoService;
         }
 
@@ -120,6 +122,50 @@ namespace Ecommerce.Web.Controllers
                 TempData["Failed"] = "Có lỗi xảy ra: " + ex.Message;
                 return RedirectToAction(nameof(Create));
             }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Orders()
+        {
+            var shopResult = await _shopClient.GetMyShopAsync();
+            if (!shopResult.IsSuccess)
+            {
+                TempData["Failed"] = "Bạn chưa có cửa hàng";
+                return RedirectToAction(nameof(Create));
+            }
+
+            var orders = await _orderClient.GetOrdersByShopAsync();
+            return View(orders.Value);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AcceptOrder(int orderId)
+        {
+            var result = await _orderClient.UpdateOrderStatusAsync(orderId);
+            if (!result.IsSuccess)
+            {
+                TempData["Failed"] = result.Error?.Message ?? "Không thể xác nhận đơn hàng";
+            }
+            else
+            {
+                TempData["Success"] = "Đã xác nhận đơn hàng thành công!";
+            }
+            return RedirectToAction(nameof(Orders));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RejectOrder(int orderId)
+        {
+            var result = await _orderClient.RejectOrderAsync(orderId);
+            if (!result.IsSuccess)
+            {
+                TempData["Failed"] = result.Error?.Message ?? "Không thể từ chối đơn hàng";
+            }
+            else
+            {
+                TempData["Success"] = "Đã từ chối đơn hàng.";
+            }
+            return RedirectToAction(nameof(Orders));
         }
 
         private async Task LoadCategories(ShopRegisterViewModel model)
