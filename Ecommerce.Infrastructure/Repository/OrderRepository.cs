@@ -4,6 +4,7 @@ using Ecommerce.Domain.Specification;
 using Ecommerce.Domain.Specification.Base;
 using Ecommerce.Infrastructure.Data;
 using Ecommerce.Infrastructure.Repository.Base;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,14 @@ namespace Ecommerce.Infrastructure.Repository
         {
             var item = new OrderWithItemSpecification(userId);
             return await GetAsync(item);
+        }
+        public async Task<IReadOnlyList<Order>> GetOrdersByShopIdAsync(int shopId)
+        {
+            return await _context.Orders
+                .Where(o => o.Items.Any(i => _context.Set<Product>().Any(p => p.Id == i.ProductId && p.ShopId == shopId)))
+                .Include(o => o.Items)
+                .OrderByDescending(o => o.OrderDate)
+                .ToListAsync();
         }
         public async Task<Order?> GetOrderByIdAsync(int orderId)
         {
