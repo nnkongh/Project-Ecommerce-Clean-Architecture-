@@ -6,7 +6,7 @@
 }
 
 <div class="product-detail-page">
-    <div class="container py-5">
+    <div class="container py-3 py-md-4">
 
         <nav aria-label="breadcrumb" class="mb-4">
             <ol class="breadcrumb mb-0">
@@ -25,8 +25,8 @@
 
                 <!-- ====== Sản phẩm ====== -->
                 <div class="card border-0 rounded-4 shadow-sm product-card">
-                    <div class="card-body p-4 p-lg-5">
-                        <div class="row g-4 g-lg-5">
+                    <div class="card-body p-3 p-lg-4">
+                        <div class="row g-3 g-lg-4">
                             <!-- Hình ảnh sản phẩm -->
                             <div class="col-md-5">
                                 <div class="product-image-wrap">
@@ -65,9 +65,9 @@
                                     <span class="id-chip">Mã SP: @Model.Id</span>
                                 </div>
 
-                                <h1 class="product-name mb-2">@Model.Name</h1>
+                                <h1 class="product-name mb-1">@Model.Name</h1>
 
-                                <div class="price-block mb-4">
+                                <div class="price-block mb-2">
                                     @if (Model.Price > 0)
                                     {
                                         <span class="price-value">@Model.Price.ToString("N0")</span>
@@ -79,7 +79,7 @@
                                     }
                                 </div>
 
-                                <div class="desc-block mb-4">
+                                <div class="desc-block mb-3">
                                     <div class="desc-label">
                                         <i class="fas fa-align-left me-1"></i>Mô tả sản phẩm
                                     </div>
@@ -95,15 +95,15 @@
                                     }
                                 </div>
 
-                                <hr class="my-4">
+                                <hr class="my-3">
 
                                 @if (inStock)
                                 {
-                                    <div class="purchase-row">
+                                    <div class="purchase-row mb-2">
                                         <form asp-controller="Cart"
                                               asp-action="AddToCart"
                                               method="post"
-                                              class="d-flex flex-wrap align-items-end gap-3 mb-3">
+                                              class="d-flex align-items-end gap-2">
                                             <input type="hidden" name="Id" value="@Model.Id" />
 
                                             <div>
@@ -121,15 +121,15 @@
                                             </div>
 
                                             <div>
-                                                <button type="submit" class="btn btn-add-cart btn-lg px-5">
-                                                    <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ hàng
+                                                <button type="submit" class="btn btn-add-cart px-4">
+                                                    <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
                                                 </button>
                                             </div>
                                         </form>
 
                                         <form asp-controller="Wishlist" asp-action="AddToWishlist" method="post">
                                             <input type="hidden" name="productId" value="@Model.Id" />
-                                            <button type="submit" class="btn btn-outline-danger rounded-pill px-4">
+                                            <button type="submit" class="btn btn-outline-danger rounded-pill px-3">
                                                 <i class="far fa-heart me-2"></i>Yêu thích
                                             </button>
                                         </form>
@@ -137,7 +137,7 @@
                                 }
                                 else
                                 {
-                                    <div class="alert alert-danger rounded-3 d-flex align-items-center gap-2 mb-0">
+                                    <div class="alert alert-danger rounded-3 d-flex align-items-center gap-2 mb-2">
                                         <i class="fas fa-exclamation-triangle"></i>
                                         <div>
                                             <strong>Sản phẩm đã hết hàng!</strong> Vui lòng quay lại sau.
@@ -146,7 +146,7 @@
                                 }
 
                                 <!-- Tin cậy -->
-                                <div class="trust-row mt-4">
+                                <div class="trust-row mt-3">
                                     <div class="trust-item">
                                         <i class="fas fa-truck-fast trust-icon"></i>
                                         <div class="trust-text">
@@ -196,61 +196,117 @@
                     </div>
                 </div>
 
-                <!-- ====== Bình luận ====== -->
+                <!-- ====== Bình luận & Đánh giá ====== -->
                 <div class="card border-0 rounded-4 shadow-sm comments-card mt-4">
                     <div class="comments-head">
-                        <div class="d-flex align-items-center gap-3">
+                        <div class="d-flex flex-wrap align-items-center gap-3">
                             <span class="comments-icon"><i class="fas fa-comments"></i></span>
-                            <div>
-                                <h2 class="h6 fw-bold text-dark mb-0">Bình luận sản phẩm</h2>
-                                <span class="text-muted small">Chia sẻ cảm nhận của bạn về sản phẩm</span>
+                            <div class="me-auto">
+                                <h2 class="h6 fw-bold text-dark mb-0">Bình luận & Đánh giá</h2>
+                                <span class="text-muted small">Chia sẻ cảm nhận và trải nghiệm của bạn về sản phẩm</span>
                             </div>
-                            <span class="comment-count-badge ms-auto" id="commentCount">0</span>
-                            <button type="button" id="toggleComments" class="btn btn-view-comments">
-                                <i id="toggleCommentsIcon" class="fas fa-chevron-down me-1"></i>
-                                <span id="toggleCommentsText">Xem bình luận</span>
-                            </button>
+                            <div class="btn-group interaction-tabs" role="group">
+                                <button type="button" class="btn interaction-tab active" id="tabComments" data-tab="comments">
+                                    <i class="fas fa-comments me-1"></i>Bình luận
+                                    <span class="tab-count-badge ms-1" id="commentCount">0</span>
+                                </button>
+                                <button type="button" class="btn interaction-tab" id="tabReviews" data-tab="reviews">
+                                    <i class="fas fa-star me-1"></i>Đánh giá
+                                    <span class="tab-count-badge ms-1" id="reviewCount">0</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="card-body p-4 p-lg-5 pt-3">
-                        <!-- Form bình luận -->
-                        <form id="commentForm" class="composer-form mt-3">
-                            <input type="hidden" id="productId" value="@Model.Id" />
-                            <div class="d-flex gap-3">
-                                <div class="composer-avatar">
-                                    @if (User.Identity?.IsAuthenticated == true)
-                                    {
-                                        <i class="fas fa-user"></i>
-                                    }
-                                    else
-                                    {
-                                        <i class="far fa-user"></i>
-                                    }
-                                </div>
-                                <div class="flex-grow-1">
-                                    <div class="composer-box">
-                                        <textarea id="commentContent" class="form-control composer-textarea" rows="2"
-                                                  placeholder="Bạn nghĩ gì về sản phẩm này? Hãy viết bình luận..." maxlength="500"></textarea>
-                                        <div class="composer-footer">
-                                            <span class="char-count text-muted small" id="charCount">0 / 500</span>
-                                            <button type="submit" class="btn btn-send-comment btn-sm rounded-pill px-4" id="submitComment" disabled>
-                                                <i class="fas fa-paper-plane me-1"></i>Gửi bình luận
-                                            </button>
-                                        </div>
+                    <div class="card-body p-4 p-lg-5 pt-4">
+                        <!-- ===== Tab Bình luận ===== -->
+                        <div id="panelComments" class="interaction-panel">
+                            <form id="commentForm" class="composer-form mt-2">
+                                <input type="hidden" id="productId" value="@Model.Id" />
+                                <div class="d-flex gap-3">
+                                    <div class="composer-avatar">
+                                        @if (User.Identity?.IsAuthenticated == true)
+                                        {
+                                            <i class="fas fa-user"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="far fa-user"></i>
+                                        }
                                     </div>
-                                    <div id="commentFeedback" class="small d-none mt-2"></div>
+                                    <div class="flex-grow-1">
+                                        <div class="composer-box">
+                                            <textarea id="commentContent" class="form-control composer-textarea" rows="2"
+                                                      placeholder="Bạn nghĩ gì về sản phẩm này? Hãy viết bình luận..." maxlength="500"></textarea>
+                                            <div class="composer-footer">
+                                                <span class="char-count text-muted small" id="charCount">0 / 500</span>
+                                                <button type="submit" class="btn btn-send-comment btn-sm rounded-pill px-4" id="submitComment" disabled>
+                                                    <i class="fas fa-paper-plane me-1"></i>Gửi bình luận
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div id="commentFeedback" class="small d-none mt-2"></div>
+                                    </div>
                                 </div>
-                            </div>
-                        </form>
+                            </form>
 
-                        <!-- Danh sách bình luận (ẩn, hiện khi bấm) -->
-                        <div id="commentsListWrap" class="d-none">
                             <hr class="my-4 comment-hr">
                             <div id="comments-list">
                                 <div class="text-center py-5 text-muted">
                                     <div class="spinner-border spinner-border-sm mb-2" role="status"></div>
                                     <p class="mb-0 small">Đang tải bình luận...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ===== Tab Đánh giá ===== -->
+                        <div id="panelReviews" class="interaction-panel d-none">
+                            <form id="reviewForm" class="composer-form mt-2">
+                                <input type="hidden" id="reviewProductId" value="@Model.Id" />
+                                <div class="d-flex gap-3">
+                                    <div class="composer-avatar">
+                                        @if (User.Identity?.IsAuthenticated == true)
+                                        {
+                                            <i class="fas fa-user"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="far fa-user"></i>
+                                        }
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <div class="mb-2">
+                                            <label class="form-label small fw-semibold text-muted mb-1">Đánh giá của bạn</label>
+                                            <div class="rating-input" id="ratingStars">
+                                                <i class="far fa-star rating-star" data-val="1"></i>
+                                                <i class="far fa-star rating-star" data-val="2"></i>
+                                                <i class="far fa-star rating-star" data-val="3"></i>
+                                                <i class="far fa-star rating-star" data-val="4"></i>
+                                                <i class="far fa-star rating-star" data-val="5"></i>
+                                                <input type="hidden" id="ratingValue" value="0" />
+                                            </div>
+                                            <span class="text-muted small ms-1" id="ratingLabel">Chưa chọn</span>
+                                        </div>
+                                        <div class="composer-box">
+                                            <textarea id="reviewContent" class="form-control composer-textarea" rows="2"
+                                                      placeholder="Chia sẻ cảm nhận và đánh giá của bạn về sản phẩm..." maxlength="1000"></textarea>
+                                            <div class="composer-footer">
+                                                <span class="char-count text-muted small" id="reviewCharCount">0 / 1000</span>
+                                                <button type="submit" class="btn btn-send-comment btn-sm rounded-pill px-4" id="submitReview" disabled>
+                                                    <i class="fas fa-paper-plane me-1"></i>Gửi đánh giá
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div id="reviewFeedback" class="small d-none mt-2"></div>
+                                    </div>
+                                </div>
+                            </form>
+
+                            <hr class="my-4 comment-hr">
+                            <div id="reviews-list">
+                                <div class="text-center py-5 text-muted">
+                                    <div class="spinner-border spinner-border-sm mb-2" role="status"></div>
+                                    <p class="mb-0 small">Đang tải đánh giá...</p>
                                 </div>
                             </div>
                         </div>
@@ -267,7 +323,10 @@
             background: radial-gradient(1200px 420px at 15% -50px, rgba(99,102,241,.06), transparent),
                         radial-gradient(1000px 380px at 90% -100px, rgba(239,68,68,.05), transparent),
                         #f6f7f9;
-            min-height: calc(100vh - 76px);
+        }
+
+        .product-detail-page .product-card {
+            height: auto;
         }
 
         .breadcrumb {
@@ -285,23 +344,23 @@
 
         /* Hình ảnh */
         .product-image-wrap {
-            border-radius: 20px;
+            border-radius: 16px;
             background: linear-gradient(135deg, #f8fafc, #f1f5f9);
             border: 1px solid #eef0f3;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-height: 360px;
-            height: 100%;
+            height: 320px;
+            max-height: 100%;
             position: relative;
         }
 
         .product-image {
-            max-height: 440px;
+            max-height: 300px;
             width: 100%;
             object-fit: contain;
-            padding: 1rem;
+            padding: .75rem;
         }
 
         .product-image-placeholder {
@@ -356,7 +415,7 @@
         }
 
         .product-name {
-            font-size: 1.7rem;
+            font-size: 1.5rem;
             font-weight: 700;
             color: #111827;
             line-height: 1.3;
@@ -370,19 +429,19 @@
         }
 
         .price-value {
-            font-size: 2.1rem;
+            font-size: 1.8rem;
             font-weight: 700;
             color: #dc2626;
         }
 
         .price-unit {
-            font-size: 1.2rem;
+            font-size: 1.05rem;
             font-weight: 700;
             color: #dc2626;
         }
 
         .price-none {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             color: #9ca3af;
             font-style: italic;
         }
@@ -394,13 +453,16 @@
             text-transform: uppercase;
             letter-spacing: .5px;
             color: #6b7280;
-            margin-bottom: .6rem;
+            margin-bottom: .4rem;
         }
 
         .desc-text {
             color: #4b5563;
-            line-height: 1.7;
+            line-height: 1.55;
             white-space: pre-wrap;
+            margin-bottom: 0;
+            max-height: 60px;
+            overflow: hidden;
         }
 
         /* Bộ đếm số lượng */
@@ -459,6 +521,13 @@
         }
 
         /* Nút thêm giỏ hàng */
+        .purchase-row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            gap: .75rem;
+        }
+
         .btn-add-cart {
             background: #111827;
             color: #fff;
@@ -479,23 +548,23 @@
         .trust-row {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
+            gap: .75rem;
             background: #f8fafc;
             border: 1px dashed #d1d5db;
             border-radius: 16px;
-            padding: 1rem 1.25rem;
+            padding: .7rem 1rem;
         }
 
         .trust-item {
             display: flex;
             align-items: center;
-            gap: .8rem;
+            gap: .6rem;
         }
 
         .trust-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 12px;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
             background: #fff;
             border: 1px solid #eef0f3;
             color: #111827;
@@ -509,16 +578,16 @@
         .trust-text {
             display: flex;
             flex-direction: column;
-            line-height: 1.25;
+            line-height: 1.2;
         }
 
         .trust-text strong {
-            font-size: .85rem;
+            font-size: .82rem;
             color: #111827;
         }
 
         .trust-text span {
-            font-size: .76rem;
+            font-size: .73rem;
             color: #6b7280;
         }
 
@@ -548,32 +617,64 @@
             flex-shrink: 0;
         }
 
-        .comment-count-badge {
-            background: #111827;
-            color: #fff;
-            border-radius: 999px;
-            padding: .35rem 1rem;
-            font-size: .85rem;
-            font-weight: 700;
+        /* Interaction tabs (Bình luận & Đánh giá) */
+        .interaction-tabs {
+            border: 1px solid #e5e7eb;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #fff;
+            flex-shrink: 0;
         }
 
-        .btn-view-comments {
+        .interaction-tab {
             background: #fff;
-            border: 1px solid #e5e7eb;
-            color: #374151;
-            border-radius: 999px;
-            padding: .5rem 1.2rem;
-            font-size: .85rem;
+            border: none;
+            color: #6b7280;
             font-weight: 600;
+            font-size: .78rem;
+            padding: .35rem .75rem;
+            border-radius: 0;
             white-space: nowrap;
             transition: all .2s;
         }
 
-        .btn-view-comments:hover {
+        .interaction-tab:hover {
+            color: #111827;
+            background: #f3f4f6;
+        }
+
+        .interaction-tab.active {
             background: #111827;
-            border-color: #111827;
             color: #fff;
-            box-shadow: 0 4px 12px rgba(17,24,39,.25);
+        }
+
+        .tab-count-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 17px;
+            height: 17px;
+            padding: 0 .35rem;
+            border-radius: 999px;
+            font-size: .66rem;
+            font-weight: 700;
+            line-height: 1;
+            background: #e5e7eb;
+            color: #4b5563;
+        }
+
+        .interaction-tab.active .tab-count-badge {
+            background: rgba(255,255,255,.2);
+            color: #fff;
+        }
+
+        .interaction-panel {
+            animation: fadeIn .2s ease;
+        }
+
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .composer-avatar {
@@ -652,6 +753,87 @@
             opacity: .6;
         }
 
+        /* Reviews */
+        .rating-input {
+            display: inline-flex;
+            align-items: center;
+            gap: .15rem;
+        }
+
+        .rating-star {
+            font-size: 1.6rem;
+            color: #d1d5db;
+            cursor: pointer;
+            transition: color .15s, transform .15s;
+        }
+
+        .rating-star:hover {
+            transform: scale(1.15);
+        }
+
+        .rating-star.active {
+            color: #f59e0b;
+        }
+
+        .rating-star.rated {
+            color: #f59e0b;
+        }
+
+        /* Review items */
+        .review-stars {
+            color: #f59e0b;
+            font-size: .9rem;
+            letter-spacing: 1px;
+        }
+
+        .review-stars .far {
+            color: #d1d5db;
+        }
+
+        #reviews-list .review-item {
+            padding: 1rem 0;
+        }
+
+        #reviews-list .review-avatar {
+            width: 44px;
+            height: 44px;
+            font-size: 1rem;
+        }
+
+        #reviews-list .review-avatar-img {
+            width: 44px;
+            height: 44px;
+        }
+
+        #reviews-list .review-author {
+            font-size: .95rem;
+        }
+
+        #reviews-list .review-content {
+            background: #f8f9fa;
+            border-radius: 12px 12px 12px 4px;
+            padding: .8rem 1rem;
+            margin-bottom: 0;
+        }
+
+        #reviews-list .delete-review {
+            opacity: 0;
+            transition: opacity .2s;
+            padding: .2rem .45rem;
+            border-radius: 8px;
+        }
+
+        #reviews-list .review-item:hover .delete-review {
+            opacity: 1;
+        }
+
+        #reviews-list .comment-avatar,
+        #reviews-list .comment-avatar-img {
+            width: 44px;
+            height: 44px;
+            font-size: 1rem;
+        }
+
         /* Comment items */
         #comments-list .comment-item {
             padding: 1rem 0;
@@ -710,26 +892,114 @@
     <script>
         $(document).ready(function () {
             loadCommentCount();
+            loadReviewCount();
 
-            // Toggle hiện/ẩn danh sách bình luận
+            // Chuyển tab Bình luận / Đánh giá
             var commentsLoaded = false;
-            $('#toggleComments').on('click', function () {
-                var wrap = $('#commentsListWrap');
-                var isHidden = wrap.hasClass('d-none');
+            var reviewsLoaded = false;
 
-                if (isHidden) {
+            function switchTab(tab) {
+                var isComments = tab === 'comments';
+                $('#tabComments').toggleClass('active', isComments);
+                $('#tabReviews').toggleClass('active', !isComments);
+                $('#panelComments').toggleClass('d-none', !isComments);
+                $('#panelReviews').toggleClass('d-none', isComments);
+
+                if (isComments) {
                     if (!commentsLoaded) {
                         loadComments();
                         commentsLoaded = true;
                     }
-                    wrap.removeClass('d-none');
-                    $('#toggleCommentsIcon').attr('class', 'fas fa-chevron-up me-1');
-                    $('#toggleCommentsText').text('Ẩn bình luận');
                 } else {
-                    wrap.addClass('d-none');
-                    $('#toggleCommentsIcon').attr('class', 'fas fa-chevron-down me-1');
-                    $('#toggleCommentsText').text('Xem bình luận (' + ($('#commentCount').text() || '0') + ')');
+                    if (!reviewsLoaded) {
+                        loadReviews();
+                        reviewsLoaded = true;
+                    }
                 }
+            }
+
+            $('#tabComments').on('click', function () { switchTab('comments'); });
+            $('#tabReviews').on('click', function () { switchTab('reviews'); });
+
+            // Star rating
+            $('.rating-star').on('mouseenter', function () {
+                var val = parseInt($(this).data('val'));
+                $('.rating-star').each(function () {
+                    $(this).toggleClass('active', parseInt($(this).data('val')) <= val);
+                });
+            }).on('mouseleave', function () {
+                applyRatings();
+            }).on('click', function () {
+                var val = parseInt($(this).data('val'));
+                $('#ratingValue').val(val);
+                applyRatings();
+                updateRatingLabel(val);
+                checkReviewSubmitable();
+            });
+
+            function applyRatings() {
+                var val = parseInt($('#ratingValue').val()) || 0;
+                $('.rating-star').each(function () {
+                    $(this).removeClass('active');
+                    $(this).toggleClass('rated', parseInt($(this).data('val')) <= val);
+                });
+            }
+
+            function updateRatingLabel(val) {
+                var labels = ['Chưa chọn', 'Rất tệ', 'Tệ', 'Bình thường', 'Tốt', 'Tuyệt vời'];
+                $('#ratingLabel').text(labels[val] || '');
+            }
+
+            // Character counter + enable/disable submit
+            $('#reviewContent').on('input', function () {
+                var len = $(this).val().length;
+                $('#reviewCharCount').text(len + ' / 1000');
+                checkReviewSubmitable();
+            });
+
+            function checkReviewSubmitable() {
+                var hasContent = $('#reviewContent').val().trim().length > 0;
+                var hasRating = parseInt($('#ratingValue').val()) > 0;
+                $('#submitReview').prop('disabled', !(hasContent && hasRating));
+            }
+
+            $('#reviewForm').submit(function (e) {
+                e.preventDefault();
+                var content = $('#reviewContent').val().trim();
+                var rating = parseInt($('#ratingValue').val());
+                if (!content || !rating) return;
+
+                $('#submitReview').prop('disabled', true).html('<span class="spinner-border spinner-border-sm me-1"></span>Đang gửi...');
+                showReviewFeedback(null);
+
+                $.ajax({
+                    url: '/reviews/create',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ productId: @Model.Id, content: content, rating: rating }),
+                    success: function (response) {
+                        if (response.isSuccess) {
+                            $('#reviewContent').val('');
+                            $('#ratingValue').val(0);
+                            $('#reviewCharCount').text('0 / 1000');
+                            $('.rating-star').removeClass('active').removeClass('rated');
+                            updateRatingLabel(0);
+                            $('#submitReview').prop('disabled', true);
+                            showReviewFeedback('<i class="fas fa-check-circle me-1"></i>Đánh giá đã được gửi thành công!', true);
+                            loadReviewCount();
+                            if (reviewsLoaded) {
+                                loadReviews();
+                            }
+                        } else {
+                            $('#submitReview').prop('disabled', false).html('<i class="fas fa-paper-plane me-1"></i>Gửi đánh giá');
+                            alert(response.error?.message || 'Không thể thêm đánh giá');
+                        }
+                    },
+                    error: function () {
+                        $('#submitReview').prop('disabled', false).html('<i class="fas fa-paper-plane me-1"></i>Gửi đánh giá');
+                        alert('Có lỗi xảy ra khi gửi đánh giá');
+                    }
+                });
             });
 
             // Quantity stepper
@@ -818,7 +1088,6 @@
                 if (response.isSuccess && response.value) {
                     var count = response.value.length;
                     $('#commentCount').text(count);
-                    $('#toggleCommentsText').text('Xem bình luận (' + count + ')');
                 }
             });
         }
@@ -893,6 +1162,112 @@
                 },
                 error: function () {
                     alert('Có lỗi xảy ra khi xóa bình luận');
+                }
+            });
+        });
+
+        function showReviewFeedback(html, isSuccess) {
+            var box = $('#reviewFeedback');
+            if (!html) {
+                box.addClass('d-none').removeClass('text-success').removeClass('text-danger');
+                return;
+            }
+            box.removeClass('d-none')
+               .toggleClass('text-success', !!isSuccess)
+               .toggleClass('text-danger', !isSuccess)
+               .html(html);
+            if (isSuccess) {
+                setTimeout(function () {
+                    box.addClass('d-none');
+                }, 3500);
+            }
+        }
+
+        function loadReviewCount() {
+            $.get('/reviews/product/' + @Model.Id, function (response) {
+                if (response.isSuccess && response.value) {
+                    var count = response.value.length;
+                    $('#reviewCount').text(count);
+                }
+            });
+        }
+
+        function renderStars(rating) {
+            var html = '';
+            for (var i = 1; i <= 5; i++) {
+                html += '<i class="' + (i <= rating ? 'fas' : 'far') + ' fa-star"></i>';
+            }
+            return html;
+        }
+
+        function loadReviews() {
+            $.get('/reviews/product/' + @Model.Id, function (response) {
+                if (response.isSuccess && response.value) {
+                    var html = '';
+                    var count = response.value.length;
+                    $('#reviewCount').text(count);
+
+                    if (count === 0) {
+                        html = '<div class="text-center py-5 text-muted">' +
+                            '    <div class="empty-comments-icon mx-auto mb-3"><i class="far fa-star"></i></div>' +
+                            '    <h6 class="fw-bold text-dark mb-1">Chưa có đánh giá nào</h6>' +
+                            '    <p class="mb-0">Hãy là người đầu tiên chia sẻ đánh giá về sản phẩm này!</p>' +
+                            '</div>';
+                    } else {
+                        $.each(response.value, function (i, review) {
+                            var initials = (review.userName || '?').charAt(0).toUpperCase();
+                            var date = new Date(review.createdAt);
+                            var dateStr = date.toLocaleDateString('vi-VN', { day: 'numeric', month: 'short', year: 'numeric' });
+                            var timeStr = date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+
+                            var avatarHtml = review.avatarUrl
+                                ? '<img src="' + review.avatarUrl + '" alt="' + escapeHtml(review.userName || '') + '" class="comment-avatar-img review-avatar-img" onerror="this.style.display=\'none\'">'
+                                : '<div class="comment-avatar review-avatar">' + initials + '</div>';
+
+                            var starsHtml = '<span class="review-stars">' + renderStars(review.rating) + '</span>';
+
+                            html += '<div class="review-item d-flex gap-3">' +
+                                '    <div class="flex-shrink-0">' + avatarHtml + '</div>' +
+                                '    <div class="flex-grow-1">' +
+                                '        <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">' +
+                                '            <strong class="review-author">' + escapeHtml(review.userName || 'Người dùng') + '</strong>' +
+                                '            <span>' + starsHtml + '</span>' +
+                                '            <span class="text-muted small"><i class="far fa-clock me-1"></i>' + dateStr + ' lúc ' + timeStr + '</span>' +
+                                '            <button class="btn btn-link text-danger p-0 ms-auto delete-review" data-id="' + review.id + '" title="Xóa đánh giá">' +
+                                '                <i class="fas fa-trash-alt"></i>' +
+                                '            </button>' +
+                                '        </div>' +
+                                '        <p class="review-content mb-3">' + escapeHtml(review.content) + '</p>' +
+                                '    </div>' +
+                                '</div>';
+
+                            if (i < count - 1) {
+                                html += '<hr class="comment-divider">';
+                            }
+                        });
+                    }
+                    $('#reviews-list').html(html);
+                }
+            });
+        }
+
+        $(document).on('click', '.delete-review', function () {
+            var id = $(this).data('id');
+            if (!confirm('Xóa đánh giá này?')) return;
+
+            $.ajax({
+                url: '/reviews/' + id,
+                type: 'DELETE',
+                success: function (response) {
+                    if (response.isSuccess) {
+                        loadReviewCount();
+                        loadReviews();
+                    } else {
+                        alert(response.error?.message || 'Không thể xóa đánh giá');
+                    }
+                },
+                error: function () {
+                    alert('Có lỗi xảy ra khi xóa đánh giá');
                 }
             });
         });
