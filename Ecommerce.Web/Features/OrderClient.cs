@@ -80,5 +80,33 @@ namespace Ecommerce.Web.Services
             return ApiResponse<bool>.Success(true);
         }
 
+        public async Task<ApiResponse<IReadOnlyList<OrderViewModel>>> GetOrdersByShopAsync()
+        {
+            var response = await _httpClient.GetAsync("order/shop");
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<IReadOnlyList<OrderModel>>>();
+
+            if (result == null || !result.IsSuccess)
+            {
+                return ApiResponse<IReadOnlyList<OrderViewModel>>.Fail(result?.Message ?? "Không tìm thấy đơn hàng");
+            }
+
+            var orderViewModel = _mapper.Map<IReadOnlyList<OrderViewModel>>(result.Value);
+            return ApiResponse<IReadOnlyList<OrderViewModel>>.Success(orderViewModel);
+        }
+
+        public async Task<ApiResponse<bool>> RejectOrderAsync(int orderId)
+        {
+            var response = await _httpClient.PutAsync($"order/{orderId}/reject", null);
+
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<bool>>();
+
+            if (result == null || !result.IsSuccess)
+            {
+                return ApiResponse<bool>.Fail(result?.Message ?? $"Không thể từ chối đơn hàng #{orderId}.");
+            }
+            return ApiResponse<bool>.Success(true);
+        }
+
     }
 }
