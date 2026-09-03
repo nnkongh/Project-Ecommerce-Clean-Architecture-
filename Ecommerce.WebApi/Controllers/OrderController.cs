@@ -1,8 +1,10 @@
 ﻿using Ecommerce.Application.Common.Command.Orders.CreateOrder;
 using Ecommerce.Application.Common.Command.Orders.UpdateOrder;
+using Ecommerce.Application.Common.Command.Shops;
 using Ecommerce.Application.Common.Queries.Orders;
 using Ecommerce.Application.Common.Queries.Orders.GetListOrderByUserId;
 using Ecommerce.Application.Common.Queries.Orders.GetOrderById;
+using Ecommerce.Application.Common.Queries.Orders.GetOrdersByShop;
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.Order;
 using Ecommerce.Web.ViewModels.ApiResponse;
@@ -64,11 +66,40 @@ namespace Ecommerce.WebApi.Controllers
             {
                 return Unauthorized();
             }
-            var handler = new UpdateOrderStatus(userId, orderId);
+            var handler = new AcceptOrderCommand(userId, orderId);
             var result = await Sender.Send(handler);
 
             return result.IsSuccess ? Ok(new ApiResponse<OrderModel> { IsSuccess = true})
                                     : BadRequest(new ApiResponse<OrderModel> { IsSuccess = false, Error = result.Error });
+        }
+
+        [HttpGet("shop")]
+        public async Task<IActionResult> GetOrdersByShop()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var query = new GetOrdersByShopQuery(userId);
+            var result = await Sender.Send(query);
+            return result.IsSuccess ? Ok(new ApiResponse<IReadOnlyList<OrderModel>> { IsSuccess = true, Value = result.Value })
+                                    : BadRequest(new ApiResponse<IReadOnlyList<OrderModel>> { IsSuccess = false, Error = result.Error });
+        }
+
+        [HttpPut("{orderId}/reject")]
+        public async Task<IActionResult> RejectOrder(int orderId)
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+            var command = new RejectOrderCommand(userId, orderId);
+            var result = await Sender.Send(command);
+
+            return result.IsSuccess ? Ok(new ApiResponse<bool> { IsSuccess = true })
+                                    : BadRequest(new ApiResponse<bool> { IsSuccess = false, Error = result.Error });
         }
     }
 
