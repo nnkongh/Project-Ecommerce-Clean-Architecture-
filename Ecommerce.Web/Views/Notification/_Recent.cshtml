@@ -1,0 +1,28 @@
+@model List<Ecommerce.Web.ViewModels.NotificationViewModel>
+@{
+    var notifications = Model ?? new List<Ecommerce.Web.ViewModels.NotificationViewModel>();
+}
+@if (!notifications.Any())
+{
+    <div class="notification-dropdown-empty">
+        <i class="fas fa-bell-slash"></i>
+        <span>Chưa có thông báo</span>
+    </div>
+}
+else
+{
+    foreach (var item in notifications)
+    {
+        <a asp-controller="Notification" asp-action="Index" class="notification-dropdown-item @(item.IsRead ? "is-read" : "")">
+            <span class="notification-dropdown-icon"><i class="fas fa-bell"></i></span>
+            <span class="notification-dropdown-body">
+                <span class="notification-dropdown-title">@item.Title</span>
+                <span class="notification-dropdown-time">@item.CreatedDate.ToString("dd/MM/yyyy HH:mm")</span>
+            </span>
+            @if (!item.IsRead)
+            {
+                <span class="unread-dot"></span>
+            }
+        </a>
+    }
+}
