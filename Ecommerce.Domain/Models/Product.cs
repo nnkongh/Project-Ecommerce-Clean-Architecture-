@@ -26,7 +26,6 @@ namespace Ecommerce.Domain.Models
         public IReadOnlyCollection<Review> Reviews => _reviews.AsReadOnly();
         private readonly List<Review> _reviews = new List<Review>();
         private readonly List<Comment> _comments = new List<Comment>();
-
         public Product() { }
         public static Product Create(string name, string imageUrl, int shopId, decimal price, int stock, int ParentCategoryId, int ChildCategoryId, string? description = null)
         {
