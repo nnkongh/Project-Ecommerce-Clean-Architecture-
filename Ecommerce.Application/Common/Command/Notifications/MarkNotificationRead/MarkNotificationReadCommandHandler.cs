@@ -26,7 +26,7 @@ namespace Ecommerce.Application.Common.Command.Notifications.MarkNotificationRea
             {
                 await _notificationRepo.MarkAllAsReadAsync(request.userId);
             }
-
+                
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success();
         }
