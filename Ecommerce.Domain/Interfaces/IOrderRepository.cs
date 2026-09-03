@@ -11,6 +11,7 @@ namespace Ecommerce.Domain.Interfaces
     public interface IOrderRepository : IRepositoryBase<Order, int>
     {
         Task<IReadOnlyList<Order>> GetOrdersByUserIdAsync(string userId);
+        Task<IReadOnlyList<Order>> GetOrdersByShopIdAsync(int shopId);
         Task<Order?> GetOrderByIdAsync(int orderId);
     }
 }

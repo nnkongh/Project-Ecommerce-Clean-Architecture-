@@ -10,7 +10,8 @@ namespace Ecommerce.Domain.Enum
     {
         Pending,       
         Processing,    
-        Finished,    
+        Finished,
+        Rejected,
     }
     public enum CartStatus
     {
