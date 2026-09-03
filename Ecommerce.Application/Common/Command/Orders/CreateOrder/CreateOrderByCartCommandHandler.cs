@@ -29,11 +29,14 @@ namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
 
         public async Task<Result<OrderModel>> Handle(CreateOrderByCartCommand request, CancellationToken cancellationToken)
         {
-            var address = Ecommerce.Domain.Models.Address.Create(request.order.User!.Address!.District!,
-                                              request.order.User!.Address.City!,
-                                              request.order.User!.Address.Province,
-                                              request.order.User!.Address.Street!,
-                                              request.order.User!.Address.Ward!);
+            var userInfo = request.order.User.Address;
+
+
+            var address = Ecommerce.Domain.Models.Address.Create(userInfo!.District!,
+                                              userInfo!.City!,
+                                              userInfo!.Province,
+                                              userInfo!.Street!,
+                                              userInfo!.Ward!);
 
             var user = request.order.User;
             var order = Order.CreateOrder(user.Id, user.UserName, user.PhoneNumber, user.Email, address);
