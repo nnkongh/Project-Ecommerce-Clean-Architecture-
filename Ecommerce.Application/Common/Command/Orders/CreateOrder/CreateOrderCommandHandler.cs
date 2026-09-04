@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Ecommerce.Application.DTOs.Models;
+using Ecommerce.Application.Interfaces;
 using Ecommerce.Domain.Enum;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Interfaces.UnitOfWork;
@@ -19,13 +20,17 @@ namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
         private readonly IProductRepository _productRepo;
         private readonly IOrderRepository _orderRepo;
         private readonly IUserRepository _userRepo;
+        private readonly IShopRepository _shopRepo;
+        private readonly INotificationService _notificationService;
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
-        public CreateOrderCommandHandler(IOrderRepository orderRepo, IProductRepository productRepo, IUserRepository userRepo, IMapper mapper, IUnitOfWork uow)
+        public CreateOrderCommandHandler(IOrderRepository orderRepo, IProductRepository productRepo, IUserRepository userRepo, IShopRepository shopRepo, INotificationService notificationService, IMapper mapper, IUnitOfWork uow)
         {
             _orderRepo = orderRepo;
             _productRepo = productRepo;
             _userRepo = userRepo;
+            _shopRepo = shopRepo;
+            _notificationService = notificationService;
             _mapper = mapper;
             _uow = uow;
         }
@@ -49,7 +54,16 @@ namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
             var order = Order.CreateOrder(user.Id, user.UserName!, user.PhoneNumber, user.Email, user.Address);
             order.AddItem(product.ImageUrl,product.Name,product.Id,product.Price,command.quantity);
             await _orderRepo.AddAsync(order);
-            //product.Stock -= command.quantity;
+
+            if (product.ShopId.HasValue)
+            {
+                var shop = await _shopRepo.GetByIdAsync(product.ShopId.Value);
+                if (shop != null)
+                {
+                    var noti = Notification.Create("Đơn hàng mới", $"Bạn có đơn hàng mới #{order.Id} từ khách hàng {user.UserName}", shop.UserId);
+                    await _notificationService.SendNotificationAsync(shop.UserId, noti);
+                }
+            }
 
             await _uow.SaveChangesAsync(cancellationToken);
             var orderDto = _mapper.Map<OrderModel>(order);
