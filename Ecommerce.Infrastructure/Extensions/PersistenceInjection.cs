@@ -52,6 +52,7 @@ namespace Ecommerce.Infrastructure.Dependency_Injection
             services.AddScoped<IShopRepository, ShopRepository>();
             services.AddScoped<IReviewRepository, ReviewRepository>();
             services.AddScoped<ICommentRepository, CommentRepository>();
+            services.AddScoped<INotificationRepository, NotificationRepository>();
             return services;
 
         }
