@@ -19,7 +19,7 @@ namespace Ecommerce.Test.TestDomain
             int categoryId = 1,
             string? description = "des")
         {
-            return Product.Create(name, imageUrl, shopId, price, stock, categoryId, description);
+            return Product.Create(name, imageUrl, shopId, price, stock, categoryId, 1, description);
         }
 
         [Fact]
@@ -59,7 +59,7 @@ namespace Ecommerce.Test.TestDomain
             Assert.Equal(price, product.Price);
             Assert.Equal(imageUrl, product.ImageUrl);
             Assert.Equal(stock, product.Stock);
-            Assert.Equal(categoryId, product.CategoryId);
+            Assert.Equal(categoryId, product.ParentCategoryId);
             Assert.Equal(shopId, product.ShopId);
             Assert.True(product.IsActive);
         }

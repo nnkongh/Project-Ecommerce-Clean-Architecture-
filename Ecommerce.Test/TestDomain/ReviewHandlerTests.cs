@@ -42,7 +42,7 @@ namespace Ecommerce.Test.TestDomain
 
         private async Task<Product> SeedProductAsync()
         {
-            var product = Product.Create("Sản phẩm test", "img.jpg", shopId: 1, price: 100, stock: 10, categoryId: 1);
+            var product = Product.Create("Sản phẩm test", "img.jpg", shopId: 1, price: 100, stock: 10,ParentCategoryId: 1, ChildCategoryId: 3);
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
             return product;
