@@ -45,6 +45,8 @@ namespace Ecommerce.WebApi.Dependencies
                 opt.AddPolicy("SignalRPolicy", policy =>
                 {
                     policy.WithOrigins("https://localhost:7214")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod()
                           .AllowCredentials();
                 });
             });
