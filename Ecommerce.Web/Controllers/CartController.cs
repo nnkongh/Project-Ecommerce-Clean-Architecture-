@@ -76,7 +76,7 @@ namespace Ecommerce.Web.Controllers
                 ModelState.AddModelError(string.Empty, orderViewModel.Message);
                 return View();
             }
-            return RedirectToAction("Index");
+            return RedirectToAction("Index","Order");
         }
     }
 }
