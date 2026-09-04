@@ -2,6 +2,7 @@
 using Ecommerce.Application.Common.Command.Orders.CreateOrder;
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Application.DTOs.ModelsRequest.Order;
+using Ecommerce.Application.Interfaces;
 using Ecommerce.Domain.Enum;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Interfaces.UnitOfWork;
@@ -23,15 +24,19 @@ namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
         private readonly IUserRepository _userRepository;
         private readonly IOrderRepository _orderRepository;
         private readonly IProductRepository _productRepository;
+        private readonly IShopRepository _shopRepository;
+        private readonly INotificationService _notificationService;
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
 
-        public CheckoutCartCommandHandler(ICartRepository cartRepository, IMapper mapper, IUserRepository userRepository, IProductRepository productRepository, IUnitOfWork uow, IOrderRepository orderRepository)
+        public CheckoutCartCommandHandler(ICartRepository cartRepository, IMapper mapper, IUserRepository userRepository, IProductRepository productRepository, IShopRepository shopRepository, INotificationService notificationService, IUnitOfWork uow, IOrderRepository orderRepository)
         {
             _cartRepository = cartRepository;
             _mapper = mapper;
             _userRepository = userRepository;
             _productRepository = productRepository;
+            _shopRepository = shopRepository;
+            _notificationService = notificationService;
             _uow = uow;
             _orderRepository = orderRepository;
         }
@@ -48,12 +53,25 @@ namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
 
             var u = userResult.Value;
             var order = Order.CreateOrder(u.Id, u.UserName!, u.PhoneNumber, u.Email, u.Address!);
+            var notifiedShopIds = new HashSet<int>();
             foreach (var item in cartResult.Value.Items)
             {
                 order.AddItem(item.ImageUrl!, item.ProductName, item.ProductId, item.UnitPrice, item.Quantity);
                 var product = await _productRepository.GetByIdAsync(item.ProductId);
                 if (product != null)
+                {
                     product.AdjustStock(-item.Quantity);
+                    if (product.ShopId.HasValue && !notifiedShopIds.Contains(product.ShopId.Value))
+                    {
+                        var shop = await _shopRepository.GetByIdAsync(product.ShopId.Value);
+                        if (shop != null)
+                        {
+                            var noti = Notification.Create("Đơn hàng mới", $"Bạn có đơn hàng mới #{order.Id} từ khách hàng {u.UserName}", shop.UserId);
+                            await _notificationService.SendNotificationAsync(shop.UserId, noti);
+                        }
+                        notifiedShopIds.Add(product.ShopId.Value);
+                    }
+                }
             }
 
             var mapped = _mapper.Map<OrderModel>(order);
