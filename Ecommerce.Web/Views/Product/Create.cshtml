@@ -296,44 +296,6 @@
 </div>
 
 <script>
-    const allCategories = @Html.Raw(Json.Serialize(Model.AllCategories.Select(c => new {
-        id = c.Id,
-        name = c.Name,
-        parentId = c.ParentId
-    })));
-
-    $(document).ready(function() {
-        const parentSelect = $('#parentCategorySelect');
-        const childGroup = $('#childCategoryGroup');
-        const childSelect = $('#childCategorySelect');
-
-        parentSelect.on('change', function() {
-            const parentId = parseInt($(this).val());
-
-            if (!parentId) {
-                childGroup.slideUp(300);
-                childSelect.val('').trigger('change');
-                return;
-            }
-
-            const childCategories = allCategories.filter(c => c.parentId === parentId);
-
-            if (childCategories.length > 0) {
-                childSelect.empty();
-                childSelect.append('<option value="">-- Chọn danh mục con --</option>');
-
-                childCategories.forEach(category => {
-                    childSelect.append(`<option value="${category.id}">${category.name}</option>`);
-                });
-
-                childGroup.slideDown(300);
-            } else {
-                childGroup.slideUp(300);
-                childSelect.val('');
-            }
-        });
-    });
-
     function previewImage(event) {
         const file = event.target.files[0];
         const preview = document.getElementById('preview');
@@ -380,6 +342,40 @@
 </script>
 
 @section Scripts {
+    <script>
+        $(document).ready(function() {
+            const parentSelect = $('#parentCategorySelect');
+            const childGroup = $('#childCategoryGroup');
+            const childSelect = $('#childCategorySelect');
+
+            parentSelect.on('change', function() {
+                const parentId = $(this).val();
+
+                if (!parentId) {
+                    childGroup.slideUp(300);
+                    childSelect.empty().append('<option value="">-- Chọn danh mục con --</option>');
+                    return;
+                }
+
+                childSelect.empty().append('<option value="">Đang tải...</option>');
+                childGroup.slideDown(300);
+
+                $.get('/Category/GetChildCategories', { parentId: parentId }, function(response) {
+                    childSelect.empty().append('<option value="">-- Chọn danh mục con --</option>');
+
+                    if (response.isSuccess && response.value && response.value.length > 0) {
+                        response.value.forEach(function(category) {
+                            childSelect.append(`<option value="${category.id}">${category.name}</option>`);
+                        });
+                    } else {
+                        childSelect.append('<option value="">Không có danh mục con</option>');
+                    }
+                }).fail(function() {
+                    childSelect.empty().append('<option value="">Lỗi tải danh mục</option>');
+                });
+            });
+        });
+    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
