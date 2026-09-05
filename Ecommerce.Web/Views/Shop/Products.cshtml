@@ -21,9 +21,14 @@
                     <p class="text-muted mb-0">Danh sách sản phẩm đang bán tại @Model.Shop?.Name</p>
                 </div>
             </div>
-            <a asp-action="Create" class="btn btn-dark-soft btn-lg rounded-pill px-4 py-2">
-                <i class="fas fa-plus me-2"></i>Thêm sản phẩm
-            </a>
+            <div class="d-flex gap-2">
+                <a asp-action="Orders" class="btn btn-outline-dark btn-lg rounded-pill px-4 py-2">
+                    <i class="fas fa-receipt me-2"></i>Xem đơn hàng
+                </a>
+                <a asp-action="Create" class="btn btn-dark-soft btn-lg rounded-pill px-4 py-2">
+                    <i class="fas fa-plus me-2"></i>Thêm sản phẩm
+                </a>
+            </div>
         </div>
 
         @{ var shopProducts = Model.Products ?? new List<ProductViewModel>(); }
