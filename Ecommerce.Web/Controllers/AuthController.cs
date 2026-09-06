@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using MediatR;
 using Ecommerce.Web.Interface;
 using Ecommerce.Web.ViewModels;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text;
 
 namespace Ecommerce.Web.Controllers
 {
@@ -225,11 +227,32 @@ namespace Ecommerce.Web.Controllers
 
 
         [HttpGet]
-        public IActionResult ResetPassword(string email, string token)
+        public IActionResult ResetPassword(string t, string email = null, string token = null)
         {
+            // Link mới gửi email gom email+token trong MỘT param `t` (không chứa '&' nên không bị
+            // email client cắt xén). Vẫn hỗ trợ link cũ dạng ?email=...&token=...
+            if (!string.IsNullOrEmpty(t))
+            {
+                try
+                {
+                    var payload = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(t));
+                    var parts = payload.Split('|', 2);
+                    if (parts.Length == 2)
+                    {
+                        email = parts[0];
+                        token = parts[1];
+                    }
+                }
+                catch (FormatException)
+                {
+                    // tham số `t` bị hỏng -> xử lý như link không hợp lệ
+                }
+            }
+
             if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
             {
-                return BadRequest("Invalid reset password link.");
+                TempData["ErrorMessage"] = "Link đặt lại mật khẩu không hợp lệ hoặc đã hết hạn. Vui lòng gửi lại link mới.";
+                return RedirectToAction(nameof(ForgotPassword));
             }
 
             var model = new ResetPasswordViewModel
