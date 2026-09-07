@@ -115,12 +115,13 @@ namespace Ecommerce.Web.Services
             return ApiResponse<PagedResult<ProductViewModel>>.Success(mapped);
         }
 
-        public async Task<ApiResponse<CategoryDetailModel>> GetCategoryDetailAsync(int parentId, int? selectedCategoryId)
+        public async Task<ApiResponse<CategoryDetailModel>> GetCategoryDetailAsync(int? parentCaretoryId, int? selectedCategoryId, int page, int pageSize)
         {
-            var url = $"categories/{parentId}/details";
+            var pageResult = $"page?page={page}&pageSize={pageSize}";
+            var url = $"categories/{parentCaretoryId}/details";
             if (selectedCategoryId.HasValue)
             {
-                url += $"?selectedCategoryId={selectedCategoryId.Value}";
+                url += $"?selectedCategoryId={selectedCategoryId.Value}/{pageResult}";
             }
 
             var response = await _httpClient.GetAsync(url);

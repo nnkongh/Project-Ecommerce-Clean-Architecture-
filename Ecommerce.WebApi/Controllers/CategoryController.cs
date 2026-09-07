@@ -96,8 +96,8 @@ namespace Ecommerce.WebApi.Controllers
             var query = new GetChildCategoriesPagedQuery(parentId, page, pageSize);
             var result = await Sender.Send(query);
             return result.IsSuccess
-                ? Ok(new ApiResponse<PagedResult<CategoryModel>> { IsSuccess = true, Value = result.Value })
-                : BadRequest(new ApiResponse<PagedResult<CategoryModel>> { IsSuccess = false, Error = result.Error });
+                ? Ok(new ApiResponse<PagedResult<ProductModel>> { IsSuccess = true, Value = result.Value })
+                : BadRequest(new ApiResponse<PagedResult<ProductModel>> { IsSuccess = false, Error = result.Error });
         }
 
         [HttpGet("{id}")]
@@ -109,17 +109,14 @@ namespace Ecommerce.WebApi.Controllers
                                     : BadRequest(new ApiResponse<CategoryModel> { IsSuccess = false, Error = result.Error });
         }
         [HttpGet("{parentCategoryId}/details")]
-        public async Task<IActionResult> GetCategoryDetail(int parentCategoryId, [FromQuery] int? selectedCategoryId)
+        [AllowAnonymous]
+        public async Task<IActionResult> GetCategoryDetail(int parentCategoryId, [FromQuery] int? selectedCategoryId, [FromQuery] int? page, [FromQuery] int? pageSize)
         {
-            var query = new GetCategoryDetailQuery
-            {
-                ParentCategoryId = parentCategoryId,
-                SelectedCategoryId = selectedCategoryId
-            };
+            var query = new GetCategoryQuery(parentCategoryId, selectedCategoryId, page, pageSize);
             var result = await Sender.Send(query);
             return result.IsSuccess
-                ? Ok(new ApiResponse<PagedResult<CategoryDetailModel>> { IsSuccess = true, Value = result.Value })
-                : BadRequest(new ApiResponse<PagedResult<CategoryDetailModel>> { IsSuccess = false, Error = result.Error });
+                ? Ok(new ApiResponse<CategoryDetailModel> { IsSuccess = true, Value = result.Value })
+                : BadRequest(new ApiResponse<CategoryDetailModel> { IsSuccess = false, Error = result.Error });
         }
     }
 }

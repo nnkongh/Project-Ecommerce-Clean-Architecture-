@@ -42,9 +42,9 @@ namespace Ecommerce.Web.Controllers
         }
         [HttpGet("detailed/{id}")]
         [AllowAnonymous]
-        public async Task<IActionResult> ChildCategories(int id, int? selectedCategoryId = null)
+        public async Task<IActionResult> ChildCategories(int id, int? selectedCategoryId = null, int page = 1, int pageSize = 12)
         {
-            var detailResult = await _categoryClient.GetCategoryDetailAsync(id, selectedCategoryId);
+            var detailResult = await _categoryClient.GetCategoryDetailAsync(id, selectedCategoryId, page, pageSize);
 
             if (!detailResult.IsSuccess || detailResult.Value == null)
             {
@@ -59,6 +59,18 @@ namespace Ecommerce.Web.Controllers
             ViewBag.TotalProducts = detail.DisplayProducts?.TotalItems ?? 0;
 
             return View(categories);
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetChildCategories(int parentId)
+        {
+            var result = await _categoryClient.GetChildCategoriesAsync(parentId);
+            if (!result.IsSuccess)
+            {
+                return Json(new { isSuccess = false, value = Array.Empty<object>() });
+            }
+            return Json(new { isSuccess = true, value = result.Value });
         }
     }
 }
