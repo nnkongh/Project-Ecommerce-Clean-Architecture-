@@ -26,7 +26,7 @@ namespace Ecommerce.Domain.Specification
     }
     public sealed class ProductCountByCategorySpec : BaseSpecification<Product>
     { 
-        public ProductCountByCategorySpec(int categoryId) : base(p => p.IsActive && p.CategoryId == categoryId)
+        public ProductCountByCategorySpec(int categoryId) : base(p => p.IsActive && p.ParentCategoryId == categoryId)
         {
         }
     }

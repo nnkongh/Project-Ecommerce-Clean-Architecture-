@@ -23,13 +23,13 @@ namespace Ecommerce.Domain.Specification
         {
             AddIncludes(p => p.Category);
         }
-        public ProductWithCategorySpec(int categoryId, bool isCategoryId) : base(p => p.CategoryId == categoryId || p.Category.ParentId == categoryId) 
+        public ProductWithCategorySpec(int categoryId, bool isCategoryId) : base(p => p.ParentCategoryId == categoryId || p.Category.ParentId == categoryId) 
         {
             AddOrderBy(p => p.Name);
             AddIncludes(p => p.Category);
         }
         public ProductWithCategorySpec(List<int> categoryId)
-            : base(p => categoryId.Contains(p.CategoryId))
+            : base(p => categoryId.Contains(p.ParentCategoryId))
         {
             AddIncludes(p => p.Category);
         }

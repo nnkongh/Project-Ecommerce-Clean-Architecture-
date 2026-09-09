@@ -53,7 +53,7 @@ namespace Ecommerce.Domain.Specification
                 criteria = criteria.AndAlso(p => p.Price <= maxPrice.Value);
 
             if (categoryId.HasValue)
-                criteria = criteria.AndAlso(p => p.CategoryId == categoryId.Value);
+                criteria = criteria.AndAlso(p => p.ParentCategoryId == categoryId.Value);
 
             return criteria;
         }
