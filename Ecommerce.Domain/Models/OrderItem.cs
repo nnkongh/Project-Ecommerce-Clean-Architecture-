@@ -10,7 +10,8 @@ namespace Ecommerce.Domain.Models
     public class OrderItem
     {
         public int Id { get; set; }
-        public int OrderId { get; set; }
+        public int SubOrderId { get; set; }
+        public SubOrder? SubOrder { get; set; }
         public string? ImageUrl { get; set; }
         public int ProductId { get; set; }
         public string? ProductName { get; set; }
