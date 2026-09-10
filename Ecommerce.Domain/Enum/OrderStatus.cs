@@ -18,4 +18,11 @@ namespace Ecommerce.Domain.Enum
         Active,
         Expired
     }
+    public enum SubOrderStatus
+    {
+        Pending,
+        Processing,
+        Finished,
+        Rejected
+    }
 }
