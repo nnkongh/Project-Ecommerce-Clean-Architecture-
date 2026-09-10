@@ -21,8 +21,8 @@ namespace Ecommerce.Domain.Models
         public Address? Address { get; set; }
         public User? User { get; set; }
         public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
-        public ICollection<OrderItem> Items => _items.AsReadOnly();
-        private readonly List<OrderItem> _items = new List<OrderItem>();
+        public ICollection<SubOrder> SubOrders => _subOrders.AsReadOnly();
+        private readonly List<SubOrder> _subOrders = new List<SubOrder>();
 
         private Order() { }
         public static Order CreateOrder(string customerId, string customerName, string? phoneNumber, string? email, Address address)
@@ -48,38 +48,41 @@ namespace Ecommerce.Domain.Models
         {
             OrderStatus = orderStatus;
         }
-        public void AddItem(string imageUrl, string productName, int productId, decimal price, int quantity)
+        public void AddSubOrder(SubOrder subOrder)
         {
-            if (IsExistItem(productId))
+            if (subOrder == null) throw new DomainException("SubOrder không được để trống");
+            if (IsExistSubOrder(subOrder.ShopId))
             {
-                var item = FindOrderItem(productId);
-                item!.Quantity++;
+                var existing = FindSubOrder(subOrder.ShopId);
+                foreach (var item in subOrder.Items)
+                {
+                    if (item != null)
+                    {
+                        existing!.AddItem(item.ImageUrl!, item.ProductName!, item.ProductId, item.Price, item.Quantity);
+                    }
+                }
                 CalculateTotal();
                 return;
             }
-            var orderItem = OrderItem.Create(imageUrl, productName, productId, price, quantity);
-            _items.Add(orderItem);
+            _subOrders.Add(subOrder);
             CalculateTotal();
         }
-
+        public SubOrder? FindSubOrder(int shopId)
+        {
+            return SubOrders.FirstOrDefault(x => x.ShopId == shopId);
+        }
+        public void RemoveSubOrder(SubOrder subOrder)
+        {
+            _subOrders.Remove(subOrder);
+            CalculateTotal();
+        }
+        private bool IsExistSubOrder(int shopId)
+        {
+            return SubOrders.Any(x => x.ShopId == shopId);
+        }
         private void CalculateTotal()
         {
-            TotalAmount = Items.Sum(x => x.Quantity * x.Price);
+            TotalAmount = SubOrders.Sum(x => x.TotalAmount);
         }
-
-        public void RemoveItem(OrderItem item)
-        {
-            _items.Remove(item);
-            CalculateTotal();
-        }
-        public OrderItem? FindOrderItem(int productId)
-        {
-            return Items.FirstOrDefault(x => x.ProductId == productId);
-        }
-        private bool IsExistItem(int productId)
-        {
-            return Items.Any(x => x.ProductId == productId);
-        }
-
     }
 }
