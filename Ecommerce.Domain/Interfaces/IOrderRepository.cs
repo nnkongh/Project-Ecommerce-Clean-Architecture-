@@ -13,6 +13,6 @@ namespace Ecommerce.Domain.Interfaces
         Task<IReadOnlyList<Order>> GetOrdersByUserIdAsync(string userId);
         Task<IReadOnlyList<Order>> GetOrdersByShopIdAsync(int shopId);
         Task<Order?> GetOrderByIdAsync(int orderId);
+        Task<Order?> GetByIdWithSubOrdersAsync(int orderId);
     }
 }
-    
