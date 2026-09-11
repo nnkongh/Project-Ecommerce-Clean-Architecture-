@@ -11,5 +11,6 @@ namespace Ecommerce.Domain.Interfaces
     public interface IShopRepository : IRepositoryBase<Shop,int>
     {
         Task<Shop?> GetByUserIdAsync(string userId);
+        Task<IEnumerable<Shop>> GetByIdsAsync(List<int> ids);
     }
 }
