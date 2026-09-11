@@ -25,5 +25,12 @@ namespace Ecommerce.Infrastructure.Repository
                 .Include(x => x.Products)
                 .FirstOrDefaultAsync(x => x.ParentId == categoryId);
         }
+
+        public async Task<IReadOnlyList<Category>> GetChildCategoriesAsync(int parentId)
+        {
+            return await _context.Categories
+                .Where(x => x.ParentId == parentId)
+                .ToListAsync();
+        }
     }
 }
