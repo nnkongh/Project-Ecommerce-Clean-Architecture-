@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Ecommerce.Application.Common.Queries.Category.GetChildCategoriesPaged
 {
-    public sealed class GetChildCategoriesPagedHandler : IRequestHandler<GetChildCategoriesPagedQuery, Result<PagedResult<CategoryModel>>>
+    public sealed class GetChildCategoriesPagedHandler : IRequestHandler<GetChildCategoriesPagedQuery, Result<PagedResult<ProductModel>>>
     {
         private readonly ICategoryRepository _repo;
         private readonly IMapper _mapper;
@@ -18,16 +18,16 @@ namespace Ecommerce.Application.Common.Queries.Category.GetChildCategoriesPaged
             _mapper = mapper;
         }
 
-        public async Task<Result<PagedResult<CategoryModel>>> Handle(GetChildCategoriesPagedQuery request, CancellationToken cancellationToken)
+        public async Task<Result<PagedResult<ProductModel>>> Handle(GetChildCategoriesPagedQuery request, CancellationToken cancellationToken)
         {
             var countSpec = new CategoryCountSpec(request.ParentId);
             var totalItems = await _repo.CountAsync(countSpec);
 
             var pagedSpec = new CategoryWithPagingSpec(request.ParentId, request.PageIndex, request.PageSize);
-            var categories = await _repo.GetAsync(pagedSpec);
+            var categories = await _repo.GetChildCategoryWithProductAsync(request.ParentId);
 
-            var mapped = _mapper.Map<IReadOnlyList<CategoryModel>>(categories);
-            var result = new PagedResult<CategoryModel>(mapped, totalItems, request.PageIndex, request.PageSize);
+            var mapped = _mapper.Map<CategoryModel>(categories);
+            var result = new PagedResult<ProductModel>(mapped.Products, totalItems, request.PageIndex, request.PageSize);
 
             return Result.Success(result);
         }
