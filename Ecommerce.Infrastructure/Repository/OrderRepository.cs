@@ -28,8 +28,9 @@ namespace Ecommerce.Infrastructure.Repository
         public async Task<IReadOnlyList<Order>> GetOrdersByShopIdAsync(int shopId)
         {
             return await _context.Orders
-                .Where(o => o.Items.Any(i => _context.Set<Product>().Any(p => p.Id == i.ProductId && p.ShopId == shopId)))
-                .Include(o => o.Items)
+                .Where(o => o.SubOrders.Any(s => s.ShopId == shopId))
+                .Include(o => o.SubOrders)
+                    .ThenInclude(s => s.Items)
                 .OrderByDescending(o => o.OrderDate)
                 .ToListAsync();
         }
@@ -37,6 +38,14 @@ namespace Ecommerce.Infrastructure.Repository
         {
             var item = new OrderWithItemSpecification(orderId);
             return await GetEnityWithSpecAsync(item);
+        }
+        public async Task<Order?> GetByIdWithSubOrdersAsync(int orderId)
+        {
+            return await _context.Orders
+                .Where(o => o.Id == orderId)
+                .Include(o => o.SubOrders)
+                    .ThenInclude(s => s.Items)
+                .FirstOrDefaultAsync();
         }
     }
 }

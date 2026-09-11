@@ -17,6 +17,11 @@ namespace Ecommerce.Infrastructure.Repository
         {
         }
 
+        public async Task<IEnumerable<Shop>> GetByIdsAsync(List<int> ids)
+        {
+            return await _context.Shops.Where(x => ids.Contains(x.Id)).ToListAsync();
+        }
+
         public async Task<Shop?> GetByUserIdAsync(string userId)
         {
             return await _context.Shops.FirstOrDefaultAsync(s => s.UserId == userId);
