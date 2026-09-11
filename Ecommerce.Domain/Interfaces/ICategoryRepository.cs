@@ -11,5 +11,6 @@ namespace Ecommerce.Domain.Interfaces
     public interface ICategoryRepository : IRepositoryBase<Category,int>
     {
         Task<Category?> GetChildCategoryWithProductAsync(int categoryId);
+        Task<IReadOnlyList<Category>> GetChildCategoriesAsync(int parentId);
     }
 }
