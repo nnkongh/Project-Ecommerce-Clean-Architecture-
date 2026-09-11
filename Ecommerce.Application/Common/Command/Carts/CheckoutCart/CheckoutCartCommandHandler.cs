@@ -47,48 +47,74 @@ namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
             if (!userResult.IsSuccess)
                 return Result.Failure<OrderModel>(userResult.Error);
 
-            var cartResult = await ValidateCartItemAndStockProduct(userResult.Value.Id);
-            if (!cartResult.IsSuccess)
-                return Result.Failure<OrderModel>(cartResult.Error);
-
             var u = userResult.Value;
+
+            var cart = await _cartRepository.GetCartWithItemByUserIdAsync(u.Id);
+            if (cart == null)
+                return Result.Failure<OrderModel>(new Error("CART_NOT_FOUND", "Cart không tồn tại"));
+
             var order = Order.CreateOrder(u.Id, u.UserName!, u.PhoneNumber, u.Email, u.Address!);
             var notifiedShopIds = new HashSet<int>();
-            foreach (var item in cartResult.Value.Items)
+
+            var productIds = cart.Items.Select(x => x.ProductId).ToList();
+            var products = await _productRepository.GetProductsByIdsAsync(productIds);
+            var productDict = products.ToDictionary(p => p.Id);
+
+
+            foreach (var item in cart.Items)
             {
-                order.AddItem(item.ImageUrl!, item.ProductName, item.ProductId, item.UnitPrice, item.Quantity);
-                var product = await _productRepository.GetByIdAsync(item.ProductId);
-                if (product != null)
-                {
-                    product.AdjustStock(-item.Quantity);
-                    if (product.ShopId.HasValue && !notifiedShopIds.Contains(product.ShopId.Value))
-                    {
-                        var shop = await _shopRepository.GetByIdAsync(product.ShopId.Value);
-                        if (shop != null)
-                        {
-                            var noti = Notification.Create("Đơn hàng mới", $"Bạn có đơn hàng mới #{order.Id} từ khách hàng {u.UserName}", shop.UserId);
-                            await _notificationService.SendNotificationAsync(shop.UserId, noti);
-                        }
-                        notifiedShopIds.Add(product.ShopId.Value);
-                    }
-                }
+                if (!productDict.TryGetValue(item.ProductId, out var product))
+                    return Result.Failure<OrderModel>(new Error("PRODUCT_NOT_FOUND", $"Sản phẩm {item.ProductId} không tồn tại"));
+
+                if (product.Stock < item.Quantity)
+                    return Result.Failure<OrderModel>(new Error("OUT_OF_STOCK", $"Sản phẩm {product.Name} không đủ tồn kho"));
+            }
+
+            var shopIds = products.Where(p => p.ShopId.HasValue)
+                                  .Select(p => p.ShopId!.Value)
+                                  .Distinct()
+                                  .ToList();
+
+            var shops = await _shopRepository.GetByIdsAsync(shopIds);
+            var shopDict = shops.ToDictionary(p => p.Id);
+
+            foreach (var item in cart.Items)
+            {
+                if (!productDict.TryGetValue(item.ProductId, out var product ) || product.ShopId is null) continue;
+
+                if (!shopDict.TryGetValue(product.ShopId.Value, out var shop)) continue;
+
+                var subOrder = SubOrder.Create(order.Id, product.ShopId.Value, shop.Name);
+                order.AddSubOrder(subOrder);
+                product.AdjustStock(-item.Quantity);
+
+                notifiedShopIds.Add(product.ShopId.Value);
+
             }
 
             var mapped = _mapper.Map<OrderModel>(order);
 
-            cartResult.Value.Clear();
+            cart.Clear();
             await _orderRepository.AddAsync(order);
-            await _cartRepository.Delete(cartResult.Value);
+            await _cartRepository.Delete(cart);
+
+            var notiTasks = notifiedShopIds.Select(async shopId =>
+            {
+                var shop = shopDict[shopId];
+                var noti = Notification.Create("Đơn hàng mới", $"Bạn có đơn hàng mới #{order.Id} từ khách hàng {u.UserName}", shop.UserId);
+                await _notificationService.SendNotificationAsync(shop.UserId, noti);
+            });
+            await Task.WhenAll(notiTasks);
             await _uow.SaveChangesAsync(cancellationToken);
             return Result.Success(mapped);
         }
-        private async Task<Result<User>> ValidatingUserInformation(string id)   
+        private async Task<Result<User>> ValidatingUserInformation(string id)
         {
             var user = await _userRepository.GetByIdAsync(id);
             if (user == null)
                 return Result.Failure<User>(new Error("USER_NOT_FOUND", "User không tồn tại"));
 
-            if(user.PhoneNumber == null)
+            if (user.PhoneNumber == null)
                 return Result.Failure<User>(new Error("PHONE_NUMBER_EMPTY", "User chưa có số điện thoại"));
 
             if (user.Address == null)
@@ -104,31 +130,5 @@ namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
 
             return Result.Success(user);
         }
-
-        private async Task<Result<Cart>> ValidateCartItemAndStockProduct(string userId)
-        {
-            var cart = await _cartRepository.GetCartWithItemByUserIdAsync(userId);
-            if (cart == null)
-                return Result.Failure<Cart>(new Error("CART_NOT_FOUND", "Cart không tồn tại"));
-
-            if (cart.Items == null || cart.Items.Count == 0)
-                return Result.Failure<Cart>(new Error("CART_EMPTY", "Giỏ hàng đang trống"));
-
-            foreach (var item in cart.Items)
-            {
-                var product = await _productRepository.GetByIdAsync(item.ProductId);
-
-                if (product == null)
-                    return Result.Failure<Cart>(new Error("PRODUCT_NOT_FOUND",
-                        $"Sản phẩm {item.ProductId} không tồn tại"));
-
-                if (product.Stock < item.Quantity)
-                    return Result.Failure<Cart>(new Error("OUT_OF_STOCK",
-                        $"Sản phẩm {product.Name} không đủ tồn kho"));
-            }
-
-            return Result.Success(cart);
-        }
-
     }
 }
