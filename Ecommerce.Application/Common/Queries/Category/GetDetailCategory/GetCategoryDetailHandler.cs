@@ -2,17 +2,16 @@
 using Ecommerce.Application.DTOs.Models;
 using Ecommerce.Domain.Interfaces;
 using Ecommerce.Domain.Shared;
-using Ecommerce.Domain.Specification;
 using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Category.GetDetailCategory
 {
-    public class GetCategoryDetailHandler : IRequestHandler<GetCategoryDetailQuery, Result<PagedResult<CategoryDetailModel>>>
+    public sealed class GetCategoryDetailHandler : IRequestHandler<GetCategoryQuery, Result<CategoryDetailModel>>
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IProductRepository _productRepository;
@@ -25,48 +24,48 @@ namespace Ecommerce.Application.Common.Queries.Category.GetDetailCategory
             _productRepository = productRepository;
         }
 
-        public async Task<Result<PagedResult<CategoryDetailModel>>> Handle(GetCategoryDetailQuery request, CancellationToken cancellationToken)
+        public async Task<Result<CategoryDetailModel>> Handle(GetCategoryQuery request, CancellationToken cancellationToken)
         {
-            // Lấy danh mục con
-            var childCategory = await _categoryRepository.GetByAsync(c => c.ParentId == request.ParentCategoryId);
-            if (childCategory == null || childCategory.Count == 0)
+            if (!request.ParentCategoryId.HasValue)
             {
-                return Result.Failure<PagedResult<CategoryDetailModel>>(new Error("404", "Không tìm thấy danh mục con"));
+                return Result.Failure<CategoryDetailModel>(new Error("InvalidCategory", "ParentCategoryId is required"));
             }
-            // Lấy danh sách id của các danh mục con
-            var categoryId = childCategory.Select(c => c.Id).ToList();
 
-            var allProducts = new ProductWithCategorySpec(categoryId);
+            var parentCategoryId = request.ParentCategoryId.Value;
 
-            var displayProducts = await _productRepository.GetAsync(allProducts);
+            var childCategories = await _categoryRepository.GetChildCategoriesAsync(parentCategoryId);
 
-            // Nhóm sản phẩm theo danh mục
-            var productsByCategory = displayProducts.GroupBy(p => p.CategoryId).ToDictionary(g => g.Key, g => g.ToList());
-
-            // 
-            var categoriesWithProducts = childCategory.Select(c => new CategoryWithProductModel
+            var childCategoryModels = new List<CategoryWithProductModel>();
+            foreach (var child in childCategories)
             {
-                Id = c.Id,
-                Name = c.Name,
-                Products = productsByCategory.ContainsKey(c.Id) ? _mapper.Map<IReadOnlyList<ProductModel>>(productsByCategory[c.Id])
-                                                                : new List<ProductModel>()
-            }).ToList();
+                var childProducts = await _productRepository.GetProductsByCategoryIdAsync(child.Id);
+                childCategoryModels.Add(new CategoryWithProductModel
+                {
+                    Id = child.Id,
+                    Name = child.Name,
+                    Products = _mapper.Map<IReadOnlyList<ProductModel>>(childProducts)
+                });
+            }
 
-            var displayProductModels = request.SelectedCategoryId.HasValue
-                ? categoriesWithProducts.FirstOrDefault(c => c.Id == request.SelectedCategoryId.Value)?.Products
-                    ?? new List<ProductModel>()
-                : categoriesWithProducts.SelectMany(c => c.Products).ToList();
+            var displayCategoryId = request.SelectedCategoryId ?? parentCategoryId;
+            var products = await _productRepository.GetProductsByCategoryIdAsync(displayCategoryId);
+            var count = products.Count();
+            var productDto = _mapper.Map<IReadOnlyList<ProductModel>>(products);
 
-            var result = new CategoryDetailModel
+            var page = request.page ?? 1;
+            var pageSize = request.pageSize ?? 12;
+            var items = productDto.Skip((page - 1) * pageSize).Take(pageSize).ToList();
+            var pagedProduct = new PagedResult<ProductModel>(items, count, page, pageSize);
+
+            var category = new CategoryDetailModel
             {
-                ParentCategoryId = request.ParentCategoryId,
+                ParentCategoryId = parentCategoryId,
                 SelectedCategoryId = request.SelectedCategoryId,
-                ChildCategories = categoriesWithProducts,
-                DisplayProducts = new PagedResult<ProductModel>(displayProductModels, displayProductModels.Count, 1, displayProductModels.Count),
+                ChildCategories = childCategoryModels,
+                DisplayProducts = pagedProduct
             };
-            var pagedResult = new PagedResult<CategoryDetailModel>(new List<CategoryDetailModel> { result }, 1, 1, 1);
 
-            return Result.Success(pagedResult);
+            return Result.Success(category);
         }
     }
 }

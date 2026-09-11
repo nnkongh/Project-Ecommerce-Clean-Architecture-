@@ -9,9 +9,7 @@ using System.Threading.Tasks;
 
 namespace Ecommerce.Application.Common.Queries.Category.GetDetailCategory
 {
-    public class GetCategoryDetailQuery : IRequest<Result<PagedResult<CategoryDetailModel>>>
+    public sealed record GetCategoryQuery(int? ParentCategoryId, int? SelectedCategoryId, int? page, int? pageSize) : IRequest<Result<CategoryDetailModel>>
     {
-        public int? SelectedCategoryId { get; set; }
-        public int? ParentCategoryId { get; set; }
     }
 }
