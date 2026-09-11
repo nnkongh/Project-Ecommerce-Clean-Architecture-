@@ -57,15 +57,14 @@
         <!-- Danh mục cha -->
         @if (Model != null && Model.Items.Any())
         {
-            <div class="category-grid row g-3 g-md-4 mb-5">
+            <div class="category-grid row g-3 g-md-4 mb-4">
                 @foreach (var category in Model.Items)
                 {
                     <div class="cat-card-wrap col-6 col-sm-4 col-md-3 col-lg-2">
-                        <a href="@Url.Action("ChildCategories", "Category", new { id = category.Id })"
-                           class="cat-card">
+                        <a href="@Url.Action("ChildCategories", "Category", new { id = category.Id })" class="cat-card cat-parent" data-parent-id="@category.Id">
                             <span class="cat-icon"><i class="@GetCategoryIcon(category.Name!)"></i></span>
                             <span class="cat-name">@category.Name</span>
-                            <span class="cat-go"><i class="fas fa-arrow-right"></i></span>
+                            <span class="cat-go"><i class="fas fa-chevron-right"></i></span>
                         </a>
                     </div>
                 }

@@ -3,209 +3,12 @@
 @model IReadOnlyList<CategoryViewModel>
 
 @{
-    ViewData["Title"] = "Danh mục con";
+    ViewData["Title"] = "Danh mục sản phẩm";
     var parentId = ViewBag.ParentCategoryId as int?;
     var selectedCategoryId = ViewBag.SelectedCategoryId as int?;
-    var categoryPaged = ViewBag.CategoryPagedResult as PagedResult<CategoryViewModel>;
+    var totalProducts = (int)(ViewBag.TotalProducts ?? 0);
     var selectedCategory = Model?.FirstOrDefault(c => c.Id == selectedCategoryId);
 }
-
-<div class="container my-4">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="@Url.Action("Index", "Home")">
-                    <i class="fas fa-home me-1"></i>Trang chủ
-                </a>
-            </li>
-            <li class="breadcrumb-item">
-                <a href="@Url.Action("Index", "Category")">Danh mục</a>
-            </li>
-            <li class="breadcrumb-item active">Danh mục con</li>
-        </ol>
-    </nav>
-
-    <!-- Back Button -->
-    <a href="@Url.Action("Index", "Category")" class="btn btn-outline-secondary mb-4">
-        <i class="fas fa-arrow-left me-2"></i>Quay lại
-    </a>
-
-    <!-- Danh mục con -->
-    @if (Model != null && Model.Any())
-    {
-        <div class="card shadow-sm mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">
-                    <i class="fas fa-layer-group me-2"></i>Danh mục con
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    @foreach (var category in Model)
-                    {
-                        <div class="col-md-3 col-sm-6">
-                            <a href="@Url.Action("ChildCategories", "Category", new { id = parentId, selectedCategoryId = category.Id })"
-                               class="text-decoration-none">
-                                <div class="card h-100 text-center @(category.Id == selectedCategoryId ? "border-primary bg-primary text-white" : "")">
-                                    <div class="card-body">
-                                        <i class="@GetCategoryIcon(category.Name) fa-3x mb-3 @(category.Id == selectedCategoryId ? "text-white" : "text-primary")"></i>
-                                        <h6 class="card-title mb-2">@category.Name</h6>
-                                        <p class="card-text small mb-0">
-                                            <i class="fas fa-box me-1"></i>
-                                            @(category.Products?.Count ?? 0) sản phẩm
-                                        </p>
-                                    </div>
-                                </div>
-                            </a>
-                        </div>
-                    }
-                </div>
-
-                @if (categoryPaged != null && categoryPaged.TotalPages > 1)
-                {
-                    <nav class="mt-4">
-                        <ul class="pagination justify-content-center">
-                            <li class="page-item @(categoryPaged.PageIndex <= 1 ? "disabled" : "")">
-                                <a class="page-link" href="@Url.Action("ChildCategories", new { id = parentId, page = categoryPaged.PageIndex - 1, pageSize = categoryPaged.PageSize })">
-                                    <i class="fas fa-chevron-left"></i>
-                                </a>
-                            </li>
-                            @for (var i = 1; i <= categoryPaged.TotalPages; i++)
-                            {
-                                <li class="page-item @(i == categoryPaged.PageIndex ? "active" : "")">
-                                    <a class="page-link" href="@Url.Action("ChildCategories", new { id = parentId, page = i, pageSize = categoryPaged.PageSize })">@i</a>
-                                </li>
-                            }
-                            <li class="page-item @(categoryPaged.PageIndex >= categoryPaged.TotalPages ? "disabled" : "")">
-                                <a class="page-link" href="@Url.Action("ChildCategories", new { id = parentId, page = categoryPaged.PageIndex + 1, pageSize = categoryPaged.PageSize })">
-                                    <i class="fas fa-chevron-right"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </nav>
-                }
-            </div>
-        </div>
-    }
-
-    <!-- Sản phẩm -->
-    <div class="card shadow-sm">
-        <div class="card-header bg-white">
-            <div class="d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">
-                    <i class="fas fa-shopping-bag me-2"></i>
-                    @if (selectedCategoryId.HasValue && selectedCategory != null)
-                    {
-                        <span>@selectedCategory.Name</span>
-                    }
-                    else
-                    {
-                        <span>Tất cả sản phẩm</span>
-                    }
-                </h5>
-                <span class="badge bg-primary">@((categoryPaged?.TotalItems ?? 0).ToString()) sản phẩm</span>
-            </div>
-        </div>
-
-        <div class="card-body">
-            @if (Model != null && Model.Any())
-            {
-                var allProducts = Model.SelectMany(c => c.Products ?? new List<ProductViewModel>()).ToList();
-                if (allProducts.Any())
-                {
-                    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
-                        @foreach (var product in allProducts)
-                        {
-                            <div class="col">
-                                <div class="card h-100 product-card">
-                                    <a href="@Url.Action("Detail", "Product", new { id = product.Id })"
-                                       class="text-decoration-none">
-                                        @if (!string.IsNullOrEmpty(product.ImageUrl))
-                                        {
-                                            <img src="@product.ImageUrl"
-                                                 class="card-img-top"
-                                                 alt="@product.Name"
-                                                 style="height: 200px; object-fit: cover;">
-                                        }
-                                        else
-                                        {
-                                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center"
-                                                 style="height: 200px;">
-                                                <i class="fas fa-image fa-3x text-muted"></i>
-                                            </div>
-                                        }
-
-                                        <div class="card-body">
-                                            <h6 class="card-title text-dark mb-2"
-                                                style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                                                @product.Name
-                                            </h6>
-                                            @if (product.Price > 0)
-                                            {
-                                                <p class="card-text text-danger fw-bold fs-5 mb-0">
-                                                    @product.Price.ToString("N0") đ
-                                                </p>
-                                            }
-                                            else
-                                            {
-                                                <p class="card-text text-muted mb-0">Liên hệ</p>
-                                            }
-                                        </div>
-                                    </a>
-                                    <div class="card-footer bg-transparent border-0 pt-0">
-                                        <form asp-controller="Cart" asp-action="AddToCart" method="post">
-                                            <input type="hidden" name="Id" value="@product.Id" />
-                                            <input type="hidden" name="quantity" value="1" />
-                                            <button type="submit" class="btn btn-outline-primary btn-sm w-100">
-                                                <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
-                                            </button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
-                else
-                {
-                    <div class="text-center py-5">
-                        <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
-                        <p class="text-muted">Chưa có sản phẩm nào trong danh mục này</p>
-                        <a href="@Url.Action("Index", "Category")" class="btn btn-primary mt-2">
-                            Xem danh mục khác
-                        </a>
-                    </div>
-                }
-            }
-            else
-            {
-                <div class="text-center py-5">
-                    <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
-                    <p class="text-muted">Chưa có danh mục nào</p>
-                    <a href="@Url.Action("Index", "Category")" class="btn btn-primary mt-2">
-                        Xem danh mục khác
-                    </a>
-                </div>
-            }
-        </div>
-    </div>
-</div>
-
-<style>
-    .product-card {
-        transition: all 0.3s ease;
-    }
-
-        .product-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-        }
-
-    .card.border-primary {
-        border-width: 2px !important;
-    }
-</style>
 
 @functions {
     string GetCategoryIcon(string name)
@@ -233,3 +36,147 @@
         };
     }
 }
+
+<div class="app-page">
+    <div class="container py-5">
+
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item">
+                    <a href="@Url.Action("Index", "Home")"><i class="fas fa-home me-1"></i>Trang chủ</a>
+                </li>
+                <li class="breadcrumb-item">
+                    <a href="@Url.Action("Index", "Category")">Danh mục</a>
+                </li>
+                <li class="breadcrumb-item active">
+                    @(selectedCategory != null ? selectedCategory.Name : "Tất cả danh mục")
+                </li>
+            </ol>
+        </nav>
+
+        <!-- Tiêu đề -->
+        <div class="page-head mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <a href="@Url.Action("Index", "Category")" class="btn btn-outline-dark rounded-circle back-btn" title="Quay lại">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div>
+                    <h1 class="page-title mb-1">@(selectedCategory != null ? selectedCategory.Name : "Danh mục sản phẩm")</h1>
+                    <p class="text-muted mb-0">Chọn một danh mục con để xem sản phẩm</p>
+                </div>
+            </div>
+            <span class="badge bg-dark fs-6 rounded-pill px-3 py-2">
+                <i class="fas fa-box me-1"></i>@totalProducts sản phẩm
+            </span>
+        </div>
+
+        <!-- Danh mục con -->
+        @if (Model != null && Model.Any())
+        {
+            <div class="row g-3 g-md-4 mb-5">
+                @foreach (var category in Model)
+                {
+                    var isSelected = category.Id == selectedCategoryId;
+                    <div class="col-6 col-md-3 col-lg-2">
+                        <a href="@Url.Action("ChildCategories", "Category", new { id = parentId, selectedCategoryId = category.Id })"
+                           class="child-card @(isSelected ? "selected" : "")">
+                            <span class="child-icon"><i class="@GetCategoryIcon(category.Name!)"></i></span>
+                            <span class="child-name">@category.Name</span>
+                            <span class="child-count">
+                                <i class="fas fa-box me-1"></i>@(category.Products?.Count ?? 0) sản phẩm
+                            </span>
+                            <span class="child-check"><i class="fas fa-check"></i></span>
+                        </a>
+                    </div>
+                }
+            </div>
+        }
+
+        <!-- Sản phẩm -->
+        <div class="section-head mb-3">
+            <h2 class="section-title mb-0">
+                <span class="title-icon bg-dark"><i class="fas fa-shopping-bag"></i></span>
+                @if (selectedCategoryId.HasValue && selectedCategory != null)
+                {
+                    <span>@selectedCategory.Name</span>
+                }
+                else
+                {
+                    <span>Tất cả sản phẩm</span>
+                }
+            </h2>
+            <span class="badge bg-light text-dark border rounded-pill px-3 py-2">
+                @totalProducts sản phẩm
+            </span>
+        </div>
+
+        @{
+            var allProducts = new List<ProductViewModel>();
+            if (Model != null)
+            {
+                allProducts = (selectedCategoryId.HasValue && selectedCategory != null)
+                    ? (selectedCategory.Products ?? new List<ProductViewModel>()).ToList()
+                    : Model.SelectMany(c => c.Products ?? new List<ProductViewModel>()).ToList();
+            }
+        }
+
+        @if (allProducts.Any())
+        {
+            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+                @foreach (var product in allProducts)
+                {
+                    <div class="col">
+                        <div class="product-card">
+                            <a href="@Url.Action("Detail", "Product", new { id = product.Id })" class="product-link">
+                                <div class="product-img">
+                                    @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                    {
+                                        <img src="@product.ImageUrl" alt="@product.Name">
+                                    }
+                                    else
+                                    {
+                                        <div class="product-img-placeholder">
+                                            <i class="fas fa-image"></i>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="product-info">
+                                    <h6 class="product-title">@product.Name</h6>
+                                    @if (product.Price > 0)
+                                    {
+                                        <div class="product-price">@product.Price.ToString("N0") đ</div>
+                                    }
+                                    else
+                                    {
+                                        <div class="product-price price-none">Liên hệ</div>
+                                    }
+                                </div>
+                            </a>
+                            <div class="product-actions">
+                                <form asp-controller="Cart" asp-action="AddToCart" method="post">
+                                    <input type="hidden" name="Id" value="@product.Id" />
+                                    <input type="hidden" name="quantity" value="1" />
+                                    <button type="submit" class="btn btn-add-cart w-100">
+                                        <i class="fas fa-cart-plus me-2"></i>Thêm vào giỏ
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="empty-state text-center py-5">
+                <div class="empty-icon"><i class="fas fa-box-open"></i></div>
+                <h4 class="mb-1">Chưa có sản phẩm nào</h4>
+                <p class="text-muted mb-3">Danh mục này hiện chưa có sản phẩm</p>
+                <a href="@Url.Action("Index", "Category")" class="btn btn-dark-soft rounded-pill px-4">
+                    <i class="fas fa-th-large me-2"></i>Xem danh mục khác
+                </a>
+            </div>
+        }
+    </div>
+</div>

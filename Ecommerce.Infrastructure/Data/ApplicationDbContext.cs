@@ -16,6 +16,8 @@ namespace Ecommerce.Infrastructure.Data
         public DbSet<Cart> Carts { get; set; } = null!;
         public DbSet<Product> Products { get; set; } = null!;
         public DbSet<Order> Orders { get; set; } = null!;
+        public DbSet<SubOrder> SubOrders { get; set; } = null!;
+        public DbSet<Payment> Payments { get; set; } = null!;
         public DbSet<Comment> Comments { get; set; } = null!;
         public DbSet<Wishlist> Wishlist { get; set; } = null!;
         public DbSet<User> User { get; set; } = null!;
@@ -38,6 +40,38 @@ namespace Ecommerce.Infrastructure.Data
 
             modelBuilder.Entity<Order>()
                 .Property(x => x.TotalAmount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Order>()
+                .HasMany(x => x.SubOrders)
+                .WithOne(x => x.Order)
+                .HasForeignKey(x => x.OrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SubOrder>()
+                .HasMany(x => x.Items)
+                .WithOne(x => x.SubOrder)
+                .HasForeignKey(x => x.SubOrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<SubOrder>()
+                .HasOne(x => x.Shop)
+                .WithMany()
+                .HasForeignKey(x => x.ShopId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<SubOrder>()
+                .Property(x => x.TotalAmount)
+                .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Payment>()
+                .HasOne(x => x.SubOrder)
+                .WithOne(x => x.Payment)
+                .HasForeignKey<Payment>(x => x.SubOrderId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Payment>()
+                .Property(x => x.Amount)
                 .HasPrecision(18, 2);
 
             modelBuilder.Entity<Product>()
