@@ -52,17 +52,21 @@ namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
                 return Result.Failure<OrderModel>(new Error("", "User address not found"));
             }
             var order = Order.CreateOrder(user.Id, user.UserName!, user.PhoneNumber, user.Email, user.Address);
-            order.AddItem(product.ImageUrl,product.Name,product.Id,product.Price,command.quantity);
-            await _orderRepo.AddAsync(order);
 
+            Shop? shop = null;
             if (product.ShopId.HasValue)
             {
-                var shop = await _shopRepo.GetByIdAsync(product.ShopId.Value);
-                if (shop != null)
-                {
-                    var noti = Notification.Create("Đơn hàng mới", $"Bạn có đơn hàng mới #{order.Id} từ khách hàng {user.UserName}", shop.UserId);
-                    await _notificationService.SendNotificationAsync(shop.UserId, noti);
-                }
+                shop = await _shopRepo.GetByIdAsync(product.ShopId.Value);
+            }
+
+            var subOrder = SubOrder.Create(order.Id, product.ShopId ?? 0, shop?.Name ?? "Unknown");
+            subOrder.AddItem(product.ImageUrl, product.Name, product.Id, product.Price, command.quantity);
+            order.AddSubOrder(subOrder);
+
+            if (shop != null)
+            {
+                var noti = Notification.Create("Đơn hàng mới", $"Bạn có đơn hàng mới #{order.Id} từ khách hàng {user.UserName}", shop.UserId);
+                await _notificationService.SendNotificationAsync(shop.UserId, noti);
             }
 
             await _uow.SaveChangesAsync(cancellationToken);
