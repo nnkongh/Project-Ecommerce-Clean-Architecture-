@@ -29,17 +29,11 @@ namespace Ecommerce.Application.Common.Queries.Category.GetCategoryById
             {
                 return Result.Failure<IReadOnlyList<CategoryModel>>(new Error("Null",$"{request.parentId} is null"));
             }
-            var parentCategory = await _repo.GetByIdAsync(request.parentId);
-            if (parentCategory is null)
-            {
-                return Result.Success<IReadOnlyList<CategoryModel>>(Array.Empty<CategoryModel>());
-            }
-            var childCategories = await _repo.GetByAsync(c => c.ParentId == request.parentId);
+            var childCategories = await _repo.GetChildCategoriesAsync(request.parentId);
 
-            if (childCategories is null)
+            if (childCategories == null || !childCategories.Any())
             {
-                return Result.Success<IReadOnlyList<CategoryModel>>(
-                    Array.Empty<CategoryModel>());
+                return Result.Success<IReadOnlyList<CategoryModel>>(new List<CategoryModel>());
             }
             var mapped = _mapper.Map<IReadOnlyList<CategoryModel>>(childCategories);
             return Result.Success(mapped);
