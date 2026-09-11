@@ -4,6 +4,7 @@ using Ecommerce.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260829075339_AddNotificationReadStatus")]
+    partial class AddNotificationReadStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -256,6 +259,9 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
                     b.Property<string>("ImageUrl")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -269,52 +275,11 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int>("SubOrderId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("SubOrderId");
+                    b.HasIndex("OrderId");
 
                     b.ToTable("OrderItem");
-                });
-
-            modelBuilder.Entity("Ecommerce.Domain.Models.Payment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Method")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("PaidAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SubOrderId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TransactionId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SubOrderId")
-                        .IsUnique();
-
-                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.Models.Product", b =>
@@ -430,39 +395,6 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
                         .IsUnique();
 
                     b.ToTable("Shops");
-                });
-
-            modelBuilder.Entity("Ecommerce.Domain.Models.SubOrder", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ShopId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ShopName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SubOrderStatus")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.HasIndex("ShopId");
-
-                    b.ToTable("SubOrders");
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.Models.User", b =>
@@ -695,24 +627,11 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
 
             modelBuilder.Entity("Ecommerce.Domain.Models.OrderItem", b =>
                 {
-                    b.HasOne("Ecommerce.Domain.Models.SubOrder", "SubOrder")
+                    b.HasOne("Ecommerce.Domain.Models.Order", null)
                         .WithMany("Items")
-                        .HasForeignKey("SubOrderId")
+                        .HasForeignKey("OrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("SubOrder");
-                });
-
-            modelBuilder.Entity("Ecommerce.Domain.Models.Payment", b =>
-                {
-                    b.HasOne("Ecommerce.Domain.Models.SubOrder", "SubOrder")
-                        .WithOne("Payment")
-                        .HasForeignKey("Ecommerce.Domain.Models.Payment", "SubOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SubOrder");
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.Models.Product", b =>
@@ -793,25 +712,6 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Ecommerce.Domain.Models.SubOrder", b =>
-                {
-                    b.HasOne("Ecommerce.Domain.Models.Order", "Order")
-                        .WithMany("SubOrders")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Ecommerce.Domain.Models.Shop", "Shop")
-                        .WithMany()
-                        .HasForeignKey("ShopId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-
-                    b.Navigation("Shop");
-                });
-
             modelBuilder.Entity("Ecommerce.Domain.Models.User", b =>
                 {
                     b.OwnsOne("Ecommerce.Domain.Models.Address", "Address", b1 =>
@@ -869,7 +769,7 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
 
             modelBuilder.Entity("Ecommerce.Domain.Models.Order", b =>
                 {
-                    b.Navigation("SubOrders");
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.Models.Product", b =>
@@ -882,13 +782,6 @@ namespace Ecommerce.Infrastructure.Migrations.ApplicationDb
             modelBuilder.Entity("Ecommerce.Domain.Models.Shop", b =>
                 {
                     b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("Ecommerce.Domain.Models.SubOrder", b =>
-                {
-                    b.Navigation("Items");
-
-                    b.Navigation("Payment");
                 });
 
             modelBuilder.Entity("Ecommerce.Domain.Models.User", b =>
