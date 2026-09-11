@@ -15,7 +15,8 @@ namespace Ecommerce.Web.Interface
         Task<ApiResponse<IReadOnlyList<CategoryViewModel>>> GetChildCategoriesAsync(int parentId);
         Task<ApiResponse<IReadOnlyList<CategoryViewModel>>> GetAllCategoriesAsync();
         Task<ApiResponse<PagedResult<CategoryViewModel>>> GetRootCategoriesPagedAsync(int page, int pageSize);
-        Task<ApiResponse<CategoryDetailModel>> GetCategoryDetailAsync(int? parentCategoyId, int? selectedCategoryId, int page, int pageSize);
+        Task<ApiResponse<CategoryDetailModel>> GetCategoryDetailAsync(int? parentCategoryId, int? selectedCategoryId, int page, int pageSize);
+        Task<ApiResponse<CategoryViewModel>> GetCategoryByIdAsync(int? id);
 
     }
 }
