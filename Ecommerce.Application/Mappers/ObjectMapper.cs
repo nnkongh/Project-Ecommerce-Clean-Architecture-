@@ -18,6 +18,7 @@ namespace Ecommerce.Application.Mappers
         {
             CreateMap<Product, ProductModel>().ReverseMap();
             CreateMap<Order, OrderModel>().ReverseMap();
+            CreateMap<SubOrder, SubOrderModel>().ReverseMap();
             CreateMap<Category, CategoryModel>().ReverseMap();
             CreateMap<OrderItem, OrderItemModel >().ReverseMap();
             CreateMap<Cart,CartModel>().ReverseMap();
