@@ -13,15 +13,19 @@ namespace Ecommerce.Domain.Specification
     {
         public OrderWithItemSpecification(string userId) : base(o => o.CustomerId == userId)
         {
-            AddIncludes(o => o.Items);
+            AddIncludes(o => o.SubOrders);
+            AddInclude("SubOrders.Items");
+            AddOrderByDescending(o => o.OrderDate);
         }
         public OrderWithItemSpecification(int orderId) : base(o => o.Id == orderId)
         {
-            AddIncludes(o => o.Items);
+            AddIncludes(o => o.SubOrders);
+            AddInclude("SubOrders.Items");
         }
         public OrderWithItemSpecification() : base(null)
         {
-            AddIncludes(o => o.Items);
+            AddIncludes(o => o.SubOrders);
+            AddInclude("SubOrders.Items");
         }
     }
 }
