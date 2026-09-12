@@ -11,6 +11,7 @@ namespace Ecommerce.Domain.Specification.Base
     {
         Expression<Func<T, bool>> Criteria { get; }
         List<Expression<Func<T, object>>> Include { get; }
+        List<string> IncludeStrings { get; }
         Expression<Func<T, object>>? OrderBy { get; }
         Expression<Func<T, object>>? OrderByDescending { get; }
         public int Skip { get; }

@@ -21,6 +21,12 @@ namespace Ecommerce.Domain.Specification.Base
 
         public List<Expression<Func<T, object>>> Include { get; } =  new List<Expression<Func<T, object>>>();
 
+        public List<string> IncludeStrings { get; } = new List<string>();
+
+        protected virtual void AddInclude(string includeString)
+        {
+            IncludeStrings.Add(includeString);
+        }
         public Expression<Func<T, object>>? OrderBy { get; private set; }
 
         public Expression<Func<T, object>>? OrderByDescending { get;private set; }

@@ -19,11 +19,7 @@ namespace Ecommerce.Infrastructure.Repository.Base
                 query = query.Where(specification.Criteria);
             }
             query = specification.Include.Aggregate(query, (current,include) => current.Include(include));
-            // áp dụng nhiều includes vào query dựa trên các navigation properties được định nghĩa trong specification.include
-            //aggregate có ba tham số
-            //(seed, (... ,...)) giá trị khởi tạo, ở đây là query
-            //(...,(accumulator,...)) biến tạm giữ kết quả include sau mỗi vòng lặp
-            //(..., (..., item)) là phần tử hiện tại trong danh sách
+            query = specification.IncludeStrings.Aggregate(query, (current, include) => current.Include(include));
 
             if(specification.OrderBy != null)
             {
