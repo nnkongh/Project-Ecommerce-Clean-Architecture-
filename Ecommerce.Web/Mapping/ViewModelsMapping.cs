@@ -38,6 +38,7 @@ namespace Ecommerce.Web.Mapping
             CreateMap<CartItemModel, CartItemViewModel>();
 
             CreateMap<OrderModel, OrderViewModel>();
+            CreateMap<SubOrderModel, SubOrderViewModel>();
             CreateMap<OrderItemModel, OrderItemViewModel >();
 
             CreateMap<UpdateProfileRequest, ProfileModel>();
