@@ -153,11 +153,11 @@
                         </div>
                         <div class="info-row">
                             <span class="info-label">Số loại sản phẩm</span>
-                            <span class="info-value">@Model.Items.Count</span>
+                            <span class="info-value">@Model.SubOrders.Sum(s => s.Items.Count)</span>
                         </div>
                         <div class="info-row">
                             <span class="info-label">Tổng số sản phẩm</span>
-                            <span class="info-value">@Model.Items.Sum(i => i.Quantity)</span>
+                            <span class="info-value">@Model.SubOrders.Sum(s => s.Items.Sum(i => i.Quantity))</span>
                         </div>
                         <div class="info-row mb-0">
                             <span class="info-label">Tổng tiền</span>
@@ -187,34 +187,53 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in Model.Items)
+                            @foreach (var subOrder in Model.SubOrders)
                             {
-                                <tr>
-                                    <td>
-                                        @if (!string.IsNullOrEmpty(item.ImageUrl))
-                                        {
-                                            <img src="@item.ImageUrl" alt="@item.ProductName"
-                                                 onerror="this.src='/images/no-image.png'"
-                                                 class="rounded-3 border" style="width: 64px; height: 64px; object-fit: cover;" />
-                                        }
-                                        else
-                                        {
-                                            <div class="rounded-3 d-flex align-items-center justify-content-center"
-                                                 style="width: 64px; height: 64px; background: #f3f4f6; color: #9ca3af;">
-                                                <i class="fas fa-image fa-lg"></i>
-                                            </div>
-                                        }
+                                <tr class="suborder-row">
+                                    <td colspan="5">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <span class="fw-bold text-dark">
+                                                <i class="fas fa-store me-2"></i>@(subOrder.ShopName ?? "Cửa hàng")
+                                            </span>
+                                            <span class="badge rounded-pill bg-light text-dark border">@subOrder.SubOrderStatus</span>
+                                        </div>
                                     </td>
-                                    <td>
-                                        <span class="fw-semibold text-dark">@item.ProductName</span>
+                                </tr>
+                                @foreach (var item in subOrder.Items)
+                                {
+                                    <tr>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                            {
+                                                <img src="@item.ImageUrl" alt="@item.ProductName"
+                                                     onerror="this.src='/images/no-image.png'"
+                                                     class="rounded-3 border" style="width: 64px; height: 64px; object-fit: cover;" />
+                                            }
+                                            else
+                                            {
+                                                <div class="rounded-3 d-flex align-items-center justify-content-center"
+                                                     style="width: 64px; height: 64px; background: #f3f4f6; color: #9ca3af;">
+                                                    <i class="fas fa-image fa-lg"></i>
+                                                </div>
+                                            }
+                                        </td>
+                                        <td>
+                                            <span class="fw-semibold text-dark">@item.ProductName</span>
+                                        </td>
+                                        <td class="text-center text-muted">@item.Price.ToString("N0") đ</td>
+                                        <td class="text-center">
+                                            <span class="qty-badge">@item.Quantity</span>
+                                        </td>
+                                        <td class="text-end fw-bold" style="color: #dc2626;">
+                                            @((item.Price * item.Quantity).ToString("N0")) đ
+                                        </td>
+                                    </tr>
+                                }
+                                <tr class="suborder-total">
+                                    <td colspan="4" class="text-end text-muted">
+                                        Tổng cộng đơn hàng @(subOrder.ShopName ?? "")
                                     </td>
-                                    <td class="text-center text-muted">@item.Price.ToString("N0") đ</td>
-                                    <td class="text-center">
-                                        <span class="qty-badge">@item.Quantity</span>
-                                    </td>
-                                    <td class="text-end fw-bold" style="color: #dc2626;">
-                                        @((item.Price * item.Quantity).ToString("N0")) đ
-                                    </td>
+                                    <td class="text-end fw-bold">@subOrder.TotalAmount.ToString("N0") đ</td>
                                 </tr>
                             }
                         </tbody>
@@ -222,7 +241,7 @@
                             <tr>
                                 <td colspan="4" class="text-end text-muted">
                                     Tổng cộng
-                                    <div class="small">gồm @Model.Items.Count loại sản phẩm</div>
+                                    <div class="small">gồm @Model.SubOrders.Sum(s => s.Items.Count) loại sản phẩm</div>
                                 </td>
                                 <td class="text-end total-amount">@Model.TotalAmount.ToString("N0") đ</td>
                             </tr>
