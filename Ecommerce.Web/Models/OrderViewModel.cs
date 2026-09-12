@@ -13,7 +13,7 @@ namespace Ecommerce.Web.ViewModels
         public string? Email { get; set;}
         public string? PhoneNumber { get; set; }
         public Address? Address { get; set; }
-        public IReadOnlyList<OrderItemViewModel> Items { get; set; } = [];
+        public IReadOnlyList<SubOrderViewModel> SubOrders { get; set; } = [];
         public decimal TotalAmount { get; set; }
         public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;
 
