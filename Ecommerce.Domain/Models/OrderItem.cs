@@ -9,14 +9,14 @@ namespace Ecommerce.Domain.Models
 {
     public class OrderItem
     {
-        public int Id { get; set; }
-        public int SubOrderId { get; set; }
-        public SubOrder? SubOrder { get; set; }
-        public string? ImageUrl { get; set; }
-        public int ProductId { get; set; }
-        public string? ProductName { get; set; }
-        public decimal Price { get; set; } 
-        public int Quantity { get; set; }
+        public int Id { get; private set; }
+        public int SubOrderId { get; private set; }
+        public SubOrder? SubOrder { get; private set; }
+        public string? ImageUrl { get; private set; }
+        public int ProductId { get; private set; }
+        public string? ProductName { get; private set; }
+        public decimal Price { get; private set; } 
+        public int Quantity { get; private set; }
 
 
         public void IncreasingQuantity(int quantity) => Quantity += quantity;
