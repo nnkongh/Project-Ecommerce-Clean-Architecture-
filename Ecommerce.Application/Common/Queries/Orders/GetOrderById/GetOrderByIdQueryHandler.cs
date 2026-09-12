@@ -25,7 +25,7 @@ namespace Ecommerce.Application.Common.Queries.Orders.GetOrderById
 
         public async Task<Result<OrderModel>> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken)
         {
-            var order = await _orderRepo.GetOrderByIdAsync(request.orderId);
+            var order = await _orderRepo.GetByIdWithSubOrdersAsync(request.orderId);
             if(order == null)
             {
                 return Result.Failure<OrderModel>(new Error("", "Order is not found"));
