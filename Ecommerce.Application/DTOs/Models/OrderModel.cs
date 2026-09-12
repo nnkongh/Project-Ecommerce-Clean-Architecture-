@@ -17,7 +17,7 @@ namespace Ecommerce.Application.DTOs.Models
         public string? Email { get; set; }
         public decimal TotalAmount { get; set; }
         public DateTime OrderDate { get; set; }
-        public IReadOnlyList<OrderItemModel> Items { get; set; } = [];
+        public IReadOnlyList<SubOrderModel> SubOrders { get; set; } = [];
         public OrderStatus OrderStatus { get; set; }
     }
 }
