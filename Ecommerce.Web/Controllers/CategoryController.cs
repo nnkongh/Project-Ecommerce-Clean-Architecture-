@@ -35,7 +35,7 @@ namespace Ecommerce.Web.Controllers
                 return RedirectToAction("Login", "Auth");
             }
 
-            var products = await _productClient.GetAllProductsByPaginationAsync(productPage, 8);
+            var products = await _productClient.GetAllProductsByPaginationAsync(productPage, pageSize);
 
             ViewBag.DisplayProducts = products;
             return View(result.Value);
@@ -57,6 +57,7 @@ namespace Ecommerce.Web.Controllers
             ViewBag.ParentCategoryId = id;
             ViewBag.SelectedCategoryId = selectedCategoryId;
             ViewBag.TotalProducts = detail.DisplayProducts?.TotalItems ?? 0;
+            ViewBag.DisplayProducts = detail.DisplayProducts;
 
             return View(categories);
         }
