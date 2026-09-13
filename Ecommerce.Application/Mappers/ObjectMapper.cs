@@ -16,7 +16,10 @@ namespace Ecommerce.Application.Mappers
     {
        public ObjectMapper()
         {
-            CreateMap<Product, ProductModel>().ReverseMap();
+            CreateMap<Product, ProductModel>()
+                .ForMember(d => d.ShopName, opt => opt.MapFrom(src => src.Shop != null ? src.Shop.Name : null))
+                .ForMember(d => d.ShopImageUrl, opt => opt.MapFrom(src => src.Shop != null ? src.Shop.ImageUrl : null))
+                .ReverseMap();
             CreateMap<Order, OrderModel>().ReverseMap();
             CreateMap<SubOrder, SubOrderModel>().ReverseMap();
             CreateMap<Category, CategoryModel>().ReverseMap();
