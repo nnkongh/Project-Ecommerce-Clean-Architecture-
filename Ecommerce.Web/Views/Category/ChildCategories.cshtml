@@ -112,19 +112,16 @@
         </div>
 
         @{
-            var allProducts = new List<ProductViewModel>();
-            if (Model != null)
-            {
-                allProducts = (selectedCategoryId.HasValue && selectedCategory != null)
-                    ? (selectedCategory.Products ?? new List<ProductViewModel>()).ToList()
-                    : Model.SelectMany(c => c.Products ?? new List<ProductViewModel>()).ToList();
-            }
+            var displayProducts = ViewBag.DisplayProducts as PagedResult<ProductModel>;
+            var products = (displayProducts?.Items ?? Array.Empty<ProductModel>()).ToList();
+            var pageIndex = displayProducts?.PageIndex ?? 1;
+            var totalPages = displayProducts?.TotalPages ?? 0;
         }
 
-        @if (allProducts.Any())
+        @if (products.Any())
         {
             <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
-                @foreach (var product in allProducts)
+                @foreach (var product in products)
                 {
                     <div class="col">
                         <div class="product-card">
@@ -166,6 +163,30 @@
                     </div>
                 }
             </div>
+
+            @if (totalPages > 1)
+            {
+                <nav class="mt-4 mb-4">
+                    <ul class="pagination pagination-custom justify-content-center">
+                        <li class="page-item @(pageIndex <= 1 ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("ChildCategories", "Category", new { id = parentId, selectedCategoryId = selectedCategoryId, page = pageIndex - 1 })">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                        @for (var i = 1; i <= totalPages; i++)
+                        {
+                            <li class="page-item @(i == pageIndex ? "active" : "")">
+                                <a class="page-link" href="@Url.Action("ChildCategories", "Category", new { id = parentId, selectedCategoryId = selectedCategoryId, page = i })">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(pageIndex >= totalPages ? "disabled" : "")">
+                            <a class="page-link" href="@Url.Action("ChildCategories", "Category", new { id = parentId, selectedCategoryId = selectedCategoryId, page = pageIndex + 1 })">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            }
         }
         else
         {
