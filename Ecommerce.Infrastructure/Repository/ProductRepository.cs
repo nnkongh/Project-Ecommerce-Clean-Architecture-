@@ -36,9 +36,17 @@ namespace Ecommerce.Infrastructure.Repository
         {
             return await _context.Products
                 .Include(p => p.Category)
+                .Include(p => p.Shop)
                 .OrderByDescending(p => p.Id)
                 .Where(p => p.ShopId == shopId)
                 .ToListAsync();
+        }
+
+        public override async Task<Product?> GetByIdAsync(int id)
+        {
+            return await _context.Products
+                .Include(p => p.Shop)
+                .FirstOrDefaultAsync(p => p.Id == id);
         }
     }
 }

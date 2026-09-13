@@ -26,5 +26,12 @@ namespace Ecommerce.Infrastructure.Repository
         {
             return await _context.Shops.FirstOrDefaultAsync(s => s.UserId == userId);
         }
+
+        public override async Task<Shop?> GetByIdAsync(int id)
+        {
+            return await _context.Shops
+                .Include(s => s.Address)
+                .FirstOrDefaultAsync(s => s.Id == id);
+        }
     }
 }
