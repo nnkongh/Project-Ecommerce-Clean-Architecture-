@@ -1,4 +1,5 @@
 using Ecommerce.Application.Common.Command.Shops;
+using Ecommerce.Application.Common.Queries.Shops.GetShopById;
 using Ecommerce.Application.Common.Queries.Shops.GetShopByUserId;
 using Ecommerce.Web.ViewModels.ApiResponse;
 using Ecommerce.WebApi.Controllers.BaseController;
@@ -28,6 +29,17 @@ namespace Ecommerce.WebApi.Controllers.Shops
             return result.IsSuccess
                 ? Ok(new ApiResponse<ShopModel> { IsSuccess = true, Value = result.Value })
                 : Ok(new ApiResponse<ShopModel> { IsSuccess = false, Error = result.Error });
+        }
+
+        [HttpGet("{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetShopById(int id)
+        {
+            var query = new GetShopByIdQuery(id);
+            var result = await Sender.Send(query);
+            return result.IsSuccess
+                ? Ok(new ApiResponse<ShopModel> { IsSuccess = true, Value = result.Value })
+                : NotFound(new ApiResponse<ShopModel> { IsSuccess = false, Error = result.Error });
         }
 
         [HttpPost]
