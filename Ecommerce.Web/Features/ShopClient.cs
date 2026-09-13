@@ -32,6 +32,20 @@ namespace Ecommerce.Web.Features
             return ApiResponse<ShopViewModel>.Success(mapped);
         }
 
+        public async Task<ApiResponse<ShopViewModel>> GetShopByIdAsync(int id)
+        {
+            var response = await _httpClient.GetAsync($"shops/{id}");
+            var result = await response.Content.ReadFromJsonAsync<ApiResponse<ShopModel>>();
+
+            if (result == null || !result.IsSuccess)
+            {
+                return ApiResponse<ShopViewModel>.Fail(result?.Error?.Message ?? "Không tìm thấy cửa hàng");
+            }
+
+            var mapped = _mapper.Map<ShopViewModel>(result.Value);
+            return ApiResponse<ShopViewModel>.Success(mapped);
+        }
+
         public async Task<ApiResponse<ShopViewModel>> CreateShopAsync(string name)
         {
             var response = await _httpClient.PostAsJsonAsync("shops", new { Name = name });
