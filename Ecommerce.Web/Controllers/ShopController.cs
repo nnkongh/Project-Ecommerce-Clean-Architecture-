@@ -138,6 +138,31 @@ namespace Ecommerce.Web.Controllers
             return View(orders.Value);
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> Details(int id)
+        {
+            var shopResult = await _shopClient.GetShopByIdAsync(id);
+            if (!shopResult.IsSuccess)
+            {
+                TempData["Failed"] = shopResult.Error?.Message ?? "Không tìm thấy cửa hàng";
+                return RedirectToAction("Index", "Home");
+            }
+
+            var model = new ShopDetailsViewModel
+            {
+                Shop = shopResult.Value,
+            };
+
+            var productsResult = await _productClient.GetAllProductsByShopIdAsync(id);
+            if (productsResult.IsSuccess)
+            {
+                model.Products = productsResult.Value.ToList();
+            }
+
+            return View(model);
+        }
+
         [HttpPost]
         public async Task<IActionResult> AcceptOrder(int orderId)
         {
