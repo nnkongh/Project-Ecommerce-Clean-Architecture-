@@ -20,4 +20,10 @@ namespace Ecommerce.Web.ViewModels
         public List<SelectListItem> ParentCategories { get; set; } = new();
         public List<CategoryViewModel>? AllCategories { get; set; } = new();
     }
+
+    public class ShopDetailsViewModel
+    {
+        public ShopViewModel? Shop { get; set; }
+        public List<ProductViewModel> Products { get; set; } = new();
+    }
 }

@@ -12,6 +12,9 @@ namespace Ecommerce.Web.ViewModels
         public string? ImageUrl { get; set; }
         public decimal Price { get; set; }
         public int Stock { get; set; }
+        public int? ShopId { get; set; }
+        public string? ShopName { get; set; }
+        public string? ShopImageUrl { get; set; }
         public int? ParentCategoryId { get; set; }
         public int? ChildCategoryId { get; set; }
         public List<SelectListItem> ParentCategories { get; set; } = new();
