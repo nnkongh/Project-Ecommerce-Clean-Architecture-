@@ -16,6 +16,9 @@ namespace Ecommerce.Application.DTOs.Models
         public decimal Price { get; set; }
         public int Stock { get; set; }
         public int CategoryId { get; set; }
+        public int? ShopId { get; set; }
+        public string? ShopName { get; set; }
+        public string? ShopImageUrl { get; set; }
         public IEnumerable<ProductModel> Products { get; set; }
     }
 }
