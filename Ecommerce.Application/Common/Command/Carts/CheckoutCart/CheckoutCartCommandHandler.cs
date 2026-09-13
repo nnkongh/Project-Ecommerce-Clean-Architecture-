@@ -85,9 +85,9 @@ namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
                 if (!shopDict.TryGetValue(product.ShopId.Value, out var shop)) continue;
 
                 var subOrder = SubOrder.Create(order.Id, product.ShopId.Value, shop.Name);
+                subOrder.AddItem(product.ImageUrl,product.Name,product.Id,product.Price,item.Quantity);
                 order.AddSubOrder(subOrder);
                 product.AdjustStock(-item.Quantity);
-
                 notifiedShopIds.Add(product.ShopId.Value);
 
             }
