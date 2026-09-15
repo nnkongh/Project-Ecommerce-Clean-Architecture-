@@ -4,13 +4,6 @@
 // Write your JavaScript code.
 
 (function () {
-  function getCookie(name) {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-    return null;
-  }
-
   function updateBadge(count) {
     const badge = document.getElementById('notification-badge');
     if (!badge) return;
@@ -47,33 +40,46 @@
     loadRecent();
   }
 
+    async function getToken() {
+        const res = await fetch('Auth/GetAccessToken', { credentials: 'include' });
+        if (!res.ok) return null;
+        const data = await res.json();
+        return data.token;
+    }
   function initSignalR() {
     const bell = document.getElementById('notification-nav');
     if (!bell || typeof window.signalR === 'undefined') return;
 
-    const connection = new signalR.HubConnectionBuilder()
-      .withUrl(window.__API_BASE_URL__ + '/chatHub', {
-        accessTokenFactory: () => getCookie('access_token') || ''
-      })
+      const connection = new signalR.HubConnectionBuilder()
+          .withUrl('https://localhost:7021/chatHub', { accessTokenFactory: () => getToken() })
       .withAutomaticReconnect()
       .build();
 
-    connection.on('ReceiveNotification', function () {
+    connection.on('ReceiveNotification', function () {  
       loadNotifications();
-      try {
-        const list = document.getElementById('notification-dropdown-list');
-        if (list && list.scrollHeight) {
-          // Trigger a reload of the dropdown content in case it is open
-          loadRecent();
-        }
-      } catch (e) { }
     });
 
-    connection.start().catch(() => { });
+    connection.onreconnected(function () {
+      loadNotifications();
+    });
+
+    connection.onclose(function (err) {
+      if (err) console.warn('[notifications] SignalR closed', err);
+    });
+
+      connection.start()
+          .then(() => console.log('[SignalR] CONNECTED', new Date().toISOString()))
+          .catch(err => console.error('[SignalR] FAILED', err));
+
+      connection.on('ReceiveNotification', () => {
+          console.log('[SignalR] PUSH received', new Date().toISOString());
+          loadNotifications();
+      });
   }
 
   document.addEventListener('DOMContentLoaded', function () {
     loadNotifications();
     initSignalR();
+    //setInterval(loadNotifications, 30000);
   });
 })();
