@@ -1,8 +1,10 @@
 ﻿using Ecommerce.Application.Interfaces;
 using Ecommerce.Application.Services;
 using Ecommerce.Infrastructure.Dependency_Injection;
+using Ecommerce.Infrastructure.Interfaces;
 using Ecommerce.Infrastructure.Services;
 using Ecommerce.WebApi.Services;
+using System;
 
 namespace Ecommerce.WebApi.Dependencies
 {
@@ -22,7 +24,7 @@ namespace Ecommerce.WebApi.Dependencies
             services.AddJwtAuthentication(configuration);
             services.AddAdapterServices();
             services.AddPhotoService(configuration);
-            services.AddCors();
+            services.AddCORS();
             services.AddSignalRService();
             return services;
         }
@@ -35,7 +37,8 @@ namespace Ecommerce.WebApi.Dependencies
         public static IServiceCollection AddSignalRService(this IServiceCollection services)
         {
             services.AddSignalR();
-            services.AddScoped<INotificationService,NotificationService>();
+            services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<INotificationHubService, NotificationHubService>();
             return services;
         }
         public static IServiceCollection AddCORS(this IServiceCollection services)
