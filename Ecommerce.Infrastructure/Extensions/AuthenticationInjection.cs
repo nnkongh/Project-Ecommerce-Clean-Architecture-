@@ -37,6 +37,17 @@ namespace Ecommerce.Infrastructure.Dependency_Injection
                             Encoding.UTF8.GetBytes(jwtSettings["Key"]!)
                         )
                     };
+                    opt.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = ctx =>
+                        {
+                            var accessToken = ctx.Request.Query["access_token"];
+                            var path = ctx.HttpContext.Request.Path;
+                            if (!string.IsNullOrWhiteSpace(accessToken) && path.StartsWithSegments("/chatHub"))
+                                ctx.Token = accessToken;
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
          
             return services;
