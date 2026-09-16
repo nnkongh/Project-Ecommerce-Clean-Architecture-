@@ -296,5 +296,12 @@ namespace Ecommerce.Web.Controllers
             _cookieTokenService.RemoveTokenFromCookie();
             return RedirectToAction("Login", "Auth");
         }
+        [HttpGet]
+        public IActionResult GetAccessToken()
+        {
+            var token = Request.Cookies["access_token"];
+            if (string.IsNullOrEmpty(token)) return Unauthorized();
+            return Ok(new { token });
+        }
     }
 }
