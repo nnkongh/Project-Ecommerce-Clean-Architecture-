@@ -1,0 +1,399 @@
+@using Ecommerce.Domain.Enum
+@model Ecommerce.Web.ViewModels.NotificationDetailViewModel
+@{
+    ViewData["Title"] = $"Chi tiết thông báo #{Model.Notification.Id}";
+
+    var stepIndex = Model.Order?.OrderStatus switch
+    {
+        OrderStatus.Pending => 0,
+        OrderStatus.Processing => 1,
+        OrderStatus.Finished => 2,
+        OrderStatus.Rejected => 3,
+        _ => 0
+    };
+
+    string StatusClass(OrderStatus s) => s switch
+    {
+        OrderStatus.Pending => "st-pending",
+        OrderStatus.Processing => "st-processing",
+        OrderStatus.Finished => "st-finished",
+        OrderStatus.Rejected => "st-rejected",
+        _ => "st-default"
+    };
+    string StatusIcon(OrderStatus s) => s switch
+    {
+        OrderStatus.Pending => "fa-clock",
+        OrderStatus.Processing => "fa-rotate",
+        OrderStatus.Finished => "fa-circle-check",
+        OrderStatus.Rejected => "fa-xmark",
+        _ => "fa-circle"
+    };
+}
+
+<div class="notification-detail-page">
+    <div class="container py-5">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a asp-controller="Notification" asp-action="Index">Thông báo</a></li>
+                <li class="breadcrumb-item active">Chi tiết thông báo #@Model.Notification.Id</li>
+            </ol>
+        </nav>
+
+        <div class="notification-hero mb-4">
+            <div class="d-flex align-items-center gap-3">
+                <span class="noti-icon" style="background: linear-gradient(135deg, #6366f1, #a855f7); box-shadow: 0 6px 14px rgba(99,102,241,.3);">
+                    <i class="fas fa-bell"></i>
+                </span>
+                <div class="flex-grow-1">
+                    <h1 class="h3 mb-1 fw-bold text-dark">@Model.Notification.Title</h1>
+                    <div class="small text-muted">
+                        <i class="far fa-calendar-alt me-1"></i>@Model.Notification.CreatedDate.ToString("dd/MM/yyyy HH:mm")
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Notification.Description))
+        {
+            <div class="card border-0 rounded-4 mb-4">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-start gap-3">
+                        <span class="noti-desc-icon"><i class="fas fa-info-circle"></i></span>
+                        <p class="mb-0 text-dark" style="font-size: 1.05rem; line-height: 1.7;">@Model.Notification.Description</p>
+                    </div>
+                </div>
+            </div>
+        }
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        @if (Model.Order == null)
+        {
+            <div class="card border-0 rounded-4 mb-4">
+                <div class="card-body text-center py-5">
+                    <div class="empty-icon mb-3"><i class="fas fa-receipt"></i></div>
+                    <h5 class="text-muted">Thông báo này không gắn liền với đơn hàng</h5>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card border-0 rounded-4 mb-4">
+                <div class="card-header bg-white border-0 rounded-top-4 pt-4 px-4 pb-0">
+                    <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <h2 class="h6 text-uppercase fw-bold text-muted small mb-0">
+                            <i class="fas fa-shopping-bag me-2"></i>Đơn hàng #@Model.Order.Id
+                        </h2>
+                        <span class="status-pill @StatusClass(Model.Order.OrderStatus)">
+                            <i class="fas @StatusIcon(Model.Order.OrderStatus)"></i>
+                            @switch (Model.Order.OrderStatus)
+                            {
+                                case OrderStatus.Pending:
+                                    <span class="ms-1">Chờ xử lý</span>
+                                    break;
+                                case OrderStatus.Processing:
+                                    <span class="ms-1">Đang xử lý</span>
+                                    break;
+                                case OrderStatus.Finished:
+                                    <span class="ms-1">Hoàn thành</span>
+                                    break;
+                                case OrderStatus.Rejected:
+                                    <span class="ms-1">Đã từ chối</span>
+                                    break;
+                                default:
+                                    <span class="ms-1">@Model.Order.OrderStatus</span>
+                                    break;
+                            }
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-body p-4">
+                    <div class="row g-3 mb-4">
+                        <div class="col-lg-4">
+                            <div class="info-box">
+                                <div class="info-label"><i class="fas fa-user-circle me-1"></i>Khách hàng</div>
+                                <div class="fw-semibold text-dark">@Model.Order.CustomerName</div>
+                                @if (!string.IsNullOrWhiteSpace(Model.Order.PhoneNumber))
+                                {
+                                    <div class="small text-muted"><i class="fas fa-phone me-1"></i>@Model.Order.PhoneNumber</div>
+                                }
+                                @if (!string.IsNullOrWhiteSpace(Model.Order.Email))
+                                {
+                                    <div class="small text-muted"><i class="fas fa-envelope me-1"></i>@Model.Order.Email</div>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="info-box">
+                                <div class="info-label"><i class="fas fa-map-marker-alt me-1"></i>Địa chỉ giao hàng</div>
+                                @if (Model.Order.Address != null)
+                                {
+                                    <div class="small text-muted mb-0">@Model.Order.Address.Street, @Model.Order.Address.Ward</div>
+                                    <div class="small text-muted mb-0">@Model.Order.Address.District, @Model.Order.Address.City</div>
+                                }
+                                else
+                                {
+                                    <div class="small text-muted">Không có thông tin</div>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-lg-4">
+                            <div class="info-box">
+                                <div class="info-label"><i class="fas fa-receipt me-1"></i>Tóm tắt</div>
+                                <div class="small text-muted">Ngày đặt: @Model.Order.OrderDate.ToString("dd/MM/yyyy HH:mm")</div>
+                                <div class="small text-muted">Số sản phẩm: @Model.Order.SubOrders.Sum(s => s.Items.Count)</div>
+                                @if (Model.ShopSubOrder != null)
+                                {
+                                    <div class="small text-muted">Cửa hàng: @Model.ShopSubOrder.ShopName</div>
+                                    <div class="fw-bold text-danger mt-1">Tổng: @Model.ShopSubOrder.TotalAmount.ToString("N0") đ</div>
+                                }
+                                else
+                                {
+                                    <div class="fw-bold text-danger mt-1">Tổng: @Model.Order.TotalAmount.ToString("N0") đ</div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="order-items mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div class="info-label mb-0"><i class="fas fa-shopping-bag me-1"></i>Sản phẩm đặt mua</div>
+                            @if (Model.ShopSubOrder != null)
+                            {
+                                <span class="item-count-badge">
+                                    <i class="fas fa-store me-1"></i>@Model.ShopSubOrder.ShopName - @Model.ShopSubOrder.Items.Count sản phẩm
+                                </span>
+                            }
+                        </div>
+
+                        @if (Model.ShopSubOrder != null)
+                        {
+                            <div class="items-table">
+                                @foreach (var item in Model.ShopSubOrder.Items)
+                                {
+                                    <div class="item-row">
+                                        <div class="item-thumb">
+                                            @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                            {
+                                                <img src="@item.ImageUrl" alt="@item.ProductName"
+                                                     onerror="this.src='/images/no-image.png'" />
+                                            }
+                                            else
+                                            {
+                                                <div class="no-img"><i class="fas fa-image"></i></div>
+                                            }
+                                        </div>
+                                        <div class="item-name flex-grow-1">
+                                            <span class="fw-semibold text-dark">@item.ProductName</span>
+                                        </div>
+                                        <div class="item-qty">x@(item.Quantity)</div>
+                                        <div class="item-price">@item.Price.ToString("N0") đ</div>
+                                        <div class="item-subtotal">@((item.Price * item.Quantity).ToString("N0")) đ</div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            @foreach (var subOrder in Model.Order.SubOrders)
+                            {
+                                <div class="mb-3">
+                                    <div class="fw-bold text-dark mb-2">
+                                        <i class="fas fa-store me-2"></i>@(subOrder.ShopName ?? "Cửa hàng")
+                                    </div>
+                                    <div class="items-table">
+                                        @foreach (var item in subOrder.Items)
+                                        {
+                                            <div class="item-row">
+                                                <div class="item-thumb">
+                                                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                                    {
+                                                        <img src="@item.ImageUrl" alt="@item.ProductName"
+                                                             onerror="this.src='/images/no-image.png'" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="no-img"><i class="fas fa-image"></i></div>
+                                                    }
+                                                </div>
+                                                <div class="item-name flex-grow-1">
+                                                    <span class="fw-semibold text-dark">@item.ProductName</span>
+                                                </div>
+                                                <div class="item-qty">x@(item.Quantity)</div>
+                                                <div class="item-price">@item.Price.ToString("N0") đ</div>
+                                                <div class="item-subtotal">@((item.Price * item.Quantity).ToString("N0")) đ</div>
+                                            </div>
+                                        }
+                                    </div>
+                                    <div class="d-flex justify-content-end mt-2">
+                                        <span class="text-muted small">Tạm tính: <strong class="text-dark">@subOrder.TotalAmount.ToString("N0") đ</strong></span>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+
+                    <div class="d-flex flex-wrap justify-content-between align-items-center pt-3 border-top gap-3">
+                        <a asp-controller="Notification" asp-action="Index" class="btn btn-outline-dark rounded-pill px-4">
+                            <i class="fas fa-arrow-left me-2"></i>Quay lại thông báo
+                        </a>
+
+                        <div class="d-flex gap-2">
+                            @if (Model.CanReject)
+                            {
+                                <form method="post" asp-action="RejectOrder"
+                                      onsubmit="return confirm('Bạn chắc chắn muốn từ chối đơn hàng #@Model.Order.Id?')">
+                                    <input type="hidden" name="notificationId" value="@Model.Notification.Id" />
+                                    <input type="hidden" name="orderId" value="@Model.Order.Id" />
+                                    <button type="submit" class="btn btn-ghost-reject rounded-pill px-4">
+                                        <i class="fas fa-xmark me-1"></i>Từ chối
+                                    </button>
+                                </form>
+                            }
+                            @if (Model.CanAccept)
+                            {
+                                <form method="post" asp-action="AcceptOrder">
+                                    <input type="hidden" name="notificationId" value="@Model.Notification.Id" />
+                                    <input type="hidden" name="orderId" value="@Model.Order.Id" />
+                                    <button type="submit" class="btn btn-ghost-confirm rounded-pill px-4">
+                                        <i class="fas fa-check me-1"></i>Chấp nhận đơn hàng
+                                    </button>
+                                </form>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .notification-detail-page {
+            background: radial-gradient(1200px 400px at 15% -50px, rgba(99,102,241,.08), transparent),
+                        radial-gradient(1000px 400px at 90% -100px, rgba(168,85,247,.06), transparent),
+                        #f6f7f9;
+            min-height: calc(100vh - 76px);
+        }
+
+        .breadcrumb { font-size: .9rem; }
+        .breadcrumb a { color: #6b7280; text-decoration: none; }
+        .breadcrumb a:hover { color: #111827; }
+
+        .notification-hero {
+            background: #fff;
+            border: 1px solid #eef0f3;
+            border-radius: 18px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 12px rgba(17,24,39,.05);
+        }
+
+        .noti-icon {
+            width: 50px; height: 50px; border-radius: 14px;
+            color: #fff; display: inline-flex; align-items: center;
+            justify-content: center; font-size: 1.1rem; flex-shrink: 0;
+        }
+
+        .noti-desc-icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            background: #eef2ff; color: #6366f1;
+            display: inline-flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .empty-icon {
+            width: 72px; height: 72px; border-radius: 50%;
+            background: #f3f4f6; color: #9ca3af;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; margin: 0 auto;
+        }
+
+        .info-box {
+            background: #fafbfc; border: 1px solid #eef0f3;
+            border-radius: 12px; padding: 1rem 1.15rem; height: 100%;
+        }
+        .info-label {
+            font-size: .75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .5px; color: #6b7280; margin-bottom: .35rem;
+        }
+
+        .status-pill {
+            display: inline-flex; align-items: center; border-radius: 999px;
+            padding: .4rem .95rem; font-size: .82rem; font-weight: 600;
+        }
+        .st-pending { background: #fffbeb; color: #b45309; }
+        .st-processing { background: #eff6ff; color: #1d4ed8; }
+        .st-finished { background: #ecfdf5; color: #047857; }
+        .st-rejected { background: #fef2f2; color: #dc2626; }
+        .st-default { background: #eef0f3; color: #4b5563; }
+
+        .item-count-badge {
+            background: #eef0f3; color: #374151; border-radius: 999px;
+            padding: .3rem .8rem; font-size: .78rem; font-weight: 600;
+            display: inline-flex; align-items: center;
+        }
+
+        .items-table {
+            border: 1px solid #eef0f3; border-radius: 14px;
+            overflow: hidden; background: #fafbfc;
+        }
+        .item-row {
+            display: flex; align-items: center; gap: 1rem;
+            padding: .65rem 1rem; border-bottom: 1px solid #eef0f3;
+            background: #fff;
+        }
+        .item-row:last-child { border-bottom: none; }
+        .item-thumb {
+            width: 52px; height: 52px; border-radius: 10px; overflow: hidden;
+            border: 1px solid #e5e7eb; flex-shrink: 0; background: #fff;
+        }
+        .item-thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .item-thumb .no-img {
+            width: 100%; height: 100%; display: flex;
+            align-items: center; justify-content: center;
+            color: #9ca3af; background: #f3f4f6;
+        }
+        .item-name { min-width: 0; font-size: .92rem; }
+        .item-qty { color: #6b7280; font-size: .85rem; flex-shrink: 0; }
+        .item-price { color: #6b7280; font-size: .85rem; width: 110px; text-align: right; flex-shrink: 0; }
+        .item-subtotal { color: #dc2626; font-weight: 700; width: 120px; text-align: right; flex-shrink: 0; }
+
+        .btn-ghost-confirm {
+            border: 1px solid #10b981; color: #047857; background: #fff;
+            border-radius: 10px; font-weight: 600; transition: all .2s;
+        }
+        .btn-ghost-confirm:hover {
+            background: #10b981; color: #fff; border-color: #10b981;
+            box-shadow: 0 4px 12px rgba(16,185,129,.3);
+        }
+
+        .btn-ghost-reject {
+            border: 1px solid #f87171; color: #dc2626; background: #fff;
+            border-radius: 10px; font-weight: 600; transition: all .2s;
+        }
+        .btn-ghost-reject:hover {
+            background: #f87171; color: #fff; border-color: #f87171;
+            box-shadow: 0 4px 12px rgba(248,113,113,.3);
+        }
+
+        @@media (max-width: 768px) {
+            .item-price { display: none; }
+            .item-subtotal { text-align: left; }
+        }
+    </style>
+}
