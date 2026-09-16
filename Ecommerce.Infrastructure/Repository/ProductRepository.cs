@@ -23,7 +23,7 @@ namespace Ecommerce.Infrastructure.Repository
         {
             return await _context.Products
                 .Include(p => p.Category)
-                .Where(p => p.ParentCategoryId == categoryId)
+                .Where(p => p.ParentCategoryId == categoryId || p.ChildCategoryId == categoryId)
                 .ToListAsync();
         }
 
