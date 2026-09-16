@@ -42,9 +42,9 @@ namespace Ecommerce.Application.Common.Command.Shops
             {
                 order.UpdateStatus(OrderStatus.Finished);
 
-                var noti = Notification.Create("Đơn hàng của bạn đã được xác nhận", "", shop.UserId);
+                var noti = Notification.Create("Đơn hàng của bạn đã được xác nhận", "", order.CustomerId, order.Id);
                 await _orderRepository.Update(order);
-                await _notificationService.SendNotificationAsync(order.CustomerId, noti);
+                await _notificationService.SendNotificationAsync(noti, cancellationToken);
                 await unitOfWork.SaveChangesAsync(cancellationToken);
                 return Result.Success();
             }

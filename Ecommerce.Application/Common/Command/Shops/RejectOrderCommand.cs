@@ -45,9 +45,9 @@ namespace Ecommerce.Application.Common.Command.Shops
 
             order.UpdateStatus(OrderStatus.Rejected);
 
-            var noti = Notification.Create("Đơn hàng đã bị từ chối", $"Đơn hàng #{order.Id} đã bị cửa hàng từ chối", order.CustomerId);
+            var noti = Notification.Create("Đơn hàng đã bị từ chối", $"Đơn hàng #{order.Id} đã bị cửa hàng từ chối", order.CustomerId, order.Id);
             await _orderRepository.Update(order);
-            await _notificationService.SendNotificationAsync(order.CustomerId, noti);
+            await _notificationService.SendNotificationAsync(noti, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return Result.Success();

@@ -46,8 +46,8 @@ namespace Ecommerce.Application.Common.Command.Orders.UpdateOrder
             order.UpdateStatus(Domain.Enum.OrderStatus.Processing);
             await _orderRepository.Update(order);
 
-            var noti = Notification.Create("Xác nhận đơn", "Đơn hàng của bạn đã được cửa hàng xác nhận",order.CustomerId);
-            await _notification.SendNotificationAsync(order.CustomerId, noti);
+            var noti = Notification.Create("Xác nhận đơn", "Đơn hàng của bạn đã được cửa hàng xác nhận",order.CustomerId, order.Id);
+            await _notification.SendNotificationAsync(noti, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             
             return Result.Success();

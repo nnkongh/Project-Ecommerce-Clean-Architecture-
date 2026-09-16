@@ -22,15 +22,17 @@ namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
         private readonly IUserRepository _userRepo;
         private readonly IShopRepository _shopRepo;
         private readonly INotificationService _notificationService;
+        private readonly INotificationRepository _notificationRepository;
         private readonly IUnitOfWork _uow;
         private readonly IMapper _mapper;
-        public CreateOrderCommandHandler(IOrderRepository orderRepo, IProductRepository productRepo, IUserRepository userRepo, IShopRepository shopRepo, INotificationService notificationService, IMapper mapper, IUnitOfWork uow)
+        public CreateOrderCommandHandler(IOrderRepository orderRepo, IProductRepository productRepo, IUserRepository userRepo, IShopRepository shopRepo, INotificationService notificationService, INotificationRepository notificationRepository, IMapper mapper, IUnitOfWork uow)
         {
             _orderRepo = orderRepo;
             _productRepo = productRepo;
             _userRepo = userRepo;
             _shopRepo = shopRepo;
             _notificationService = notificationService;
+            _notificationRepository = notificationRepository;
             _mapper = mapper;
             _uow = uow;
         }
@@ -65,8 +67,9 @@ namespace Ecommerce.Application.Common.Command.Orders.CreateOrder
 
             if (shop != null)
             {
-                var noti = Notification.Create("Đơn hàng mới", $"Bạn có đơn hàng mới #{order.Id} từ khách hàng {user.UserName}", shop.UserId);
-                await _notificationService.SendNotificationAsync(shop.UserId, noti);
+                var noti = Notification.Create("Đơn hàng mới", $"Bạn có đơn hàng mới #{order.Id} từ khách hàng {user.UserName}", shop.UserId, order.Id);
+                await _notificationRepository.AddAsync(noti);
+                await _notificationService.SendNotificationAsync(noti, cancellationToken);
             }
 
             await _uow.SaveChangesAsync(cancellationToken);

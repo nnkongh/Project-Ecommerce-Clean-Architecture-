@@ -78,6 +78,7 @@ namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
             var shops = await _shopRepository.GetByIdsAsync(shopIds);
             var shopDict = shops.ToDictionary(p => p.Id);
 
+
             foreach (var item in cart.Items)
             {
                 if (!productDict.TryGetValue(item.ProductId, out var product ) || product.ShopId is null) continue;
@@ -97,15 +98,14 @@ namespace Ecommerce.Application.Common.Command.Carts.CheckoutCart
             cart.Clear();
             await _orderRepository.AddAsync(order);
             await _cartRepository.Delete(cart);
-
-            var notiTasks = notifiedShopIds.Select(async shopId =>
-            {
-                var shop = shopDict[shopId];
-                var noti = Notification.Create("Đơn hàng mới", $"Bạn có đơn hàng mới #{order.Id} từ khách hàng {u.UserName}", shop.UserId);
-                await _notificationService.SendNotificationAsync(shop.UserId, noti);
-            });
-            await Task.WhenAll(notiTasks);
             await _uow.SaveChangesAsync(cancellationToken);
+            foreach (var notiId in notifiedShopIds)
+            {
+                var shop = shopDict[notiId];
+                var noti = Notification.Create("Đơn hàng mới", $"Bạn có đơn hàng mới #{order.Id} từ khách hàng {u.UserName}", shop.UserId, order.Id);
+                await _notificationService.SendNotificationAsync(noti, cancellationToken);
+            }
+                
             return Result.Success(mapped);
         }
         private async Task<Result<User>> ValidatingUserInformation(string id)
