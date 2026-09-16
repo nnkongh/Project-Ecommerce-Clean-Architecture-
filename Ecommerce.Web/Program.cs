@@ -2,7 +2,6 @@
 using Ecommerce.Infrastructure;
 using Ecommerce.Infrastructure.Dependency_Injection;
 using Ecommerce.Infrastructure.Mapper;
-using Ecommerce.Infrastructure.Services;
 using Ecommerce.Web.Dependencies;
 using Ecommerce.Web.Exceptions;
 
