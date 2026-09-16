@@ -1580,6 +1580,13 @@ main {
   font-weight: 700;
   color: #111827;
   margin-bottom: 0.2rem;
+  text-decoration: none;
+  display: block;
+  transition: color 0.15s;
+}
+
+.notification-title:hover {
+  color: #6366f1;
 }
 
 .notification-desc {
