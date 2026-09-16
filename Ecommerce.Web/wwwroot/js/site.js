@@ -50,17 +50,20 @@
     const bell = document.getElementById('notification-nav');
     if (!bell || typeof window.signalR === 'undefined') return;
 
+    const baseUrl = window.__API_BASE_URL__ || 'https://localhost:7021';
+
       const connection = new signalR.HubConnectionBuilder()
-          .withUrl('https://localhost:7021/chatHub', { accessTokenFactory: () => getToken() })
-      .withAutomaticReconnect()
+          .withUrl(`${baseUrl}/chatHub`, { accessTokenFactory: () => getToken() })
+      .withAutomaticReconnect([0, 2000, 5000, 10000, 30000])
+      .configureLogging(signalR.LogLevel.Information)
       .build();
 
-    connection.on('ReceiveNotification', function () {  
+    connection.on('ReceiveNotification', function () {
       loadNotifications();
     });
 
     connection.onreconnected(function () {
-      loadNotifications();
+        loadNotifications();
     });
 
     connection.onclose(function (err) {
@@ -70,16 +73,17 @@
       connection.start()
           .then(() => console.log('[SignalR] CONNECTED', new Date().toISOString()))
           .catch(err => console.error('[SignalR] FAILED', err));
-
-      connection.on('ReceiveNotification', () => {
-          console.log('[SignalR] PUSH received', new Date().toISOString());
-          loadNotifications();
-      });
   }
 
   document.addEventListener('DOMContentLoaded', function () {
     loadNotifications();
     initSignalR();
-    //setInterval(loadNotifications, 30000);
+    setInterval(loadNotifications, 30000);
+
+    document.addEventListener('visibilitychange', function () {
+      if (document.visibilityState === 'visible') {
+        loadNotifications();
+      }
+    });
   });
 })();
