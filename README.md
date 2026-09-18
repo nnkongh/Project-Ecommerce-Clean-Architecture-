@@ -24,7 +24,7 @@
 ### Sử dụng Docker (khuyến nghị)
 
 ```bash
-git clone https://github.com/nnkongh/Project-Ecommerce-Clean-Architecture
+git clone https://github.com/nnkongh/Ecommerce-FullStack.git
 cd FINAL_PROJECT
 docker compose up --build
 ```
