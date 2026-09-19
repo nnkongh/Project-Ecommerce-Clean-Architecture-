@@ -6,7 +6,9 @@
 - Quản lý thông tin người dùng
 - Tạo, xóa, sửa sản phẩm
 - Đặt hàng, thêm vào giỏ hàng, thêm vào yêu thích
-- Bình luận về sản phẩm
+- Bình luận và đánh giá về sản phẩm
+- Tạo cửa hàng
+- Thông báo cho chủ cửa hàng khi sản phẩm được đặt hàng
 
 
 ## Công nghệ sử dụng
@@ -24,7 +26,7 @@
 ### Sử dụng Docker (khuyến nghị)
 
 ```bash
-git clone https://github.com/nnkongh/Project-Ecommerce-Clean-Architecture
+git clone https://github.com/nnkongh/Ecommerce-FullStack.git
 cd FINAL_PROJECT
 docker compose up --build
 ```
